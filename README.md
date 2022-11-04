@@ -27,13 +27,13 @@ These algorithms can be analysed using
 [this parent repository].
 Together, these repos can be used to investigate the effectivity of various
 [brain-adaptation] mechanisms applied to these algorithms, in order to increase
-their \[radiation\] robustness. You can run it on various [backends], as well 
+their \[radiation\] robustness. You can run it on various [backends], as well
 as on a custom LIF-neuron simulator.
 
 ## Algorithms
 
 An overview is included of the implemented SNN algorithms and their
-respective compatibilities with [brain-adaptation], \[radiation\] and 
+respective compatibilities with [brain-adaptation], \[radiation\] and
 [backends] implementations:
 
 | Algorithm                            | Encoding | Adaptation | Radiation    | Backend                      |
