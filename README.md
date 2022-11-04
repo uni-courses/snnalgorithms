@@ -4,7 +4,6 @@
 [![License: AGPL v3][agpl3_badge]](https://www.gnu.org/licenses/agpl-3.0)
 [![Code Style: Black][black_badge]](https://github.com/ambv/black)
 [![Code Coverage][codecov_badge]](https://codecov.io/gh/a-t-0/snnalgos)
-[![CICD: GitLab CI][build_status]](https://github.com/a-t-0/snnalgos)
 
 This is a library of Spiking Neural Network algorithms (SNNs), along with their
 regular/normal/Neumann implementation. to their default/Neumann implementations.
