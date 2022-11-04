@@ -3,7 +3,7 @@
 [![Python 3.10][python_badge]](https://www.python.org/downloads/release/python-3106/)
 [![License: AGPL v3][agpl3_badge]](https://www.gnu.org/licenses/agpl-3.0)
 [![Code Style: Black][black_badge]](https://github.com/ambv/black)
-[![Code Coverage][codecov_badge]](https://codecov.io/gh/skilkis/numfoil)
+[![Code Coverage][codecov_badge]](https://codecov.io/gh/a-t-0/snnalgos)
 [![CICD: GitLab CI][build_status]](https://github.com/a-t-0/snnalgos)
 
 This is a library of Spiking Neural Network algorithms (SNNs), along with their
@@ -27,21 +27,15 @@ sparse coding, population coding and/or rate coding.
 These algorithms can be analysed using
 [this parent repository].
 Together, these repos can be used to investigate the effectivity of various
-brain-adaptation mechanisms applied to these algorithms, in order to increase
-their radiation robustness. You can run it on various [backends], as well as on
+[brain-adaptation] mechanisms applied to these algorithms, in order to increase
+their [radiation] robustness. You can run it on various [backends], as well as on
 a custom LIF-neuron simulator.
 
 ## Algorithms
 
-The algorithms in this library can be enhanced with
-[brain-adaptation] mechanisms
-to increase their radiation robustness for space applications. These [simulated
-radiation effects][simulated radiation effects] can also be applied
-to the SNNs in these algorithms. The algorithms can be simulated on multiple
-backends.
-
-Hence, an overview is included of the implemented SNN algorithms and their
-respective compatibilities with adaptation and radiation implementations:
+An overview is included of the implemented SNN algorithms and their
+respective compatibilities with [brain-adaptation], [radiation] and [backends]
+implementations:
 
 | Algorithm                            | Encoding | Adaptation | Radiation    | Backend                      |
 | ------------------------------------ | -------- | ---------- | ------------ | ---------------------------- |
