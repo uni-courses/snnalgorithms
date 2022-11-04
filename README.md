@@ -1,6 +1,6 @@
 # networkx-to-lava-nc
 
-This is a libary of Spiking Neural Network algorithms (SNNs), along with their
+This is a library of Spiking Neural Network algorithms (SNNs), along with their
 regular/normal/Neumann implementation. to their default/Neumann implementations.
 The user can specify an SNN and "normal" algorithm which take as input a
 networkx graph, and compute some graph property as output. The output of the
@@ -14,7 +14,7 @@ SNN is then compared to the "normal" algorithm as "ground truth", in terms of:
   mainly relevant for the additions of brain adaptation and simulated radiation.
 
 Different SNN implementations may use different encoding schemes, such as
-sparse coding, population coding and/or rate coding. 
+sparse coding, population coding and/or rate coding.
 
 ## Parent Repository
 
@@ -27,21 +27,29 @@ a custom LIF-neuron simulator.
 
 ## Algorithms
 
-The algorithms in this library can be enhanced with 
+The algorithms in this library can be enhanced with
 [brain-adaptation](https://github.com/a-t-0/snnadaptation) mechanisms
 to increase their radiation robustness for space applications. These [simulated
-radiation effects](https://github.com/a-t-0/snnradiation) can also be applied 
+radiation effects](https://github.com/a-t-0/snnradiation) can also be applied
 to the SNNs in these algorithms. The algorithms can be simulated on multiple
 backends.
 
- Hence, an overview is included of the implemented SNN algorithms and their
+Hence, an overview is included of the implemented SNN algorithms and their
 respective compatibilities with adaptation and radiation implementations:
 
-| Algorithm                                	| Encoding 	| Adaptation 	| Radiation    	| Backend                      	|
-|------------------------------------------	|----------	|------------	|--------------	|------------------------------	|
-| Minimum Dominating Set Approximation 	    | Sparse   	| Redundancy 	| Neuron Death 	| - networkx LIF<br>- Lava LIF 	|
-|                                          	|          	|            	|              	|                              	|
-|                                          	|          	|            	|              	|                              	|
+| Algorithm                            | Encoding | Adaptation | Radiation    | Backend                      |
+| ------------------------------------ | -------- | ---------- | ------------ | ---------------------------- |
+| Minimum Dominating Set Approximation | Sparse   | Redundancy | Neuron Death | - networkx LIF<br>- Lava LIF |
+| Some Algorithm Approximation         | Sparse   | Redundancy | Neuron Death | - networkx LIF<br>- Lava LIF |
+|                                      |          |            |              |                              |
+
+retry
+| Algorithm         | Encoding | Adaptation | Radiation    | Backend       |
+| ------------------| -------- | ---------- | ------------ | ------------- |
+| Minimum Dominating| Sparse   | Redundancy | Neuron Death | - networkx LIF|
+| Set Approximation | Sparse   | Redundancy | Neuron Death | - Lava LIF    |
+| Some Algorithm    | Sparse   | Redundancy | Neuron Death | - networkx LIF|
+|                   |          |            |              |               |
 
 ### Minimum Dominating Set Approximation
 
