@@ -33,7 +33,7 @@ as on a custom LIF-neuron simulator.
 ## Algorithms
 
 An overview is included of the implemented SNN algorithms and their
-respective compatibilities with [brain-adaptation], \[radiation\] and
+respective compatibilities with [brain-adaptation], [radiation] and
 [backends] implementations:
 
 | Algorithm                            | Encoding | Adaptation | Radiation    | Backend                      |
@@ -84,4 +84,5 @@ the first round:
 [brain-adaptation]: https://github.com/a-t-0/snnadaptation
 [codecov_badge]: https://codecov.io/gh/a-t-0/snn/branch/main/graph/badge.svg
 [python_badge]: https://img.shields.io/badge/python-3.10-blue.svg
+[radiation]: https://github.com/a-t-0/snnradiation
 [this parent repository]: https://github.com/a-t-0/snncompare
