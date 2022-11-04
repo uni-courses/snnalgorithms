@@ -27,14 +27,14 @@ These algorithms can be analysed using
 [this parent repository].
 Together, these repos can be used to investigate the effectivity of various
 [brain-adaptation] mechanisms applied to these algorithms, in order to increase
-their [radiation] robustness. You can run it on various [backends], as well as on
-a custom LIF-neuron simulator.
+their \[radiation\] robustness. You can run it on various [backends], as well 
+as on a custom LIF-neuron simulator.
 
 ## Algorithms
 
 An overview is included of the implemented SNN algorithms and their
-respective compatibilities with [brain-adaptation], [radiation] and [backends]
-implementations:
+respective compatibilities with [brain-adaptation], \[radiation\] and 
+[backends] implementations:
 
 | Algorithm                            | Encoding | Adaptation | Radiation    | Backend                      |
 | ------------------------------------ | -------- | ---------- | ------------ | ---------------------------- |
@@ -82,8 +82,6 @@ the first round:
 [backends]: https://github.com/a-t-0/snnbackends
 [black_badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [brain-adaptation]: https://github.com/a-t-0/snnadaptation
-[build_status]: https://github.com/a-t-0/snnalgos/build/badge.svg
 [codecov_badge]: https://codecov.io/gh/a-t-0/snn/branch/main/graph/badge.svg
 [python_badge]: https://img.shields.io/badge/python-3.10-blue.svg
-[simulated radiation effects]: https://github.com/a-t-0/snnradiation
 [this parent repository]: https://github.com/a-t-0/snncompare
