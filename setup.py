@@ -1,4 +1,4 @@
-"""Packaging logic for snnalgos."""
+"""Packaging logic for snnalgorithms."""
 from __future__ import annotations
 
 import os
