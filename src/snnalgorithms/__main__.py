@@ -3,11 +3,8 @@ that invokes this script."""
 
 # Import code belonging to this project.
 
-from src.snnalgorithms.get_alg_configs import (
-    get_algo_configs,
-    verify_algo_configs,
-)
-from src.snnalgorithms.population.MDSA import MDSA
+from .get_alg_configs import get_algo_configs, verify_algo_configs
+from .population.MDSA import MDSA
 
 mdsa = MDSA(list(range(0, 4, 1)))
 mdsa_configs = get_algo_configs(mdsa.__dict__)

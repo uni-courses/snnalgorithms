@@ -4,8 +4,8 @@ from typing import Any, List, Union
 
 from typeguard import typechecked
 
-from src.snnalgorithms.get_alg_configs import verify_algo_configs
-from src.snnalgorithms.helper import assert_parameter_is_list
+from .get_alg_configs import verify_algo_configs
+from .helper import assert_parameter_is_list
 
 
 @typechecked

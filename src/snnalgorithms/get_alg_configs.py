@@ -4,8 +4,8 @@ from typing import Any, Dict, List
 
 from typeguard import typechecked
 
-from src.snnalgorithms.population.DUMMY import DUMMY, DUMMY_config
-from src.snnalgorithms.population.MDSA import MDSA, MDSA_config
+from .population.DUMMY import DUMMY, DUMMY_config
+from .population.MDSA import MDSA, MDSA_config
 
 
 @typechecked
