@@ -4,7 +4,7 @@ from typing import List
 
 from typeguard import typechecked
 
-from ..helper import assert_parameter_is_list
+from snnalgorithms.helper import assert_parameter_is_list
 
 
 # pylint: disable=R0903

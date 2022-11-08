@@ -6,7 +6,7 @@ import unittest
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs, verify_algo_configs
-from snnalgorithms.population.DUMMY import DUMMY
+from snnalgorithms.sparse.DUMMY.DUMMY import DUMMY
 
 
 class Test_dummy(unittest.TestCase):

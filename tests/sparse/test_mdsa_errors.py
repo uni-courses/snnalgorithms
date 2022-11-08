@@ -6,7 +6,7 @@ import unittest
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs, verify_algo_configs
-from snnalgorithms.population.MDSA import MDSA
+from snnalgorithms.sparse.MDSA.MDSA import MDSA
 
 
 class Test_mdsa(unittest.TestCase):

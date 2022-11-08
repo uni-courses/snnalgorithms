@@ -4,7 +4,7 @@ that invokes this script."""
 # Import code belonging to this project.
 
 from .get_alg_configs import get_algo_configs, verify_algo_configs
-from .population.MDSA import MDSA
+from .sparse.MDSA.MDSA import MDSA
 
 mdsa = MDSA(list(range(0, 4, 1)))
 mdsa_configs = get_algo_configs(mdsa.__dict__)

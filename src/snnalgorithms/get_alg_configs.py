@@ -4,8 +4,8 @@ from typing import Any, Dict, List
 
 from typeguard import typechecked
 
-from .population.DUMMY import DUMMY, DUMMY_config
-from .population.MDSA import MDSA, MDSA_config
+from .sparse.DUMMY.DUMMY import DUMMY, DUMMY_config
+from .sparse.MDSA.MDSA import MDSA, MDSA_config
 
 
 @typechecked

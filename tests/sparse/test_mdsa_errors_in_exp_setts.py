@@ -16,7 +16,7 @@ from snncompare.exp_setts.verify_experiment_settings import (
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs, verify_algo_configs
-from snnalgorithms.population.MDSA import MDSA
+from snnalgorithms.sparse.MDSA.MDSA import MDSA
 
 
 class Test_mdsa(unittest.TestCase):
