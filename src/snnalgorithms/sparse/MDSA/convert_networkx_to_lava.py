@@ -9,11 +9,10 @@ import numpy as np
 from lava.proc.dense.process import Dense
 from lava.proc.lif.process import LIF
 from networkx.classes.digraph import DiGraph
-from typeguard import typechecked
-
 from snnbackends.networkx.verify_graph_is_networkx_snn import (
     assert_synapse_properties_are_specified,
 )
+from typeguard import typechecked
 
 
 @typechecked
