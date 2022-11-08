@@ -2,14 +2,13 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import networkx as nx
-from typeguard import typechecked
-
-from snnalgorithms.sparse.MDSA.convert_networkx_to_lava import (
+from snnbackends.lava.convert_networkx_to_lava import (
     add_neuron_to_dict,
     add_synapse_between_nodes,
     create_neuron_from_node,
     node_is_converted,
 )
+from typeguard import typechecked
 
 
 @typechecked
