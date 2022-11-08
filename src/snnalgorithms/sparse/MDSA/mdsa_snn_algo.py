@@ -5,7 +5,7 @@ from typing import List
 
 import networkx as nx
 from networkx.classes.graph import Graph
-from snncompare.graph_generation.helper_network_structure import (
+from snnalgorithms.helper_network_structure import (
     create_synapses_and_spike_dicts,
 )
 from snncompare.helper import generate_list_of_n_random_nrs, get_y_position
