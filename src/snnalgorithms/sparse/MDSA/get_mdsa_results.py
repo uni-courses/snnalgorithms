@@ -11,9 +11,9 @@ These results are returned in the form of a dict.
 from typing import Dict
 
 import networkx as nx
+from snncompare.helper import get_sim_duration
 from typeguard import typechecked
 
-from snncompare.helper import get_sim_duration
 from snnalgorithms.sparse.MDSA.get_alipour_nodes import get_alipour_nodes
 
 

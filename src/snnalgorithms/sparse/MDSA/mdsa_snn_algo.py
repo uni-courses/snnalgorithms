@@ -5,11 +5,12 @@ from typing import List
 
 import networkx as nx
 from networkx.classes.graph import Graph
+from snncompare.helper import generate_list_of_n_random_nrs, get_y_position
+from typeguard import typechecked
+
 from snnalgorithms.helper_network_structure import (
     create_synapses_and_spike_dicts,
 )
-from snncompare.helper import generate_list_of_n_random_nrs, get_y_position
-from typeguard import typechecked
 
 
 @typechecked

@@ -4,9 +4,8 @@ from typing import Any, Dict, List, Tuple, Union
 
 import networkx as nx
 import pylab as plt  # TODO: verify not matplotlib.
-from typeguard import typechecked
-
 from snncompare.export_results.Plot_to_tex import Plot_to_tex
+from typeguard import typechecked
 
 
 @typechecked

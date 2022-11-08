@@ -3,13 +3,12 @@ et al."""
 from typing import Any, Dict
 
 import networkx as nx
-from typeguard import typechecked
-
 from snncompare.helper import (
     compute_mark,
     compute_marks_for_m_larger_than_one,
     set_node_default_values,
 )
+from typeguard import typechecked
 
 
 # pylint: disable=R0913
