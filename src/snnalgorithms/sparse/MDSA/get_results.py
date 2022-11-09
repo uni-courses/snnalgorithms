@@ -13,7 +13,7 @@ from typeguard import typechecked
 
 # pylint: disable=R0913
 @typechecked
-def get_alipour_nodes(
+def get_results(
     input_graph: nx.Graph,
     iteration: int,
     m_val: int,

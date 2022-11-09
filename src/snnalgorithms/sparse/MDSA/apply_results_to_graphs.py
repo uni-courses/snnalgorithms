@@ -14,7 +14,7 @@ import networkx as nx
 from snncompare.helper import get_sim_duration
 from typeguard import typechecked
 
-from snnalgorithms.sparse.MDSA.get_alipour_nodes import get_alipour_nodes
+from snnalgorithms.sparse.MDSA.get_results import get_results
 
 
 @typechecked
@@ -31,7 +31,7 @@ def set_mdsa_snn_results(
 
     # Get Alipour count.
     # Compute the count for each node according to Alipour et al.'s algorithm.
-    alipour_counter_marks = get_alipour_nodes(
+    alipour_counter_marks = get_results(
         input_graph=stage_2_graphs["input_graph"],
         iteration=run_config["iteration"],
         m_val=m_val,

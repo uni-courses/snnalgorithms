@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from typeguard import typechecked
 
 from .sparse.DUMMY.DUMMY import DUMMY, DUMMY_config
-from .sparse.MDSA.MDSA import MDSA, MDSA_config
+from .sparse.MDSA.alg_params import MDSA, MDSA_config
 
 
 @typechecked
