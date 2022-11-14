@@ -1,6 +1,8 @@
 """Tests whether the snn MDSA algorithm results equal those of the
 default/Neumann implementation."""
 # pylint: disable=R0801
+import os
+import shutil
 import unittest
 from pprint import pprint
 
@@ -30,7 +32,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
     def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
         self.algorithms = {
-            "MDSA": get_algo_configs(MDSA(list(range(0, 4, 1))).__dict__)
+            "MDSA": get_algo_configs(MDSA(list(range(0, 7, 1))).__dict__)
         }
 
     @typechecked
@@ -39,15 +41,19 @@ class Test_mdsa_snn_results(unittest.TestCase):
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
 
+        # Remove results directory if it exists.
+        if os.path.exists("results"):
+            shutil.rmtree("results")
+        if os.path.exists("latex"):
+            shutil.rmtree("latex")
+
         # Generate default experiment config.
         mdsa_creation_only_size_3_4: dict = (
             experiment_config_for_mdsa_testing()
         )
 
         # Do not output images.
-        mdsa_creation_only_size_3_4["overwrite_visualisation"] = False
-        # TODO: determine why this throws an error.
-        # mdsa_creation_only_size_3_4["overwrite_visualisation"] = True
+        mdsa_creation_only_size_3_4["overwrite_visualisation"] = True
         mdsa_creation_only_size_3_4["show_snns"] = False
         mdsa_creation_only_size_3_4["export_images"] = False
 
