@@ -47,7 +47,7 @@ class MDSA:
     ) -> None:
         self.name = "MDSA"
         self.min_m_vals: int = 0
-        self.max_m_vals: int = 3
+        self.max_m_vals: int = 200
 
         self.verify_m_vals(m_vals)
 
