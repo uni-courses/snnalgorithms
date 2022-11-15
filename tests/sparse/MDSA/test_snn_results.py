@@ -4,7 +4,6 @@ default/Neumann implementation."""
 import os
 import shutil
 import unittest
-from pprint import pprint
 
 from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
     experiment_config_for_mdsa_testing,
@@ -32,7 +31,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
     def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
         self.algorithms = {
-            "MDSA": get_algo_configs(MDSA(list(range(0, 7, 1))).__dict__)
+            "MDSA": get_algo_configs(MDSA(list(range(0, 2, 1))).__dict__)
         }
 
     @typechecked
@@ -71,5 +70,4 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # Do not apply radiation (default).
 
         # Verify results are identical.
-        pprint(mdsa_creation_only_size_3_4)
         Experiment_runner(mdsa_creation_only_size_3_4)
