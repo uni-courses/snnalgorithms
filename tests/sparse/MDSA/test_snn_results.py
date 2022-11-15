@@ -58,6 +58,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
 
         # Do not output images.
+        mdsa_creation_only_size_3_4["overwrite_snn_propagation"] = True
         mdsa_creation_only_size_3_4["overwrite_visualisation"] = True
         mdsa_creation_only_size_3_4["show_snns"] = False
         mdsa_creation_only_size_3_4["export_images"] = False
