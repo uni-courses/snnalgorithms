@@ -109,14 +109,32 @@ def assert_valid_results(
     copy_actual_nodenames = copy.deepcopy(actual_nodenames)
     copy_actual_nodenames.pop("passed")
 
-    # Verify the expected nodes are the same as the actual nodes.
-    if expected_nodenames != copy_actual_nodenames:
-        raise ValueError(
-            f"Selected SNN nodes for: {graph_name}, are not equal to "
-            " the default/Neumann selected nodes:\n"
-            f"SNN nodes:    {actual_nodenames}\n"
+    # Verify node names are identical.
+    if copy_actual_nodenames.keys() != expected_nodenames.keys():
+        raise KeyError(
+            f"Selected SNN nodenames for: {graph_name}, are "
+            "not equal to the default/Neumann selected nodes:\n"
+            f"SNN nodes:    {copy_actual_nodenames.keys()}\n"
             "!=\n"
-            f"Neumann nodes:{expected_nodenames}\n"
+            f"Neumann nodes:{expected_nodenames.keys()}\n"
+        )
+
+    # Verify the expected nodes are the same as the actual nodes.
+    for key in expected_nodenames.keys():
+        if expected_nodenames[key] != copy_actual_nodenames[key]:
+            raise ValueError(
+                f"SNN count per node for: {graph_name}, are not equal to "
+                " the default/Neumann node counts:\n"
+                f"SNN nodes:    {actual_nodenames}\n"
+                "!=\n"
+                f"Neumann nodes:{expected_nodenames}\n"
+                f"Node:{key} has different counts."
+            )
+    if not actual_nodenames["passed"]:
+        raise Exception(
+            "Error, did not detect a difference between SNN "
+            "and Neumann mark count in the nodes. Yet "
+            "the results computation says there should be a difference."
         )
 
 
