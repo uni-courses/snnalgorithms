@@ -7,6 +7,7 @@ import unittest
 
 from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
     long_exp_setts_for_mdsa_testing,
+    run_config_with_error,
 )
 from snncompare.exp_setts.Supported_experiment_settings import (
     Supported_experiment_settings,
@@ -68,4 +69,4 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # Do not apply radiation (default).
 
         # Verify results are identical.
-        Experiment_runner(mdsa_creation_only_size_3_4)
+        Experiment_runner(mdsa_creation_only_size_3_4, run_config_with_error())
