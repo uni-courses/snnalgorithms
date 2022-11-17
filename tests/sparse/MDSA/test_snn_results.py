@@ -8,7 +8,8 @@ import unittest
 from typing import Any, Dict
 
 from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
-    minimal_mdsa_test_exp_setts,
+    long_exp_setts_for_mdsa_testing,
+    run_config_with_error,
 )
 from snncompare.exp_setts.Supported_experiment_settings import (
     Supported_experiment_settings,
@@ -53,15 +54,15 @@ class Test_mdsa_snn_results(unittest.TestCase):
             shutil.rmtree("latex")
 
         # Generate default experiment config.
-        # mdsa_creation_only_size_3_4: dict = long_exp_setts_for_mdsa_testing()
+        mdsa_creation_only_size_3_4: dict = long_exp_setts_for_mdsa_testing()
         # mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
-        mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
+        # mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
 
         # Do not output images.
         mdsa_creation_only_size_3_4["overwrite_snn_propagation"] = True
         mdsa_creation_only_size_3_4["overwrite_visualisation"] = True
         mdsa_creation_only_size_3_4["show_snns"] = False
-        mdsa_creation_only_size_3_4["export_images"] = False
+        mdsa_creation_only_size_3_4["export_images"] = True
 
         # Include desired mdsa settings.
         mdsa_creation_only_size_3_4["algorithms"] = self.algorithms
@@ -73,11 +74,15 @@ class Test_mdsa_snn_results(unittest.TestCase):
             allow_optional=True,
         )
 
-        # Verify results are identical.
-        # Experiment_runner(
-        # mdsa_creation_only_size_3_4, run_config_with_error())
-        exp_runner = Experiment_runner(mdsa_creation_only_size_3_4)
+        # Perform the experiment/SNN propagation.
+        # exp_runner = Experiment_runner(mdsa_creation_only_size_3_4)
+        some_run_config_with_error = run_config_with_error()
+        some_run_config_with_error["export_images"] = True
+        exp_runner = Experiment_runner(
+            mdsa_creation_only_size_3_4, some_run_config_with_error
+        )
 
+        # Verify results are identical using the json results file.
         for run_config in exp_runner.run_configs:
             assert_run_config_json_results(self, exp_runner, run_config)
 
