@@ -131,6 +131,10 @@ def assert_run_config_json_results(
 
             # Verify the expected nodes are the same as the actual nodes.
             for key, expected_val in expected_nodenames.items():
+                print(
+                    f"key={key},expected={expected_val},"
+                    + f"actual={copy_actual_nodenames[key]}"
+                )
                 test_object.assertEquals(
                     expected_val, copy_actual_nodenames[key]
                 )

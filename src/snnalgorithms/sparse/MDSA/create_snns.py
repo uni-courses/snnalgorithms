@@ -443,7 +443,7 @@ class Alipour_properties:
         spread_rand_nrs = self.spread_rand_nrs_with_delta(delta, rand_nrs)
         inhibition = self.get_inhibition(delta, G, rand_ceil)
         initial_rand_current = self.get_initial_random_current(
-            inhibition, rand_nrs
+            inhibition, spread_rand_nrs
         )
 
         # Store properties in object.
