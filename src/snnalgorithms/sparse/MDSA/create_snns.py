@@ -248,7 +248,8 @@ def input_graph_to_mdsa_snn_graph(
                                     f"degree_receiver_{node}_{neighbour}_0",
                                 )
                             ],
-                            weight=rand_ceil,
+                            weight=rand_ceil
+                            * input_graph.graph["alg_props"]["delta"],
                         )
 
                         for loop in range(0, shifted_m - 1):

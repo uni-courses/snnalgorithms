@@ -37,9 +37,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
     @typechecked
     def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
-        self.algorithms = {
-            "MDSA": get_algo_configs(MDSA(list(range(0, 1, 1))).__dict__)
-        }
 
     @typechecked
     def test_snn_results_equal_neumann_results(self) -> None:
@@ -54,37 +51,45 @@ class Test_mdsa_snn_results(unittest.TestCase):
             shutil.rmtree("latex")
 
         # Generate default experiment config.
-        mdsa_creation_only_size_3_4: dict = long_exp_setts_for_mdsa_testing()
+        mdsa_settings: dict = long_exp_setts_for_mdsa_testing()
         # mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
         # mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
 
         # Do not output images.
-        mdsa_creation_only_size_3_4["overwrite_snn_propagation"] = True
-        mdsa_creation_only_size_3_4["overwrite_visualisation"] = True
-        mdsa_creation_only_size_3_4["show_snns"] = False
-        mdsa_creation_only_size_3_4["export_images"] = True
-
-        # Include desired mdsa settings.
-        mdsa_creation_only_size_3_4["algorithms"] = self.algorithms
+        mdsa_settings["overwrite_snn_propagation"] = True
+        mdsa_settings["overwrite_visualisation"] = True
+        mdsa_settings["show_snns"] = False
+        mdsa_settings["export_images"] = True
 
         verify_experiment_config(
             Supported_experiment_settings(),
-            mdsa_creation_only_size_3_4,
+            mdsa_settings,
             has_unique_id=False,
             allow_optional=True,
         )
 
-        # Perform the experiment/SNN propagation.
-        # exp_runner = Experiment_runner(mdsa_creation_only_size_3_4)
-        some_run_config_with_error = run_config_with_error()
-        some_run_config_with_error["export_images"] = True
-        exp_runner = Experiment_runner(
-            mdsa_creation_only_size_3_4, some_run_config_with_error
-        )
+        # OVERRIDE: Run only on a single run config.
+        # exp_runner = override_with_single_run_setting(mdsa_settings)
+
+        # Get experiment runner for long test.
+        exp_runner = Experiment_runner(mdsa_settings)
 
         # Verify results are identical using the json results file.
         for run_config in exp_runner.run_configs:
             assert_run_config_json_results(self, exp_runner, run_config)
+
+
+def override_with_single_run_setting(mdsa_settings: dict) -> Experiment_runner:
+    """Overwrites a list of experiment settings to only run the experiment on a
+    single run configuration."""
+    algorithms = {
+        "MDSA": get_algo_configs(MDSA(list(range(0, 1, 1))).__dict__)
+    }
+    mdsa_settings["algorithms"] = algorithms
+    some_run_config_with_error = run_config_with_error()
+    some_run_config_with_error["export_images"] = True
+    exp_runner = Experiment_runner(mdsa_settings, some_run_config_with_error)
+    return exp_runner
 
 
 @typechecked
