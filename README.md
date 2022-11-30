@@ -1,9 +1,9 @@
 # Spiking Neural Network Algorithms
 
-[![Python 3.10][python_badge]](https://www.python.org/downloads/release/python-3106/)
-[![License: AGPL v3][agpl3_badge]](https://www.gnu.org/licenses/agpl-3.0)
-[![Code Style: Black][black_badge]](https://github.com/ambv/black)
-[![Code Coverage][codecov_badge]](https://codecov.io/gh/a-t-0/snnalgorithms)
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3106/)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![Code Coverage](https://codecov.io/gh/a-t-0/snn/branch/main/graph/badge.svg)](https://codecov.io/gh/a-t-0/snnalgorithms)
 
 This is a library of Spiking Neural Network algorithms (SNNs), along with their
 regular/normal/Neumann implementation. to their default/Neumann implementations.
@@ -78,11 +78,7 @@ the first round:
 
 <!-- Un-wrapped URL's (Badges and Hyperlinks) -->
 
-[agpl3_badge]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
 [backends]: https://github.com/a-t-0/snnbackends
-[black_badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [brain-adaptation]: https://github.com/a-t-0/snnadaptation
-[codecov_badge]: https://codecov.io/gh/a-t-0/snn/branch/main/graph/badge.svg
-[python_badge]: https://img.shields.io/badge/python-3.10-blue.svg
 [radiation]: https://github.com/a-t-0/snnradiation
 [this parent repository]: https://github.com/a-t-0/snncompare
