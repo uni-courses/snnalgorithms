@@ -248,7 +248,8 @@ def input_graph_to_mdsa_snn_graph(
                                     f"degree_receiver_{node}_{neighbour}_0",
                                 )
                             ],
-                            weight=rand_ceil,
+                            weight=rand_ceil
+                            * input_graph.graph["alg_props"]["delta"],
                         )
 
                         for loop in range(0, shifted_m - 1):
@@ -279,12 +280,31 @@ def input_graph_to_mdsa_snn_graph(
         mdsa_snn_graph.add_edges_from(
             [
                 (
+                    f"next_round_{loop}",
+                    f"next_round_{loop}",
+                )
+            ],
+            weight=-5,
+        )
+        mdsa_snn_graph.add_edges_from(
+            [
+                (
                     f"delay_{loop}",
                     f"d_charger_{loop}",
                 )
             ],
-            weight=-1,
+            weight=-100,
         )
+        # TODO: make this possible.
+        # mdsa_snn_graph.add_edges_from(
+        #    [
+        #        (
+        #            f"delay_{loop}",
+        #            f"next_round{loop}",
+        #        )
+        #    ],
+        #    weight=-100,
+        # )
         mdsa_snn_graph.add_edges_from(
             [
                 (
@@ -293,6 +313,15 @@ def input_graph_to_mdsa_snn_graph(
                 )
             ],
             weight=+1,
+        )
+        mdsa_snn_graph.add_edges_from(
+            [
+                (
+                    f"delay_{loop}",
+                    f"delay_{loop}",
+                )
+            ],
+            weight=-15,
         )
 
     for circuit in input_graph.nodes:
@@ -415,7 +444,7 @@ class Alipour_properties:
         spread_rand_nrs = self.spread_rand_nrs_with_delta(delta, rand_nrs)
         inhibition = self.get_inhibition(delta, G, rand_ceil)
         initial_rand_current = self.get_initial_random_current(
-            inhibition, rand_nrs
+            inhibition, spread_rand_nrs
         )
 
         # Store properties in object.

@@ -8,6 +8,7 @@ and the SNN match.
 
 These results are returned in the form of a dict.
 """
+import copy
 from typing import Dict
 
 import networkx as nx
@@ -58,6 +59,10 @@ def set_mdsa_snn_results(
                 run_config=run_config,
                 snn_graph=snn_graph,
             )
+            assert_valid_results(
+                snn_graph.graph["results"], alipour_counter_marks, graph_name
+            )
+
         elif graph_name == "adapted_snn_graph":
             snn_graph.graph["results"] = get_snn_results(
                 alipour_counter_marks,
@@ -67,6 +72,10 @@ def set_mdsa_snn_results(
                 run_config=run_config,
                 snn_graph=snn_graph,
             )
+            assert_valid_results(
+                snn_graph.graph["results"], alipour_counter_marks, graph_name
+            )
+
         elif graph_name == "rad_snn_algo_graph":
             snn_graph.graph["results"] = get_snn_results(
                 alipour_counter_marks,
@@ -86,6 +95,47 @@ def set_mdsa_snn_results(
                 snn_graph=snn_graph,
             )
         # TODO: verify the results are set correctly.
+
+
+@typechecked
+def assert_valid_results(
+    actual_nodenames: Dict[str, int],
+    expected_nodenames: Dict[str, int],
+    graph_name: str,
+) -> None:
+    """Assert results are equal to the Alipour default algorithm."""
+
+    # Remove the passed boolean, and redo results verification.
+    copy_actual_nodenames = copy.deepcopy(actual_nodenames)
+    copy_actual_nodenames.pop("passed")
+
+    # Verify node names are identical.
+    if copy_actual_nodenames.keys() != expected_nodenames.keys():
+        raise KeyError(
+            f"Selected SNN nodenames for: {graph_name}, are "
+            "not equal to the default/Neumann selected nodes:\n"
+            f"SNN nodes:    {copy_actual_nodenames.keys()}\n"
+            "!=\n"
+            f"Neumann nodes:{expected_nodenames.keys()}\n"
+        )
+
+    # Verify the expected nodes are the same as the actual nodes.
+    for key in expected_nodenames.keys():
+        if expected_nodenames[key] != copy_actual_nodenames[key]:
+            raise ValueError(
+                f"SNN count per node for: {graph_name}, are not equal to "
+                " the default/Neumann node counts:\n"
+                f"SNN nodes:    {actual_nodenames}\n"
+                "!=\n"
+                f"Neumann nodes:{expected_nodenames}\n"
+                f"Node:{key} has different counts."
+            )
+    if not actual_nodenames["passed"]:
+        raise Exception(
+            "Error, did not detect a difference between SNN "
+            "and Neumann mark count in the nodes. Yet "
+            "the results computation says there should be a difference."
+        )
 
 
 # pylint: disable=R0913
@@ -151,9 +201,11 @@ def get_nx_LIF_count_without_redundancy(
 
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
-        node_counts[f"counter_{node_index}_{m_val}"] = nx_SNN_G.nodes[
-            f"counter_{node_index}_{m_val}"
-        ]["nx_LIF"][t].u.get()
+        node_counts[f"counter_{node_index}_{m_val}"] = int(
+            nx_SNN_G.nodes[f"counter_{node_index}_{m_val}"]["nx_LIF"][
+                t
+            ].u.get()
+        )
     return node_counts
 
 

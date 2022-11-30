@@ -40,7 +40,6 @@ def verify_algo_configs(algo_name: str, algo_configs: List[dict]) -> None:
             mdsa = MDSA([algo_config_dict["m_val"]])
             get_algo_configs(mdsa.__dict__)
         elif algo_name == "DUMMY":
-            print(f"algo_config_dict={algo_config_dict}")
             dummy = DUMMY(
                 some_vals=[algo_config_dict["some_val"]],
                 other_vals=[algo_config_dict["other_val"]],
