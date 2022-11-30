@@ -90,5 +90,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         for nodename in original_nx_snn.nodes:
             self.assertIn(
                 nodename,
-                list(map(lambda neuron: neuron.name, new_nx_mdsa_snn.nodes)),
+                list(
+                    map(lambda neuron: neuron.full_name, new_nx_mdsa_snn.nodes)
+                ),
             )
