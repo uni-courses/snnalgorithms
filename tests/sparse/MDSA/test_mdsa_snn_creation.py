@@ -87,10 +87,18 @@ class Test_mdsa_snn_results(unittest.TestCase):
     ) -> None:
         """Verifies the results new snn graph contains the same nodes as the
         old snn graph creation."""
+        # Verify all old nodes are in new network.
         for nodename in original_nx_snn.nodes:
             self.assertIn(
                 nodename,
                 list(
                     map(lambda neuron: neuron.full_name, new_nx_mdsa_snn.nodes)
                 ),
+            )
+
+        # Also verify no extra nodes are created.
+        for nodename in new_nx_mdsa_snn.nodes:
+            self.assertIn(
+                nodename.full_name,
+                list(map(lambda neuron: neuron, original_nx_snn.nodes)),
             )

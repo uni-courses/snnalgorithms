@@ -1,8 +1,6 @@
 """Creates the MDSA snn."""
 
 
-from pprint import pprint
-
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import (
     Identifier,
@@ -27,6 +25,8 @@ def get_new_mdsa_graph(
     return create_MDSA_neurons(run_config, stage_1_nx_graphs["input_graph"])
 
 
+# pylint: disable=R0912
+# pylint: disable=R0914
 @typechecked
 def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
@@ -53,7 +53,6 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
                 for m_val in range(
                     0, run_config["algorithm"]["MDSA"]["m_val"] + 1
                 ):
-                    pprint(run_config)
                     degree_receiver_node = create_degree_receiver_node(
                         input_graph,
                         m_val,
@@ -74,6 +73,51 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
                 recurrent_weight,
             )
             mdsa_snn.add_node(rand_node)
+
+    # Create selector nodes.
+    for node_index in input_graph.nodes:
+        for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+            selector_node = create_selector_node(
+                m_val,
+                node_index,
+                spacing,
+            )
+            mdsa_snn.add_node(selector_node)
+
+    # Create selector nodes.
+    for node_index in input_graph.nodes:
+        counter_node = create_counter_node(
+            run_config["algorithm"]["MDSA"]["m_val"],
+            node_index,
+            spacing,
+        )
+        mdsa_snn.add_node(counter_node)
+
+    # NOTE, for loop starts at index 1, instead of 0!
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        next_round_node = create_next_round_node(
+            m_val,
+            len(input_graph.nodes),
+            spacing,
+        )
+        mdsa_snn.add_node(next_round_node)
+
+    # NOTE, for loop starts at index 1, instead of 0!
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        d_charger = create_d_charger_node(
+            m_val,
+            spacing,
+        )
+        mdsa_snn.add_node(d_charger)
+
+    # NOTE, for loop starts at index 1, instead of 0!
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        delay = create_delay_node(
+            m_val,
+            len(input_graph.nodes),
+            spacing,
+        )
+        mdsa_snn.add_node(delay)
 
     return mdsa_snn
 
@@ -183,5 +227,120 @@ def create_rand_node(
                 delay=0,
                 change_per_t=0,
             )
+        ],
+    )
+
+
+def create_selector_node(
+    m_val: int,
+    node_index: int,
+    spacing: float,
+) -> LIF_neuron:
+    """Creates the neuron settings for the selector node in the MDSA
+    algorithm."""
+    # TODO: why. This is probably for the delay in activation for m>0.
+    bias: float
+    if m_val == 0:
+        bias = 4.0
+    else:
+        bias = 5.0
+
+    return LIF_neuron(
+        name="selector",
+        bias=bias,
+        du=0.0,
+        dv=1.0,
+        vth=4.0,
+        pos=(
+            float(7 * spacing + m_val * 9 * spacing),
+            float(node_index * 4 * spacing + spacing),
+        ),
+        identifiers=[
+            Identifier(description="node_index", position=0, value=node_index),
+            Identifier(description="m_val", position=1, value=m_val),
+        ],
+    )
+
+
+def create_counter_node(
+    m_val: int,
+    node_index: int,
+    spacing: float,
+) -> LIF_neuron:
+    """Creates the neuron settings for the counter node in the MDSA
+    algorithm."""
+
+    return LIF_neuron(
+        name="counter",
+        bias=0.0,
+        du=0.0,
+        dv=1.0,
+        vth=0.0,
+        pos=(
+            float(9 * spacing + m_val * 9 * spacing),
+            float(node_index * 4 * spacing),
+        ),
+        identifiers=[
+            Identifier(description="node_index", position=0, value=node_index),
+            # TODO: remove m_val dependency.
+            Identifier(description="m_val", position=1, value=m_val),
+        ],
+    )
+
+
+def create_next_round_node(
+    m_val: int,
+    nr_of_nodes: int,
+    spacing: float,
+) -> LIF_neuron:
+    """Creates the neuron settings for the counter node in the MDSA
+    algorithm."""
+    return LIF_neuron(
+        name="next_round",
+        bias=0.0,
+        du=0.0,
+        dv=1.0,
+        vth=float(nr_of_nodes),
+        pos=(float(6 * spacing + (m_val - 1) * 9 * spacing), -2 * spacing),
+        identifiers=[
+            Identifier(description="m_val", position=0, value=m_val),
+        ],
+    )
+
+
+def create_d_charger_node(
+    m_val: int,
+    spacing: float,
+) -> LIF_neuron:
+    """Creates the neuron settings for the d_charger node in the MDSA
+    algorithm."""
+    return LIF_neuron(
+        name="d_charger",
+        bias=0.0,
+        du=0.0,
+        dv=1.0,
+        vth=0.0,
+        pos=(float(9 * spacing + (m_val - 1) * 9 * spacing), -2 * spacing),
+        identifiers=[
+            Identifier(description="m_val", position=0, value=m_val),
+        ],
+    )
+
+
+def create_delay_node(
+    m_val: int,
+    nr_of_nodes: int,
+    spacing: float,
+) -> LIF_neuron:
+    """Creates the neuron settings for the delay node in the MDSA algorithm."""
+    return LIF_neuron(
+        name="delay",
+        bias=0.0,
+        du=0.0,
+        dv=1.0,
+        vth=float(2 * nr_of_nodes - 1),
+        pos=(float(12 * spacing + (m_val - 1) * 9 * spacing), -2 * spacing),
+        identifiers=[
+            Identifier(description="m_val", position=0, value=m_val),
         ],
     )
