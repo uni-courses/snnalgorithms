@@ -71,7 +71,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         exp_runner = Experiment_runner(mdsa_settings, perform_run=False)
         for run_config in exp_runner.run_configs:
             stage_1_nx_graphs: dict = get_used_graphs(run_config)
-            new_nx_mdsa_snn = get_new_mdsa_graph(stage_1_nx_graphs)
+            new_nx_mdsa_snn = get_new_mdsa_graph(run_config, stage_1_nx_graphs)
 
             # Assert the old and new networkx snns are itentical.
             # pprint(stage_1_nx_graphs["snn_algo_graph"].__dict__)
