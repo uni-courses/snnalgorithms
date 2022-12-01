@@ -2,11 +2,7 @@
 
 
 import networkx as nx
-from snnbackends.networkx.LIF_neuron import (
-    Identifier,
-    LIF_neuron,
-    Recurrent_synapse,
-)
+from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
 from snncompare.helper import get_y_position
 from typeguard import typechecked
 
@@ -33,7 +29,6 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
     mdsa_snn = nx.DiGraph()
     # TODO get spacing from somewhere.
     spacing = 0.25
-    recurrent_weight = -10  # TODO: explain why 10.
 
     # Create connecting node.
     connecting_nodes = create_connecting_node(spacing)
@@ -41,11 +36,10 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
 
     # Create spike_once nodes.
     for node_index in input_graph.nodes:
-        spike_once_node = create_spike_once_node(
-            spacing, node_index, recurrent_weight
-        )
+        spike_once_node = create_spike_once_node(spacing, node_index)
         mdsa_snn.add_node(spike_once_node)
 
+    # pylint: disable=R0801
     # Create degree_receiver nodes.
     for node_index in input_graph.nodes:
         for node_neighbour in nx.all_neighbors(input_graph, node_index):
@@ -58,7 +52,6 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
                         m_val,
                         node_index,
                         node_neighbour,
-                        recurrent_weight,
                         spacing,
                     )
                     mdsa_snn.add_node(degree_receiver_node)
@@ -70,7 +63,6 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
                 m_val,
                 node_index,
                 spacing,
-                recurrent_weight,
             )
             mdsa_snn.add_node(rand_node)
 
@@ -136,9 +128,7 @@ def create_connecting_node(spacing: float) -> LIF_neuron:
     )
 
 
-def create_spike_once_node(
-    spacing: float, node_index: int, recurrent_weight: int
-) -> LIF_neuron:
+def create_spike_once_node(spacing: float, node_index: int) -> LIF_neuron:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
     return LIF_neuron(
@@ -151,13 +141,6 @@ def create_spike_once_node(
         identifiers=[
             Identifier(description="node_index", position=0, value=node_index)
         ],
-        recurrent_synapses=[
-            Recurrent_synapse(
-                weight=recurrent_weight,
-                delay=0,
-                change_per_t=0,
-            )
-        ],
     )
 
 
@@ -167,7 +150,6 @@ def create_degree_receiver_node(
     m_val: int,
     node_index: int,
     node_neighbour: int,
-    recurrent_weight: int,
     spacing: float,
 ) -> LIF_neuron:
     """Creates the neuron settings for the spike_once node in the MDSA
@@ -189,13 +171,6 @@ def create_degree_receiver_node(
             ),
             Identifier(description="m_val", position=2, value=m_val),
         ],
-        recurrent_synapses=[
-            Recurrent_synapse(
-                weight=recurrent_weight,
-                delay=0,
-                change_per_t=0,
-            )
-        ],
     )
 
 
@@ -203,7 +178,6 @@ def create_rand_node(
     m_val: int,
     node_index: int,
     spacing: float,
-    recurrent_weight: int,
 ) -> LIF_neuron:
     """Creates the neuron settings for the rand node in the MDSA algorithm."""
     return LIF_neuron(
@@ -220,13 +194,6 @@ def create_rand_node(
             Identifier(description="node_index", position=0, value=node_index),
             # TODO: remove m_val dependency.
             Identifier(description="m_val", position=1, value=m_val),
-        ],
-        recurrent_synapses=[
-            Recurrent_synapse(
-                weight=recurrent_weight,
-                delay=0,
-                change_per_t=0,
-            )
         ],
     )
 

@@ -24,6 +24,9 @@ from typeguard import typechecked
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_neurons import (
     get_new_mdsa_graph,
 )
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
+    create_MDSA_recurrent_synapses,
+)
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_synapses import (
     create_MDSA_synapses,
 )
@@ -44,6 +47,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
         """Tests whether the results of the snn implementation of the MDSA
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
+
+        # TODO: move to central place in MDSA algo spec.
+        recurrent_weight = -10
 
         # Remove results directory if it exists.
         if os.path.exists("results"):
@@ -77,14 +83,24 @@ class Test_mdsa_snn_results(unittest.TestCase):
         for run_config in exp_runner.run_configs:
             stage_1_nx_graphs: dict = get_used_graphs(run_config)
             new_nx_mdsa_snn = get_new_mdsa_graph(run_config, stage_1_nx_graphs)
-            create_MDSA_synapses(
-                stage_1_nx_graphs["input_graph"], new_nx_mdsa_snn
+
+            create_MDSA_recurrent_synapses(
+                stage_1_nx_graphs["input_graph"],
+                new_nx_mdsa_snn,
+                recurrent_weight,
+                run_config,
             )
 
             # Assert the old and new networkx snns are itentical.
             # pprint(stage_1_nx_graphs["snn_algo_graph"].__dict__)
             self.assert_nodes_are_present(
                 stage_1_nx_graphs["snn_algo_graph"], new_nx_mdsa_snn
+            )
+
+            create_MDSA_synapses(
+                stage_1_nx_graphs["input_graph"],
+                new_nx_mdsa_snn,
+                run_config,
             )
 
             self.assert_synapses_are_present(
@@ -101,8 +117,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
         old snn graph creation."""
         # Verify all old nodes are in new network.
         for nodename in original_nx_snn.nodes:
-            print(f"nodename={nodename}")
-            print(f"new_nx_mdsa_snn.nodes={new_nx_mdsa_snn.nodes}")
             self.assertIn(
                 nodename,
                 list(
@@ -127,14 +141,12 @@ class Test_mdsa_snn_results(unittest.TestCase):
         old snn graph creation."""
         # Verify all old nodes are in new network.
         for edge in original_nx_snn.edges:
-            print(f"edge={edge}")
             new_edgelist = list(
                 map(
                     lambda x: (x[0].full_name, x[1].full_name),
                     new_nx_mdsa_snn.edges,
                 )
             )
-            print(new_edgelist)
             self.assertIn(
                 edge,
                 list(map(lambda edge: edge, new_edgelist)),
