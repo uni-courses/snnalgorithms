@@ -21,7 +21,9 @@ from snncompare.graph_generation.stage_1_get_input_graphs import (
 )
 from typeguard import typechecked
 
-from snnalgorithms.sparse.MDSA.create_MDSA_snn import get_new_mdsa_graph
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_neurons import (
+    get_new_mdsa_graph,
+)
 
 
 class Test_mdsa_snn_results(unittest.TestCase):

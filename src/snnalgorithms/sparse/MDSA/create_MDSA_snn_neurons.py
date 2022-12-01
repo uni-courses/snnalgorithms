@@ -1,4 +1,4 @@
-"""Creates the MDSA snn."""
+"""Creates the MDSA snn neurons."""
 
 
 import networkx as nx
