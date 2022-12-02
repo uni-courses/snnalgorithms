@@ -53,6 +53,18 @@ def create_MDSA_recurrent_synapses(
                 recurrent_weight,
             )
 
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        create_recurrent_next_round_synapse(
+            mdsa_snn,
+            m_val,
+            node_dict,
+        )
+        create_recurrent_delay_synapse(
+            mdsa_snn,
+            m_val,
+            node_dict,
+        )
+
     return mdsa_snn
 
 
@@ -133,6 +145,54 @@ def create_recurrent_rand_synapse(
         ],
         weight=Synapse(
             weight=recurrent_weight,
+            delay=0,
+            change_per_t=0,
+        ),
+    )
+
+
+@typechecked
+def create_recurrent_next_round_synapse(
+    mdsa_snn: nx.DiGraph,
+    m_val: int,
+    node_dict: Dict[str, LIF_neuron],
+) -> None:
+    """Creates the outgoing synapses for the connecting node in the MDSA
+    algorithm."""
+    # Create recurrent synapse
+    mdsa_snn.add_edges_from(
+        [
+            (
+                node_dict[f"next_round_{m_val}"],
+                node_dict[f"next_round_{m_val}"],
+            )
+        ],
+        weight=Synapse(
+            weight=-5,  # TODO: why is this not "recurrent_weight"?
+            delay=0,
+            change_per_t=0,
+        ),
+    )
+
+
+@typechecked
+def create_recurrent_delay_synapse(
+    mdsa_snn: nx.DiGraph,
+    m_val: int,
+    node_dict: Dict[str, LIF_neuron],
+) -> None:
+    """Creates the outgoing synapses for the connecting node in the MDSA
+    algorithm."""
+    # Create recurrent synapse
+    mdsa_snn.add_edges_from(
+        [
+            (
+                node_dict[f"delay_{m_val}"],
+                node_dict[f"delay_{m_val}"],
+            )
+        ],
+        weight=Synapse(
+            weight=-15,  # TODO: why is this not "recurrent_weight"?
             delay=0,
             change_per_t=0,
         ),

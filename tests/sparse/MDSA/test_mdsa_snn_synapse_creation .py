@@ -139,15 +139,24 @@ class Test_mdsa_snn_results(unittest.TestCase):
     ) -> None:
         """Verifies the results new snn graph contains the same nodes as the
         old snn graph creation."""
-        # Verify all old nodes are in new network.
-        for edge in original_nx_snn.edges:
-            new_edgelist = list(
-                map(
-                    lambda x: (x[0].full_name, x[1].full_name),
-                    new_nx_mdsa_snn.edges,
-                )
+        # Verify all old synapses are in new network synapses.
+        new_edgelist = list(
+            map(
+                lambda x: (x[0].full_name, x[1].full_name),
+                new_nx_mdsa_snn.edges,
             )
+        )
+        for edge in original_nx_snn.edges:
+
             self.assertIn(
                 edge,
-                list(map(lambda edge: edge, new_edgelist)),
+                new_edgelist,
+            )
+
+        # Verify all new network synapses are in old network synapses.
+        for edge in new_edgelist:
+
+            self.assertIn(
+                edge,
+                original_nx_snn.edges,
             )

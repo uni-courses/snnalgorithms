@@ -1,7 +1,6 @@
 """Creates the MDSA snn synapses."""
 
 
-from pprint import pprint
 from typing import Dict
 
 import networkx as nx
@@ -57,6 +56,30 @@ def create_MDSA_synapses(
     )
 
     create_outgoing_rand_synapses(
+        input_graph,
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+
+    create_degree_to_degree_synapses(
+        input_graph,
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+
+    create_outgoing_next_round_synapses(
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+    create_outgoing_d_charger_synapses(
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+    create_outgoing_delay_synapses(
         input_graph,
         mdsa_snn,
         node_dict,
@@ -161,7 +184,6 @@ def create_outgoing_degree_receiver_synapses(
                     )
 
     # Create synapse to counter neuron.
-    pprint(node_dict.keys())
     for node_index in input_graph.nodes:
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
@@ -201,7 +223,7 @@ def create_outgoing_degree_receiver_synapses(
                                 (
                                     node_dict[
                                         f"degree_receiver_{circuit_target}_"
-                                        + f"{node_index}_{m_val-m_val}"
+                                        + f"{node_index}_{m_val-1}"
                                     ],
                                     node_dict[f"next_round_{m_val}"],
                                 )
@@ -286,3 +308,155 @@ def create_outgoing_rand_synapses(
                                 change_per_t=0,
                             ),
                         )
+
+
+@typechecked
+def create_degree_to_degree_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict,
+    run_config: dict,
+) -> nx.DiGraph:
+    """
+
+    :param G: The original graph on which the MDSA algorithm is ran.
+    :param get_degree: Graph with the MDSA SNN approximation solution.
+    :param m: The amount of approximation iterations used in the MDSA
+     approximation.
+    :param rand_ceil: Ceiling of the range in which rand nrs can be generated.
+
+    """
+    # pylint: disable=R0913
+    # Currently no method is found to reduce the 6/5 nested blocks.
+    rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
+    for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        for node_index_left in input_graph.nodes:
+            for y in input_graph.nodes:
+                for node_index_right in input_graph.nodes:
+                    if (
+                        f"degree_receiver_{node_index_left}_{y}_{m_val}"
+                        in node_dict.keys()
+                        and (
+                            f"degree_receiver_{node_index_right}_{y}_{m_val+1}"
+                            in node_dict.keys()
+                        )
+                    ):
+                        mdsa_snn.add_edges_from(
+                            [
+                                (
+                                    node_dict[
+                                        f"degree_receiver_{node_index_left}_"
+                                        + f"{y}_{m_val}"
+                                    ],
+                                    node_dict[
+                                        f"degree_receiver_{node_index_right}_"
+                                        + f"{y}_{m_val+1}"
+                                    ],
+                                )
+                            ],
+                            weight=Synapse(
+                                weight=rand_ceil,  # Increase u(t) at each t.
+                                delay=0,
+                                change_per_t=0,
+                            ),
+                        )
+    return mdsa_snn
+
+
+@typechecked
+def create_outgoing_next_round_synapses(
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict[str, LIF_neuron],
+    run_config: Dict,
+) -> None:
+    """Creates the outgoing synapses for the next_round node in the MDSA
+    algorithm."""
+
+    # Create outgoing synapses
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        mdsa_snn.add_edges_from(
+            [
+                (
+                    node_dict[f"next_round_{m_val}"],
+                    node_dict[f"d_charger_{m_val}"],
+                )
+            ],
+            weight=Synapse(
+                weight=1,
+                delay=0,
+                change_per_t=0,
+            ),
+        )
+
+
+@typechecked
+def create_outgoing_d_charger_synapses(
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict[str, LIF_neuron],
+    run_config: Dict,
+) -> None:
+    """Creates the outgoing synapses for the d_charger node in the MDSA
+    algorithm."""
+
+    # Create outgoing synapses
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        mdsa_snn.add_edges_from(
+            [
+                (
+                    node_dict[f"d_charger_{m_val}"],
+                    node_dict[f"delay_{m_val}"],
+                )
+            ],
+            weight=Synapse(
+                weight=-100,
+                delay=0,
+                change_per_t=0,
+            ),
+        )
+
+
+@typechecked
+def create_outgoing_delay_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict[str, LIF_neuron],
+    run_config: Dict,
+) -> None:
+    """Creates the outgoing synapses for the d_charger node in the MDSA
+    algorithm.
+
+    TODO: merge with:
+    create_outgoing_next_round_synapses
+    create_outgoing_d_charger_synapses
+    """
+
+    # Create outgoing synapses
+    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        mdsa_snn.add_edges_from(
+            [
+                (
+                    node_dict[f"delay_{m_val}"],
+                    node_dict[f"d_charger_{m_val}"],
+                )
+            ],
+            weight=Synapse(
+                weight=-100,
+                delay=0,
+                change_per_t=0,
+            ),
+        )
+
+        for node_index in input_graph.nodes:
+            mdsa_snn.add_edges_from(
+                [
+                    (
+                        node_dict[f"delay_{m_val}"],
+                        node_dict[f"selector_{node_index}_{m_val}"],
+                    )
+                ],
+                weight=Synapse(
+                    weight=1,
+                    delay=0,
+                    change_per_t=0,
+                ),
+            )
