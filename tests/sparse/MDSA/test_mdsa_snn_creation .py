@@ -29,6 +29,7 @@ from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
 )
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_synapses import (
     create_MDSA_synapses,
+    create_node_dict,
 )
 
 
@@ -64,9 +65,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # Do not output images.
         mdsa_settings["overwrite_snn_propagation"] = True
-        mdsa_settings["overwrite_visualisation"] = True
+        mdsa_settings["overwrite_visualisation"] = False
         mdsa_settings["show_snns"] = False
-        mdsa_settings["export_images"] = True
+        mdsa_settings["export_images"] = False
 
         verify_experiment_config(
             Supported_experiment_settings(),
@@ -104,6 +105,10 @@ class Test_mdsa_snn_results(unittest.TestCase):
             )
 
             self.assert_synapses_are_present(
+                stage_1_nx_graphs["snn_algo_graph"], new_nx_mdsa_snn
+            )
+
+            self.assert_synapses_weights_are_identical(
                 stage_1_nx_graphs["snn_algo_graph"], new_nx_mdsa_snn
             )
 
@@ -160,3 +165,31 @@ class Test_mdsa_snn_results(unittest.TestCase):
                 edge,
                 original_nx_snn.edges,
             )
+
+    @typechecked
+    def assert_synapses_weights_are_identical(
+        self,
+        original_nx_snn: nx.DiGraph,
+        new_nx_mdsa_snn: nx.DiGraph,
+    ) -> None:
+        """Verifies the results new snn graph contains the same synapse weights
+        as the old snn graph creation."""
+        node_dict = create_node_dict(new_nx_mdsa_snn)
+        for edge in original_nx_snn.edges:
+            original_weight = original_nx_snn.edges[edge]["weight"]
+            synapse = new_nx_mdsa_snn.edges[
+                (node_dict[edge[0]], node_dict[edge[1]])
+            ]["weight"]
+            new_weight = synapse.weight
+            self.assertEqual(
+                original_weight,
+                new_weight,
+            )
+        # Note it is not necessary to test whether the weights of the synapses
+        # of all new edges are also identical to the weights of the edges of
+        # the old network, because assert_synapses_are_present already verifies
+        # that the set of edges in the old and new network are identical.
+        # That implies that if weight identicallity is tested for each
+        # edge of the old network to the matching edge of the new network,
+        # that the weights of all the edges of the new network also equal
+        # the weights of the old network.

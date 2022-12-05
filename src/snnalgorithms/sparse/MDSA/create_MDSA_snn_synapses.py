@@ -265,9 +265,7 @@ def create_outgoing_selector_synapses(
                             )
                         ],
                         weight=Synapse(
-                            weight=input_graph.graph["alg_props"]["rand_nrs"][
-                                node_index
-                            ],
+                            weight=1,
                             delay=0,
                             change_per_t=0,
                         ),
@@ -303,7 +301,9 @@ def create_outgoing_rand_synapses(
                                 )
                             ],
                             weight=Synapse(
-                                weight=1,
+                                weight=input_graph.graph["alg_props"][
+                                    "initial_rand_current"
+                                ][node_index],
                                 delay=0,
                                 change_per_t=0,
                             ),
@@ -408,7 +408,7 @@ def create_outgoing_d_charger_synapses(
                 )
             ],
             weight=Synapse(
-                weight=-100,
+                weight=+1,
                 delay=0,
                 change_per_t=0,
             ),

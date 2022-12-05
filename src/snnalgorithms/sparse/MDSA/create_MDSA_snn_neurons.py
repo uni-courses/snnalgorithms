@@ -208,7 +208,8 @@ def create_selector_node(
     # TODO: why. This is probably for the delay in activation for m>0.
     bias: float
     if m_val == 0:
-        bias = 4.0
+        # bias = 4.0 # read this wrong looked like it was 4 in original code.
+        bias = 5.0
     else:
         bias = 5.0
 
