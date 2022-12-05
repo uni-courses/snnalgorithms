@@ -151,9 +151,3 @@ class Test_mdsa_snn_results(unittest.TestCase):
             self.assertEqual(original_lif.du.du, new_lif.du.du)
             self.assertEqual(original_lif.dv.dv, new_lif.dv.dv)
             self.assertEqual(original_lif.vth.vth, new_lif.vth.vth)
-
-            # Du
-            # Dv
-            # Bias
-            # Vth
-            # V_reset
