@@ -15,7 +15,7 @@ class Test_dummy(unittest.TestCase):
 
     # Initialize test object
     @typechecked
-    def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+    def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
         self.dummy = DUMMY(
             some_vals=list(range(4, 8, 1)),

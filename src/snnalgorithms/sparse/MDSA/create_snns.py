@@ -28,7 +28,6 @@ def specify_mdsa_network_properties(
 
     # TODO: Rename all rand_nrs usages.
     rand_nrs = input_graph.graph["alg_props"]["initial_rand_current"]
-
     # TODO: Rename all rand_nrs usages.
     rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
 
