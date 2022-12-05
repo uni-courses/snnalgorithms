@@ -11,7 +11,6 @@ this slow test is separated.
 import os
 import shutil
 import unittest
-from pprint import pprint
 
 import networkx as nx
 from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
@@ -84,12 +83,21 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # OVERRIDE: Run only on a single run config.
         # exp_runner = override_with_single_run_setting(mdsa_settings)
 
+        # TODO: run only for a single run config at a time, then perform
+        # asserts, then move to next runconfig. Do this for all run configs.
+
         # Get experiment runner for long test.
-        exp_runner = Experiment_runner(
+        full_exp_runner = Experiment_runner(
             mdsa_settings,
-            perform_run=True,
+            perform_run=False,
         )
-        for run_config in exp_runner.run_configs:
+        for run_config in full_exp_runner.run_configs:
+            exp_runner = Experiment_runner(
+                mdsa_settings,
+                specific_run_config=run_config,
+                perform_run=True,
+            )
+
             # Used to get the input graph.
             stage_1_nx_graphs: dict = get_used_graphs(run_config)
             new_nx_mdsa_snn = get_new_mdsa_graph(run_config, stage_1_nx_graphs)
@@ -116,7 +124,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
     ) -> None:
         """Verifies the results new snn graph contains the same neuron values
         as the old snn graph creation."""
-        pprint(exp_runner.results_nx_graphs)
 
         # Verify all old nodes are in new network.
         node_dict = create_node_dict(new_nx_mdsa_snn)

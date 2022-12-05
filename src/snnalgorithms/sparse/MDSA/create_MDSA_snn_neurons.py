@@ -208,10 +208,9 @@ def create_selector_node(
     # TODO: why. This is probably for the delay in activation for m>0.
     bias: float
     if m_val == 0:
-        # bias = 4.0 # read this wrong looked like it was 4 in original code.
         bias = 5.0
     else:
-        bias = 5.0
+        bias = 4.0  # read this wrong looked like it was 4 in original code.
 
     return LIF_neuron(
         name="selector",
@@ -268,7 +267,7 @@ def create_next_round_node(
         bias=0.0,
         du=0.0,
         dv=1.0,
-        vth=float(nr_of_nodes),
+        vth=float(nr_of_nodes) - 1,
         pos=(float(6 * spacing + (m_val - 1) * 9 * spacing), -2 * spacing),
         identifiers=[
             Identifier(description="m_val", position=0, value=m_val),
