@@ -41,7 +41,22 @@ def create_MDSA_synapses(
     for _ in input_graph.nodes:
         create_outgoing_spike_once_synapses(input_graph, mdsa_snn, node_dict)
 
-    create_outgoing_degree_receiver_synapses(
+    create_degree_receiver_selector_synapses(
+        input_graph,
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+
+    # pylint: disable=R0801
+    create_degree_receiver_counter_synapses(
+        input_graph,
+        mdsa_snn,
+        node_dict,
+        run_config,
+    )
+
+    create_degree_receiver_next_round_synapses(
         input_graph,
         mdsa_snn,
         node_dict,
@@ -150,7 +165,7 @@ def create_outgoing_spike_once_synapses(
 
 
 @typechecked
-def create_outgoing_degree_receiver_synapses(
+def create_degree_receiver_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     node_dict: Dict[str, LIF_neuron],
@@ -183,6 +198,16 @@ def create_outgoing_degree_receiver_synapses(
                         ),  # to disable bias
                     )
 
+
+def create_degree_receiver_counter_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict[str, LIF_neuron],
+    run_config: dict,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm."""
+
     # Create synapse to counter neuron.
     for node_index in input_graph.nodes:
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
@@ -206,8 +231,18 @@ def create_outgoing_degree_receiver_synapses(
                         weight=1,
                         delay=0,
                         change_per_t=0,
-                    ),  # to disable bias
+                    ),  # Used to disable bias.
                 )
+
+
+def create_degree_receiver_next_round_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    node_dict: Dict[str, LIF_neuron],
+    run_config: dict,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm."""
 
     # Create synapse to next_round node.
     for node_index in input_graph.nodes:
@@ -234,8 +269,6 @@ def create_outgoing_degree_receiver_synapses(
                                 change_per_t=0,
                             ),
                         )
-
-    # TODO: create degree-to-degree synapses.
 
 
 @typechecked
