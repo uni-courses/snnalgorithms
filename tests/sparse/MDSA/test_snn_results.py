@@ -57,9 +57,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # Do not output images.
         mdsa_settings["overwrite_snn_propagation"] = True
-        mdsa_settings["overwrite_visualisation"] = True
+        mdsa_settings["overwrite_visualisation"] = False
         mdsa_settings["show_snns"] = False
-        mdsa_settings["export_images"] = True
+        mdsa_settings["export_images"] = False
 
         verify_experiment_config(
             Supported_experiment_settings(),
@@ -72,13 +72,22 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # exp_runner = override_with_single_run_setting(mdsa_settings)
 
         # Get experiment runner for long test.
-        exp_runner = Experiment_runner(mdsa_settings)
+        full_exp_runner = Experiment_runner(
+            mdsa_settings,
+            perform_run=False,
+        )
+        for run_config in full_exp_runner.run_configs:
+            exp_runner = Experiment_runner(
+                mdsa_settings,
+                specific_run_config=run_config,
+                perform_run=True,
+            )
 
-        # Verify results are identical using the json results file.
-        for run_config in exp_runner.run_configs:
+            # Verify results are identical using the json results file.
             assert_run_config_json_results(self, exp_runner, run_config)
 
 
+@typechecked
 def override_with_single_run_setting(mdsa_settings: dict) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
