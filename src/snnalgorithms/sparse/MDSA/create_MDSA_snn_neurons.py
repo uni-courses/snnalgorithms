@@ -8,6 +8,13 @@ from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
 from snncompare.helper import get_y_position
 from typeguard import typechecked
 
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
+    create_MDSA_recurrent_synapses,
+)
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_synapses import (
+    create_MDSA_synapses,
+)
+
 
 @typechecked
 def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
@@ -16,17 +23,36 @@ def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
     if not isinstance(input_graph.graph["alg_props"], dict):
         raise Exception("Error, algorithm properties not set.")
 
-    return create_MDSA_neurons(run_config, input_graph)
+    # TODO get spacing and recurrent weight form algo specification.
+    spacing: float = 0.25
+    recurrent_weight: int = -10
+
+    snn_graph = create_MDSA_neurons(input_graph, run_config, spacing)
+
+    create_MDSA_recurrent_synapses(
+        input_graph,
+        snn_graph,
+        recurrent_weight,
+        run_config,
+    )
+
+    create_MDSA_synapses(
+        input_graph,
+        snn_graph,
+        run_config,
+    )
+
+    return snn_graph
 
 
 # pylint: disable=R0912
 # pylint: disable=R0914
 @typechecked
-def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
+def create_MDSA_neurons(
+    input_graph: nx.Graph, run_config: dict, spacing: float
+) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
     mdsa_snn = nx.DiGraph()
-    # TODO get spacing from somewhere.
-    spacing = 0.25
 
     # Create connecting node.
     create_connecting_node(mdsa_snn, spacing)
