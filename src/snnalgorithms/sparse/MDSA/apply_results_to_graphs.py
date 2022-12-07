@@ -159,7 +159,7 @@ def get_snn_results(
     """
     # Determine why the duration is used here to get a time step.
     sim_duration = get_sim_duration(
-        snn_graph,
+        input_graph,
         run_config,
     )
     # get runtime
@@ -202,7 +202,7 @@ def get_nx_LIF_count_without_redundancy(
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
         node_counts[f"counter_{node_index}_{m_val}"] = int(
-            nx_SNN_G.nodes[f"counter_{node_index}_{m_val}"]["nx_LIF"][
+            nx_SNN_G.nodes[f"counter_{node_index}_{m_val}"]["nx_lif"][
                 t
             ].u.get()
         )
@@ -244,7 +244,7 @@ def get_nx_LIF_count_with_redundancy(
         ] = adapted_nx_snn_graph.nodes[
             f"{prefix}counter_{node_index}_{m_val}"
         ][
-            "nx_LIF"
+            "nx_lif"
         ][
             t
         ].u.get()
