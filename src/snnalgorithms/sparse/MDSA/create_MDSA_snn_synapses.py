@@ -4,24 +4,8 @@
 from typing import Dict
 
 import networkx as nx
-from snnbackends.networkx.LIF_neuron import LIF_neuron, Synapse
+from snnbackends.networkx.LIF_neuron import Synapse
 from typeguard import typechecked
-
-
-def create_node_dict(mdsa_snn: nx.DiGraph) -> Dict[str, LIF_neuron]:
-    """Creates a dictionary with full_name of the node as key, and the actual
-    LIF_neuron object as value."""
-    node_dict: Dict[str, LIF_neuron] = {}
-    for lif_neuron in mdsa_snn.nodes:
-        # pylint: disable=C0201
-        if lif_neuron.full_name not in node_dict.keys():
-            node_dict[lif_neuron.full_name] = lif_neuron
-        else:
-            raise Exception(
-                "No duplicate nodenames permitted in"
-                + f" snn:{lif_neuron.full_name}"
-            )
-    return node_dict
 
 
 @typechecked
@@ -32,19 +16,16 @@ def create_MDSA_synapses(
 ) -> nx.DiGraph:
     """Creates the synapses between the neurons for the MDSA algorithm."""
 
-    node_dict = create_node_dict(mdsa_snn)
-
     # Create synapses for connecting node.
-    create_outgoing_connecting_synapses(input_graph, mdsa_snn, node_dict)
+    create_outgoing_connecting_synapses(input_graph, mdsa_snn)
 
     # Create spike_once nodes.
     for _ in input_graph.nodes:
-        create_outgoing_spike_once_synapses(input_graph, mdsa_snn, node_dict)
+        create_outgoing_spike_once_synapses(input_graph, mdsa_snn)
 
     create_degree_receiver_selector_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
@@ -52,52 +33,44 @@ def create_MDSA_synapses(
     create_degree_receiver_counter_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
     create_degree_receiver_next_round_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
     create_outgoing_selector_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
     create_outgoing_rand_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
     create_degree_to_degree_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
 
     create_outgoing_next_round_synapses(
         mdsa_snn,
-        node_dict,
         run_config,
     )
     create_outgoing_d_charger_synapses(
         mdsa_snn,
-        node_dict,
         run_config,
     )
     create_outgoing_delay_synapses(
         input_graph,
         mdsa_snn,
-        node_dict,
         run_config,
     )
     return mdsa_snn
@@ -107,7 +80,6 @@ def create_MDSA_synapses(
 def create_outgoing_connecting_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
     algorithm."""
@@ -117,11 +89,11 @@ def create_outgoing_connecting_synapses(
         mdsa_snn.add_edges_from(
             [
                 (
-                    node_dict["connecting_node"],
-                    node_dict[f"spike_once_{node_index}"],
+                    "connecting_node",
+                    f"spike_once_{node_index}",
                 )
             ],
-            weight=Synapse(
+            synapse=Synapse(
                 weight=0,
                 delay=0,
                 change_per_t=0,
@@ -133,7 +105,6 @@ def create_outgoing_connecting_synapses(
 def create_outgoing_spike_once_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
 ) -> None:
     """Creates the outgoing synapses for the spike_once node in the MDSA
     algorithm."""
@@ -147,16 +118,12 @@ def create_outgoing_spike_once_synapses(
                         mdsa_snn.add_edges_from(
                             [
                                 (
-                                    node_dict[
-                                        f"spike_once_{other_node_index}"
-                                    ],
-                                    node_dict[
-                                        f"degree_receiver_{node_index}_"
-                                        + f"{neighbour_index}_0"
-                                    ],
+                                    f"spike_once_{other_node_index}",
+                                    f"degree_receiver_{node_index}_"
+                                    + f"{neighbour_index}_0",
                                 )
                             ],
-                            weight=Synapse(
+                            synapse=Synapse(
                                 weight=rand_ceil * delta,
                                 delay=0,
                                 change_per_t=0,
@@ -168,7 +135,6 @@ def create_outgoing_spike_once_synapses(
 def create_degree_receiver_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: dict,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
@@ -184,14 +150,12 @@ def create_degree_receiver_selector_synapses(
                     mdsa_snn.add_edges_from(
                         [
                             (
-                                node_dict[
-                                    f"degree_receiver_{node_index}_"
-                                    + f"{neighbour_index}_{m_val}"
-                                ],
-                                node_dict[f"selector_{node_index}_{m_val}"],
+                                f"degree_receiver_{node_index}_"
+                                + f"{neighbour_index}_{m_val}",
+                                f"selector_{node_index}_{m_val}",
                             )
                         ],
-                        weight=Synapse(
+                        synapse=Synapse(
                             weight=-5,
                             delay=0,
                             change_per_t=0,
@@ -202,7 +166,6 @@ def create_degree_receiver_selector_synapses(
 def create_degree_receiver_counter_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: dict,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
@@ -217,17 +180,13 @@ def create_degree_receiver_counter_synapses(
                 mdsa_snn.add_edges_from(
                     [
                         (
-                            node_dict[
-                                f"degree_receiver_{node_index}_"
-                                # TODO: eliminate dependency on m_val
-                                + f"{neighbour_index}_{m_subscript}"
-                            ],
-                            node_dict[
-                                f"counter_{neighbour_index}_{m_subscript}"
-                            ],
+                            f"degree_receiver_{node_index}_"
+                            # TODO: eliminate dependency on m_val
+                            + f"{neighbour_index}_{m_subscript}",
+                            f"counter_{neighbour_index}_{m_subscript}",
                         )
                     ],
-                    weight=Synapse(
+                    synapse=Synapse(
                         weight=1,
                         delay=0,
                         change_per_t=0,
@@ -238,7 +197,6 @@ def create_degree_receiver_counter_synapses(
 def create_degree_receiver_next_round_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: dict,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
@@ -256,14 +214,12 @@ def create_degree_receiver_next_round_synapses(
                         mdsa_snn.add_edges_from(
                             [
                                 (
-                                    node_dict[
-                                        f"degree_receiver_{circuit_target}_"
-                                        + f"{node_index}_{m_val-1}"
-                                    ],
-                                    node_dict[f"next_round_{m_val}"],
+                                    f"degree_receiver_{circuit_target}_"
+                                    + f"{node_index}_{m_val-1}",
+                                    f"next_round_{m_val}",
                                 )
                             ],
-                            weight=Synapse(
+                            synapse=Synapse(
                                 weight=1,
                                 delay=0,
                                 change_per_t=0,
@@ -275,7 +231,6 @@ def create_degree_receiver_next_round_synapses(
 def create_outgoing_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: dict,
 ) -> None:
     """Creates the outgoing synapses for the rand node in the MDSA
@@ -290,14 +245,12 @@ def create_outgoing_selector_synapses(
                     mdsa_snn.add_edges_from(
                         [
                             (
-                                node_dict[f"selector_{node_index}_{m_val}"],
-                                node_dict[
-                                    f"degree_receiver_{node_index}_"
-                                    + f"{neighbour_index}_{m_val}"
-                                ],
+                                f"selector_{node_index}_{m_val}",
+                                f"degree_receiver_{node_index}_"
+                                + f"{neighbour_index}_{m_val}",
                             )
                         ],
-                        weight=Synapse(
+                        synapse=Synapse(
                             weight=1,
                             delay=0,
                             change_per_t=0,
@@ -309,7 +262,6 @@ def create_outgoing_selector_synapses(
 def create_outgoing_rand_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: dict,
 ) -> None:
     """Creates the outgoing synapses for the selector node in the MDSA
@@ -326,14 +278,12 @@ def create_outgoing_rand_synapses(
                         mdsa_snn.add_edges_from(
                             [
                                 (
-                                    node_dict[f"rand_{node_index}_{m_val}"],
-                                    node_dict[
-                                        f"degree_receiver_{circuit_target}_"
-                                        + f"{node_index}_{m_val}"
-                                    ],
+                                    f"rand_{node_index}_{m_val}",
+                                    f"degree_receiver_{circuit_target}_"
+                                    + f"{node_index}_{m_val}",
                                 )
                             ],
-                            weight=Synapse(
+                            synapse=Synapse(
                                 weight=input_graph.graph["alg_props"][
                                     "initial_rand_current"
                                 ][node_index],
@@ -347,7 +297,6 @@ def create_outgoing_rand_synapses(
 def create_degree_to_degree_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict,
     run_config: dict,
 ) -> nx.DiGraph:
     """
@@ -368,26 +317,22 @@ def create_degree_to_degree_synapses(
                 for node_index_right in input_graph.nodes:
                     if (
                         f"degree_receiver_{node_index_left}_{y}_{m_val}"
-                        in node_dict.keys()
+                        in mdsa_snn.nodes
                         and (
                             f"degree_receiver_{node_index_right}_{y}_{m_val+1}"
-                            in node_dict.keys()
+                            in mdsa_snn.nodes
                         )
                     ):
                         mdsa_snn.add_edges_from(
                             [
                                 (
-                                    node_dict[
-                                        f"degree_receiver_{node_index_left}_"
-                                        + f"{y}_{m_val}"
-                                    ],
-                                    node_dict[
-                                        f"degree_receiver_{node_index_right}_"
-                                        + f"{y}_{m_val+1}"
-                                    ],
+                                    f"degree_receiver_{node_index_left}_"
+                                    + f"{y}_{m_val}",
+                                    f"degree_receiver_{node_index_right}_"
+                                    + f"{y}_{m_val+1}",
                                 )
                             ],
-                            weight=Synapse(
+                            synapse=Synapse(
                                 weight=rand_ceil,  # Increase u(t) at each t.
                                 delay=0,
                                 change_per_t=0,
@@ -399,7 +344,6 @@ def create_degree_to_degree_synapses(
 @typechecked
 def create_outgoing_next_round_synapses(
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: Dict,
 ) -> None:
     """Creates the outgoing synapses for the next_round node in the MDSA
@@ -410,11 +354,11 @@ def create_outgoing_next_round_synapses(
         mdsa_snn.add_edges_from(
             [
                 (
-                    node_dict[f"next_round_{m_val}"],
-                    node_dict[f"d_charger_{m_val}"],
+                    f"next_round_{m_val}",
+                    f"d_charger_{m_val}",
                 )
             ],
-            weight=Synapse(
+            synapse=Synapse(
                 weight=1,
                 delay=0,
                 change_per_t=0,
@@ -425,7 +369,6 @@ def create_outgoing_next_round_synapses(
 @typechecked
 def create_outgoing_d_charger_synapses(
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: Dict,
 ) -> None:
     """Creates the outgoing synapses for the d_charger node in the MDSA
@@ -436,11 +379,11 @@ def create_outgoing_d_charger_synapses(
         mdsa_snn.add_edges_from(
             [
                 (
-                    node_dict[f"d_charger_{m_val}"],
-                    node_dict[f"delay_{m_val}"],
+                    f"d_charger_{m_val}",
+                    f"delay_{m_val}",
                 )
             ],
-            weight=Synapse(
+            synapse=Synapse(
                 weight=+1,
                 delay=0,
                 change_per_t=0,
@@ -452,7 +395,6 @@ def create_outgoing_d_charger_synapses(
 def create_outgoing_delay_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    node_dict: Dict[str, LIF_neuron],
     run_config: Dict,
 ) -> None:
     """Creates the outgoing synapses for the d_charger node in the MDSA
@@ -468,11 +410,11 @@ def create_outgoing_delay_synapses(
         mdsa_snn.add_edges_from(
             [
                 (
-                    node_dict[f"delay_{m_val}"],
-                    node_dict[f"d_charger_{m_val}"],
+                    f"delay_{m_val}",
+                    f"d_charger_{m_val}",
                 )
             ],
-            weight=Synapse(
+            synapse=Synapse(
                 weight=-100,
                 delay=0,
                 change_per_t=0,
@@ -483,11 +425,11 @@ def create_outgoing_delay_synapses(
             mdsa_snn.add_edges_from(
                 [
                     (
-                        node_dict[f"delay_{m_val}"],
-                        node_dict[f"selector_{node_index}_{m_val}"],
+                        f"delay_{m_val}",
+                        f"selector_{node_index}_{m_val}",
                     )
                 ],
-                weight=Synapse(
+                synapse=Synapse(
                     weight=1,
                     delay=0,
                     change_per_t=0,
