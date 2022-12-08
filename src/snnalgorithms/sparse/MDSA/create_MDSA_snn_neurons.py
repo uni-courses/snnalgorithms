@@ -111,6 +111,13 @@ def create_MDSA_neurons(
         spacing,
     )
 
+    create_terminator_node(
+        input_graph,
+        run_config["algorithm"]["MDSA"]["m_val"],
+        mdsa_snn,
+        spacing,
+    )
+
     return mdsa_snn
 
 
@@ -407,3 +414,24 @@ def create_delay_node(
         )
         mdsa_snn.add_node(lif_neuron.full_name)
         mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
+
+
+@typechecked
+def create_terminator_node(
+    input_graph: nx.Graph, m_val: int, mdsa_snn: nx.DiGraph, spacing: float
+) -> None:
+    """T800 node that stops the spiking network from proceeding, once the
+    algorithm is completed."""
+    lif_neuron = LIF_neuron(
+        name="terminator_node",
+        bias=0.0,
+        du=0.0,
+        dv=0.0,
+        vth=float(len(input_graph.nodes)),
+        pos=(
+            float(9 * spacing + m_val * 9 * spacing + 3 * spacing),
+            float(spacing),
+        ),
+    )
+    mdsa_snn.add_node(lif_neuron.full_name)
+    mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]

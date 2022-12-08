@@ -73,6 +73,13 @@ def create_MDSA_synapses(
         mdsa_snn,
         run_config,
     )
+
+    # pylint: disable=R0801
+    create_degree_receiver_terminator_synapses(
+        input_graph,
+        mdsa_snn,
+        run_config,
+    )
     return mdsa_snn
 
 
@@ -435,3 +442,34 @@ def create_outgoing_delay_synapses(
                     change_per_t=0,
                 ),
             )
+
+
+def create_degree_receiver_terminator_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    run_config: dict,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm."""
+
+    # Create synapse to terminator neuron.
+    for node_index in input_graph.nodes:
+        for neighbour_index in nx.all_neighbors(input_graph, node_index):
+            if node_index != neighbour_index:
+                # TODO: Remove the m_val dependency
+                m_subscript = max(0, run_config["algorithm"]["MDSA"]["m_val"])
+                mdsa_snn.add_edges_from(
+                    [
+                        (
+                            f"degree_receiver_{node_index}_"
+                            # TODO: eliminate dependency on m_val
+                            + f"{neighbour_index}_{m_subscript}",
+                            "terminator_node",
+                        )
+                    ],
+                    synapse=Synapse(
+                        weight=1,
+                        delay=0,
+                        change_per_t=0,
+                    ),  # Used to disable bias.
+                )
