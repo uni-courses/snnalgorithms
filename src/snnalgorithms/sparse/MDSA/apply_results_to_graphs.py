@@ -12,7 +12,7 @@ import copy
 from typing import Dict
 
 import networkx as nx
-from snncompare.helper import get_sim_duration
+from snncompare.helper import get_actual_duration
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.get_results import get_results
@@ -56,7 +56,6 @@ def set_mdsa_snn_results(
                 stage_2_graphs["input_graph"],
                 m_val,
                 redundant=False,
-                run_config=run_config,
                 snn_graph=snn_graph,
             )
             assert_valid_results(
@@ -69,7 +68,6 @@ def set_mdsa_snn_results(
                 stage_2_graphs["input_graph"],
                 m_val,
                 redundant=True,
-                run_config=run_config,
                 snn_graph=snn_graph,
             )
             assert_valid_results(
@@ -82,7 +80,6 @@ def set_mdsa_snn_results(
                 stage_2_graphs["input_graph"],
                 m_val,
                 redundant=False,
-                run_config=run_config,
                 snn_graph=snn_graph,
             )
         elif graph_name == "rad_adapted_snn_graph":
@@ -91,7 +88,6 @@ def set_mdsa_snn_results(
                 stage_2_graphs["input_graph"],
                 m_val,
                 redundant=True,
-                run_config=run_config,
                 snn_graph=snn_graph,
             )
         # TODO: verify the results are set correctly.
@@ -145,7 +141,6 @@ def get_snn_results(
     input_graph: nx.Graph,
     m_val: int,
     redundant: bool,
-    run_config: dict,
     snn_graph: nx.DiGraph,
 ) -> dict:
     """Returns the marks per node that are selected by the snn simulation.
@@ -158,10 +153,7 @@ def get_snn_results(
     picking heuristic.
     """
     # Determine why the duration is used here to get a time step.
-    sim_duration = get_sim_duration(
-        input_graph,
-        run_config,
-    )
+    sim_duration = get_actual_duration(snn_graph)
     # get runtime
 
     snn_counter_marks = {}
