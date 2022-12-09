@@ -29,33 +29,26 @@ def get_results(
     :param rand_props:
 
     """
-    delta = rand_props["delta"]
-    inhibition = rand_props["inhibition"]
-    rand_ceil = rand_props["rand_ceil"]
-    # TODO: resolve this naming discrepancy.
-    rand_nrs = rand_props["initial_rand_current"]
 
-    # Reverse engineer uninhibited spread rand nrs:
-    # TODO: read out from rand_props object.
-    uninhibited_spread_rand_nrs = [(x + inhibition) for x in rand_nrs]
+    rand_ceil = rand_props["rand_ceil"]
+    # Reverse list cause the random numbers are subtracted in the edge weights.
+    # That causes the highest to "fire first" and lowest to fire last, so the
+    # mark order is swapped. Hence the [::-1]
+    rand_nrs = rand_props["rand_nrs"][::-1]
 
     for node in input_graph.nodes:
         set_node_default_values(
-            delta,
             input_graph,
-            inhibition,
             node,
             rand_ceil,
-            uninhibited_spread_rand_nrs,
+            rand_nrs,
         )
 
     # pylint: disable=R0801
-    compute_mark(delta, input_graph, rand_ceil)
+    compute_mark(input_graph, rand_ceil)
 
     compute_marks_for_m_larger_than_one(
-        delta=delta,
         input_graph=input_graph,
-        inhibition=inhibition,
         iteration=iteration,
         m=m_val,
         seed=seed,

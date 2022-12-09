@@ -111,7 +111,6 @@ def create_outgoing_spike_once_synapses(
     """Creates the outgoing synapses for the spike_once node in the MDSA
     algorithm."""
     rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
-    delta = input_graph.graph["alg_props"]["delta"]
     for node_index in input_graph.nodes:
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
@@ -126,7 +125,7 @@ def create_outgoing_spike_once_synapses(
                                 )
                             ],
                             synapse=Synapse(
-                                weight=rand_ceil * delta,
+                                weight=rand_ceil,
                                 delay=0,
                                 change_per_t=0,
                             ),
@@ -287,7 +286,7 @@ def create_outgoing_rand_synapses(
                             ],
                             synapse=Synapse(
                                 weight=input_graph.graph["alg_props"][
-                                    "initial_rand_current"
+                                    "rand_edge_weights"
                                 ][node_index],
                                 delay=0,
                                 change_per_t=0,

@@ -57,9 +57,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # Do not output images.
         mdsa_settings["overwrite_snn_propagation"] = True
-        mdsa_settings["overwrite_visualisation"] = True
+        mdsa_settings["overwrite_visualisation"] = False
         mdsa_settings["show_snns"] = False
-        mdsa_settings["export_images"] = True
+        mdsa_settings["export_images"] = False
 
         verify_experiment_config(
             Supported_experiment_settings(),
