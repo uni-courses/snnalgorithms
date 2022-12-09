@@ -1,6 +1,5 @@
 """Takes an input graph and generates an SNN that solves the MDSA algorithm by
 Alipour et al."""
-from pprint import pprint
 from typing import List
 
 import networkx as nx
@@ -34,8 +33,6 @@ class SNN_initialisation_properties:
         self.spread_rand_nrs = spread_rand_nrs
         self.inhibition = inhibition
         self.initial_rand_current = initial_rand_current
-        pprint(self.__dict__)
-        # exit()
 
     @typechecked
     def get_random_ceiling(self, G: nx.Graph) -> int:

@@ -42,10 +42,6 @@ def create_MDSA_recurrent_synapses(
         mdsa_snn,
         run_config,
     )
-    create_recurrent_delay_synapse(
-        mdsa_snn,
-        run_config,
-    )
 
     return mdsa_snn
 
@@ -156,30 +152,6 @@ def create_recurrent_next_round_synapse(
             # pylint: disable=R0801
             synapse=Synapse(
                 weight=-5,  # TODO: why is this not "recurrent_weight"?
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
-
-@typechecked
-def create_recurrent_delay_synapse(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-) -> None:
-    """Creates the outgoing synapses for the connecting node in the MDSA
-    algorithm."""
-    # Create recurrent synapse
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"delay_{m_val}",
-                    f"delay_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=-15,  # TODO: why is this not "recurrent_weight"?
                 delay=0,
                 change_per_t=0,
             ),

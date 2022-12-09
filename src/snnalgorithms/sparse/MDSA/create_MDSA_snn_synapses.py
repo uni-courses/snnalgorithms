@@ -60,20 +60,11 @@ def create_MDSA_synapses(
         run_config,
     )
 
-    create_outgoing_next_round_synapses(
-        mdsa_snn,
-        run_config,
-    )
-    create_outgoing_d_charger_synapses(
-        mdsa_snn,
-        run_config,
-    )
-    create_outgoing_delay_synapses(
+    create_outgoing_next_round_selector_synapses(
         input_graph,
         mdsa_snn,
         run_config,
     )
-
     # pylint: disable=R0801
     create_degree_receiver_terminator_synapses(
         input_graph,
@@ -353,57 +344,7 @@ def create_degree_to_degree_synapses(
 
 
 @typechecked
-def create_outgoing_next_round_synapses(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-) -> None:
-    """Creates the outgoing synapses for the next_round node in the MDSA
-    algorithm."""
-
-    # Create outgoing synapses
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"next_round_{m_val}",
-                    f"d_charger_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=1,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
-
-@typechecked
-def create_outgoing_d_charger_synapses(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-) -> None:
-    """Creates the outgoing synapses for the d_charger node in the MDSA
-    algorithm."""
-
-    # Create outgoing synapses
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"d_charger_{m_val}",
-                    f"delay_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=+1,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
-
-@typechecked
-def create_outgoing_delay_synapses(
+def create_outgoing_next_round_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Dict,
@@ -418,25 +359,11 @@ def create_outgoing_delay_synapses(
 
     # Create outgoing synapses
     for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"delay_{m_val}",
-                    f"d_charger_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=-100,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
         for node_index in input_graph.nodes:
             mdsa_snn.add_edges_from(
                 [
                     (
-                        f"delay_{m_val}",
+                        f"next_round_{m_val}",
                         f"selector_{node_index}_{m_val}",
                     )
                 ],
