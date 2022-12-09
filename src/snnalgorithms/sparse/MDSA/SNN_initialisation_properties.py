@@ -1,8 +1,9 @@
 """Takes an input graph and generates an SNN that solves the MDSA algorithm by
 Alipour et al."""
+from pprint import pprint
 from typing import List
 
-from networkx.classes.graph import Graph
+import networkx as nx
 from snncompare.helper import generate_list_of_n_random_nrs
 from typeguard import typechecked
 
@@ -12,7 +13,7 @@ class SNN_initialisation_properties:
     results."""
 
     @typechecked
-    def __init__(self, G: Graph, seed: int) -> None:
+    def __init__(self, G: nx.Graph, seed: int) -> None:
 
         # Initialise properties for Alipour algorithm
         rand_ceil = self.get_random_ceiling(G)
@@ -21,7 +22,7 @@ class SNN_initialisation_properties:
         )
         delta = self.get_delta()
         spread_rand_nrs = self.spread_rand_nrs_with_delta(delta, rand_nrs)
-        inhibition = self.get_inhibition(delta, G, rand_ceil)
+        inhibition = self.get_inhibition(G)
         initial_rand_current = self.get_initial_random_current(
             inhibition, spread_rand_nrs
         )
@@ -33,9 +34,11 @@ class SNN_initialisation_properties:
         self.spread_rand_nrs = spread_rand_nrs
         self.inhibition = inhibition
         self.initial_rand_current = initial_rand_current
+        pprint(self.__dict__)
+        # exit()
 
     @typechecked
-    def get_random_ceiling(self, G: Graph) -> int:
+    def get_random_ceiling(self, G: nx.Graph) -> int:
         """Generate the maximum random ceiling.
 
         +2 to allow selecting a larger range of numbers than the number
@@ -43,7 +46,7 @@ class SNN_initialisation_properties:
 
         :param G: The original graph on which the MDSA algorithm is ran.
         """
-        rand_ceil = len(G) + 0
+        rand_ceil = len(G) - 1
         return rand_ceil
 
     @typechecked
@@ -73,7 +76,7 @@ class SNN_initialisation_properties:
         return spread_rand_nrs
 
     @typechecked
-    def get_inhibition(self, delta: int, G: Graph, rand_ceil: int) -> int:
+    def get_inhibition(self, G: nx.Graph) -> int:
         """Add inhibition to rand_nrs to ensure the degree_receiver current
         u[1] always starts negative. The a_in of the degree_receiver_x_y neuron
         is.
@@ -92,7 +95,7 @@ class SNN_initialisation_properties:
         generated.
         :param G: The original graph on which the MDSA algorithm is ran.
         """
-        inhibition = len(G) * (rand_ceil * delta + 1) + (rand_ceil) * delta + 1
+        inhibition = (len(G) - 1) * (len(G) - 1)
         return inhibition
 
     @typechecked
@@ -105,5 +108,5 @@ class SNN_initialisation_properties:
         degree_receivers start at negative current u[t-0].
         :param rand_nrs: List of random numbers that are used.
         """
-        initial_rand_current = [x - inhibition for x in rand_nrs]
+        initial_rand_current = [-inhibition - x for x in rand_nrs]
         return initial_rand_current

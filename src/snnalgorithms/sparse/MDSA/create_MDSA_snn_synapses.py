@@ -501,8 +501,6 @@ def create_degree_receiver_inhibitory_synapses(
                 # Get the degree_receivers with the correct index.
                 if get_identifier_value(deg_lif, 0) == node_index:
                     circuit_degree_receivers.append(deg_lif)
-        for cir in circuit_degree_receivers:
-            print(f"{node_index}:{cir.full_name}")
         # Within all the degree receivers of a single circuit, set create the
         # inhibitory synapses.
         for deg_lif in circuit_degree_receivers:
