@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import random
 from itertools import combinations, groupby
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import networkx as nx
 import numpy as np
@@ -12,10 +12,10 @@ from networkx.classes.digraph import DiGraph
 from numpy import ndarray
 from snnbackends.networkx.LIF_neuron import LIF_neuron
 from snnbackends.plot_graphs import plot_circular_graph
-from typeguard import typechecked
+from typeguard import TYPE_CHECKING, typechecked
 
 if TYPE_CHECKING:
-    from tests.exp_setts.unsorted.test_scope import Long_scope_of_tests
+    from snncompare.tests.test_scope import Long_scope_of_tests
 
 
 @typechecked

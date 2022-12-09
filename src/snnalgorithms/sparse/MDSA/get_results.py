@@ -69,8 +69,4 @@ def get_results(
         counter_marks[f"counter_{node_index}_{m_val}"] = input_graph.nodes[
             node_index
         ]["countermarks"]
-        print(
-            f"node_index:{node_index}, ali-mark:"
-            + f'{input_graph.nodes[node_index]["countermarks"]}'
-        )
     return counter_marks

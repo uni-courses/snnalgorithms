@@ -4,7 +4,7 @@
 from typing import Dict
 
 import networkx as nx
-from snnbackends.networkx.LIF_neuron import Synapse
+from snnbackends.networkx.LIF_neuron import LIF_neuron, Synapse
 from typeguard import typechecked
 
 
@@ -60,18 +60,20 @@ def create_MDSA_synapses(
         run_config,
     )
 
-    create_outgoing_next_round_synapses(
-        mdsa_snn,
-        run_config,
-    )
-    create_outgoing_d_charger_synapses(
-        mdsa_snn,
-        run_config,
-    )
-    create_outgoing_delay_synapses(
+    create_outgoing_next_round_selector_synapses(
         input_graph,
         mdsa_snn,
         run_config,
+    )
+    # pylint: disable=R0801
+    create_degree_receiver_terminator_synapses(
+        input_graph,
+        mdsa_snn,
+        run_config,
+    )
+    create_degree_receiver_inhibitory_synapses(
+        input_graph,
+        mdsa_snn,
     )
     return mdsa_snn
 
@@ -342,57 +344,7 @@ def create_degree_to_degree_synapses(
 
 
 @typechecked
-def create_outgoing_next_round_synapses(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-) -> None:
-    """Creates the outgoing synapses for the next_round node in the MDSA
-    algorithm."""
-
-    # Create outgoing synapses
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"next_round_{m_val}",
-                    f"d_charger_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=1,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
-
-@typechecked
-def create_outgoing_d_charger_synapses(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-) -> None:
-    """Creates the outgoing synapses for the d_charger node in the MDSA
-    algorithm."""
-
-    # Create outgoing synapses
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"d_charger_{m_val}",
-                    f"delay_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=+1,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
-
-@typechecked
-def create_outgoing_delay_synapses(
+def create_outgoing_next_round_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Dict,
@@ -407,25 +359,11 @@ def create_outgoing_delay_synapses(
 
     # Create outgoing synapses
     for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        mdsa_snn.add_edges_from(
-            [
-                (
-                    f"delay_{m_val}",
-                    f"d_charger_{m_val}",
-                )
-            ],
-            synapse=Synapse(
-                weight=-100,
-                delay=0,
-                change_per_t=0,
-            ),
-        )
-
         for node_index in input_graph.nodes:
             mdsa_snn.add_edges_from(
                 [
                     (
-                        f"delay_{m_val}",
+                        f"next_round_{m_val}",
                         f"selector_{node_index}_{m_val}",
                     )
                 ],
@@ -435,3 +373,89 @@ def create_outgoing_delay_synapses(
                     change_per_t=0,
                 ),
             )
+
+
+def create_degree_receiver_terminator_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    run_config: dict,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm."""
+
+    # Create synapse to terminator neuron.
+    for node_index in input_graph.nodes:
+        for neighbour_index in nx.all_neighbors(input_graph, node_index):
+            if node_index != neighbour_index:
+                # TODO: Remove the m_val dependency
+                m_subscript = max(0, run_config["algorithm"]["MDSA"]["m_val"])
+                mdsa_snn.add_edges_from(
+                    [
+                        (
+                            f"degree_receiver_{node_index}_"
+                            # TODO: eliminate dependency on m_val
+                            + f"{neighbour_index}_{m_subscript}",
+                            "terminator_node",
+                        )
+                    ],
+                    synapse=Synapse(
+                        weight=1,
+                        delay=0,
+                        change_per_t=0,
+                    ),  # Used to disable bias.
+                )
+
+
+def create_degree_receiver_inhibitory_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm.
+
+    These inhibitory synapses are used to directly silence any other
+    competing degree_receiver neurons in that circuit, once a winner has
+    been found.
+    """
+
+    # Create synapse to inhibitory neuron.
+    for node_index in input_graph.nodes:
+        circuit_degree_receivers = []
+        for nodename in mdsa_snn.nodes:
+            deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]
+
+            if deg_lif.name == "degree_receiver":
+                # Get the degree_receivers with the correct index.
+                if get_identifier_value(deg_lif, 0) == node_index:
+                    circuit_degree_receivers.append(deg_lif)
+        # Within all the degree receivers of a single circuit, set create the
+        # inhibitory synapses.
+        for deg_lif in circuit_degree_receivers:
+            for other_deg_lif in circuit_degree_receivers:
+                if deg_lif != other_deg_lif:
+
+                    mdsa_snn.add_edges_from(
+                        [(deg_lif.full_name, other_deg_lif.full_name)],
+                        synapse=Synapse(
+                            weight=-1,
+                            delay=0,
+                            change_per_t=0,
+                        ),
+                    )
+
+
+def get_identifier_value(lif_neuron: LIF_neuron, position: int) -> int:
+    """Returns the identifier value of a Lif neuron at the desired position.
+
+    The positions represent the subscript indice positions in the neuron
+    names. For example: degree_receiver_5_6_4 has at identifier position
+    0 a value of 5, at identifier position 2 a value of 4.
+    """
+
+    for identifier in lif_neuron.identifiers:
+        if identifier.position == position:
+            return identifier.value
+    raise Exception(
+        "Identifier position:{position} not found in node:"
+        + f"{lif_neuron.full_name}."
+    )

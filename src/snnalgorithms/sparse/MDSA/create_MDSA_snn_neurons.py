@@ -8,6 +8,13 @@ from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
 from snncompare.helper import get_y_position
 from typeguard import typechecked
 
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
+    create_MDSA_recurrent_synapses,
+)
+from snnalgorithms.sparse.MDSA.create_MDSA_snn_synapses import (
+    create_MDSA_synapses,
+)
+
 
 @typechecked
 def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
@@ -16,17 +23,36 @@ def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
     if not isinstance(input_graph.graph["alg_props"], dict):
         raise Exception("Error, algorithm properties not set.")
 
-    return create_MDSA_neurons(run_config, input_graph)
+    # TODO get spacing and recurrent weight form algo specification.
+    spacing: float = 0.25
+    recurrent_weight: int = -10
+
+    snn_graph = create_MDSA_neurons(input_graph, run_config, spacing)
+
+    create_MDSA_recurrent_synapses(
+        input_graph,
+        snn_graph,
+        recurrent_weight,
+        run_config,
+    )
+
+    create_MDSA_synapses(
+        input_graph,
+        snn_graph,
+        run_config,
+    )
+
+    return snn_graph
 
 
 # pylint: disable=R0912
 # pylint: disable=R0914
 @typechecked
-def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
+def create_MDSA_neurons(
+    input_graph: nx.Graph, run_config: dict, spacing: float
+) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
     mdsa_snn = nx.DiGraph()
-    # TODO get spacing from somewhere.
-    spacing = 0.25
 
     # Create connecting node.
     create_connecting_node(mdsa_snn, spacing)
@@ -72,16 +98,10 @@ def create_MDSA_neurons(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
         spacing,
     )
 
-    create_d_charger_node(
+    create_terminator_node(
+        input_graph,
+        run_config["algorithm"]["MDSA"]["m_val"],
         mdsa_snn,
-        run_config,
-        spacing,
-    )
-
-    create_delay_node(
-        mdsa_snn,
-        len(input_graph.nodes),
-        run_config,
         spacing,
     )
 
@@ -328,56 +348,21 @@ def create_next_round_node(
 
 
 @typechecked
-def create_d_charger_node(
-    mdsa_snn: nx.DiGraph,
-    run_config: Dict,
-    spacing: float,
+def create_terminator_node(
+    input_graph: nx.Graph, m_val: int, mdsa_snn: nx.DiGraph, spacing: float
 ) -> None:
-    """Creates the neuron settings for the d_charger node in the MDSA
-    algorithm."""
-    # NOTE, for loop starts at index 1, instead of 0!
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        lif_neuron = LIF_neuron(
-            name="d_charger",
-            bias=0.0,
-            du=0.0,
-            dv=1.0,
-            vth=0.0,
-            pos=(
-                float(9 * spacing + (m_val - 1) * 9 * spacing),
-                -2 * spacing,
-            ),
-            identifiers=[
-                Identifier(description="m_val", position=0, value=m_val),
-            ],
-        )
-        mdsa_snn.add_node(lif_neuron.full_name)
-        mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
-
-
-@typechecked
-def create_delay_node(
-    mdsa_snn: nx.DiGraph,
-    nr_of_nodes: int,
-    run_config: Dict,
-    spacing: float,
-) -> None:
-    """Creates the neuron settings for the delay node in the MDSA algorithm."""
-    # NOTE, for loop starts at index 1, instead of 0!
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-        lif_neuron = LIF_neuron(
-            name="delay",
-            bias=0.0,
-            du=0.0,
-            dv=1.0,
-            vth=float(2 * nr_of_nodes - 1),
-            pos=(
-                float(12 * spacing + (m_val - 1) * 9 * spacing),
-                -2 * spacing,
-            ),
-            identifiers=[
-                Identifier(description="m_val", position=0, value=m_val),
-            ],
-        )
-        mdsa_snn.add_node(lif_neuron.full_name)
-        mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
+    """T800 node that stops the spiking network from proceeding, once the
+    algorithm is completed."""
+    lif_neuron = LIF_neuron(
+        name="terminator_node",
+        bias=0.0,
+        du=0.0,
+        dv=1.0,
+        vth=float(len(input_graph.nodes)) - 1,
+        pos=(
+            float(6 * spacing + (m_val) * 9 * spacing),
+            -2 * spacing,
+        ),
+    )
+    mdsa_snn.add_node(lif_neuron.full_name)
+    mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
