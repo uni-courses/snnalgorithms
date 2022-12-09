@@ -50,47 +50,54 @@ def set_mdsa_snn_results(
                 + f" completed for: {graph_name}"
             )
 
-        if graph_name == "snn_algo_graph":
-            snn_graph.graph["results"] = get_snn_results(
-                alipour_counter_marks,
-                stage_2_graphs["input_graph"],
-                m_val,
-                redundant=False,
-                snn_graph=snn_graph,
-            )
-            assert_valid_results(
-                snn_graph.graph["results"], alipour_counter_marks, graph_name
-            )
+        if graph_name != "input_graph":
+            if graph_name == "snn_algo_graph":
+                snn_graph.graph["results"] = get_snn_results(
+                    alipour_counter_marks,
+                    stage_2_graphs["input_graph"],
+                    m_val,
+                    redundant=False,
+                    snn_graph=snn_graph,
+                )
+                assert_valid_results(
+                    snn_graph.graph["results"],
+                    alipour_counter_marks,
+                    graph_name,
+                )
 
-        elif graph_name == "adapted_snn_graph":
-            snn_graph.graph["results"] = get_snn_results(
-                alipour_counter_marks,
-                stage_2_graphs["input_graph"],
-                m_val,
-                redundant=True,
-                snn_graph=snn_graph,
-            )
-            assert_valid_results(
-                snn_graph.graph["results"], alipour_counter_marks, graph_name
-            )
+            elif graph_name == "adapted_snn_graph":
+                snn_graph.graph["results"] = get_snn_results(
+                    alipour_counter_marks,
+                    stage_2_graphs["input_graph"],
+                    m_val,
+                    redundant=True,
+                    snn_graph=snn_graph,
+                )
+                assert_valid_results(
+                    snn_graph.graph["results"],
+                    alipour_counter_marks,
+                    graph_name,
+                )
 
-        elif graph_name == "rad_snn_algo_graph":
-            snn_graph.graph["results"] = get_snn_results(
-                alipour_counter_marks,
-                stage_2_graphs["input_graph"],
-                m_val,
-                redundant=False,
-                snn_graph=snn_graph,
-            )
-        elif graph_name == "rad_adapted_snn_graph":
-            snn_graph.graph["results"] = get_snn_results(
-                alipour_counter_marks,
-                stage_2_graphs["input_graph"],
-                m_val,
-                redundant=True,
-                snn_graph=snn_graph,
-            )
-        # TODO: verify the results are set correctly.
+            elif graph_name == "rad_snn_algo_graph":
+                snn_graph.graph["results"] = get_snn_results(
+                    alipour_counter_marks,
+                    stage_2_graphs["input_graph"],
+                    m_val,
+                    redundant=False,
+                    snn_graph=snn_graph,
+                )
+            elif graph_name == "rad_adapted_snn_graph":
+                snn_graph.graph["results"] = get_snn_results(
+                    alipour_counter_marks,
+                    stage_2_graphs["input_graph"],
+                    m_val,
+                    redundant=True,
+                    snn_graph=snn_graph,
+                )
+            else:
+                raise Exception(f"Invalid graph name:{graph_name}")
+            # TODO: verify the results are set correctly.
 
 
 @typechecked
@@ -131,6 +138,13 @@ def assert_valid_results(
             "Error, did not detect a difference between SNN "
             "and Neumann mark count in the nodes. Yet "
             "the results computation says there should be a difference."
+        )
+
+    print("")
+    for node_index, expected_count in expected_nodenames.items():
+        print(
+            f"node_index:{node_index}, ali-mark:"
+            + f"{expected_count}, snn:{copy_actual_nodenames[node_index]}"
         )
 
 

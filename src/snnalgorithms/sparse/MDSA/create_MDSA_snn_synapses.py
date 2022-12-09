@@ -4,7 +4,7 @@
 from typing import Dict
 
 import networkx as nx
-from snnbackends.networkx.LIF_neuron import Synapse
+from snnbackends.networkx.LIF_neuron import LIF_neuron, Synapse
 from typeguard import typechecked
 
 
@@ -79,6 +79,10 @@ def create_MDSA_synapses(
         input_graph,
         mdsa_snn,
         run_config,
+    )
+    create_degree_receiver_inhibitory_synapses(
+        input_graph,
+        mdsa_snn,
     )
     return mdsa_snn
 
@@ -473,3 +477,60 @@ def create_degree_receiver_terminator_synapses(
                         change_per_t=0,
                     ),  # Used to disable bias.
                 )
+
+
+def create_degree_receiver_inhibitory_synapses(
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+) -> None:
+    """Creates the outgoing synapses for the degree_receiver node in the MDSA
+    algorithm.
+
+    These inhibitory synapses are used to directly silence any other
+    competing degree_receiver neurons in that circuit, once a winner has
+    been found.
+    """
+
+    # Create synapse to inhibitory neuron.
+    for node_index in input_graph.nodes:
+        circuit_degree_receivers = []
+        for nodename in mdsa_snn.nodes:
+            deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]
+
+            if deg_lif.name == "degree_receiver":
+                # Get the degree_receivers with the correct index.
+                if get_identifier_value(deg_lif, 0) == node_index:
+                    circuit_degree_receivers.append(deg_lif)
+        for cir in circuit_degree_receivers:
+            print(f"{node_index}:{cir.full_name}")
+        # Within all the degree receivers of a single circuit, set create the
+        # inhibitory synapses.
+        for deg_lif in circuit_degree_receivers:
+            for other_deg_lif in circuit_degree_receivers:
+                if deg_lif != other_deg_lif:
+
+                    mdsa_snn.add_edges_from(
+                        [(deg_lif.full_name, other_deg_lif.full_name)],
+                        synapse=Synapse(
+                            weight=-1,
+                            delay=0,
+                            change_per_t=0,
+                        ),
+                    )
+
+
+def get_identifier_value(lif_neuron: LIF_neuron, position: int) -> int:
+    """Returns the identifier value of a Lif neuron at the desired position.
+
+    The positions represent the subscript indice positions in the neuron
+    names. For example: degree_receiver_5_6_4 has at identifier position
+    0 a value of 5, at identifier position 2 a value of 4.
+    """
+
+    for identifier in lif_neuron.identifiers:
+        if identifier.position == position:
+            return identifier.value
+    raise Exception(
+        "Identifier position:{position} not found in node:"
+        + f"{lif_neuron.full_name}."
+    )

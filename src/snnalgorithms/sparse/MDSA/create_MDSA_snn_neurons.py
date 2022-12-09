@@ -426,8 +426,8 @@ def create_terminator_node(
         name="terminator_node",
         bias=0.0,
         du=0.0,
-        dv=0.0,
-        vth=float(len(input_graph.nodes)),
+        dv=1.0,
+        vth=float(len(input_graph.nodes)) - 1,
         pos=(
             float(9 * spacing + m_val * 9 * spacing + 3 * spacing),
             float(spacing),

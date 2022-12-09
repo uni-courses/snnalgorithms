@@ -56,7 +56,7 @@ class SNN_initialisation_properties:
         the selector neuron and has a delay of 2. So a winner should
         have a difference of at least 2.
         """
-        delta = 2
+        delta = 1
         return delta
 
     @typechecked
