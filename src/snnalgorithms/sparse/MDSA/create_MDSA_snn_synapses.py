@@ -74,6 +74,7 @@ def create_MDSA_synapses(
     create_degree_receiver_inhibitory_synapses(
         input_graph,
         mdsa_snn,
+        run_config,
     )
     return mdsa_snn
 
@@ -279,7 +280,7 @@ def create_outgoing_rand_synapses(
                         mdsa_snn.add_edges_from(
                             [
                                 (
-                                    f"rand_{node_index}_{m_val}",
+                                    f"rand_{node_index}",
                                     f"degree_receiver_{circuit_target}_"
                                     + f"{node_index}_{m_val}",
                                 )
@@ -408,6 +409,7 @@ def create_degree_receiver_terminator_synapses(
 def create_degree_receiver_inhibitory_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    run_config: Dict,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm.
@@ -418,29 +420,31 @@ def create_degree_receiver_inhibitory_synapses(
     """
 
     # Create synapse to inhibitory neuron.
+    # pylint: disable=R1702
     for node_index in input_graph.nodes:
-        circuit_degree_receivers = []
-        for nodename in mdsa_snn.nodes:
-            deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]
+        for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+            circuit_degree_receivers = []
+            for nodename in mdsa_snn.nodes:
+                deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]
 
-            if deg_lif.name == "degree_receiver":
-                # Get the degree_receivers with the correct index.
-                if get_identifier_value(deg_lif, 0) == node_index:
-                    circuit_degree_receivers.append(deg_lif)
-        # Within all the degree receivers of a single circuit, set create the
-        # inhibitory synapses.
-        for deg_lif in circuit_degree_receivers:
-            for other_deg_lif in circuit_degree_receivers:
-                if deg_lif != other_deg_lif:
-
-                    mdsa_snn.add_edges_from(
-                        [(deg_lif.full_name, other_deg_lif.full_name)],
-                        synapse=Synapse(
-                            weight=-1,
-                            delay=0,
-                            change_per_t=0,
-                        ),
-                    )
+                if deg_lif.name == "degree_receiver":
+                    # Get the degree_receivers with the correct index.
+                    if get_identifier_value(deg_lif, 0) == node_index:
+                        if get_identifier_value(deg_lif, 2) == m_val:
+                            circuit_degree_receivers.append(deg_lif)
+            # Within all the degree receivers of a single circuit, set create
+            # the inhibitory synapses.
+            for deg_lif in circuit_degree_receivers:
+                for other_deg_lif in circuit_degree_receivers:
+                    if deg_lif != other_deg_lif:
+                        mdsa_snn.add_edges_from(
+                            [(deg_lif.full_name, other_deg_lif.full_name)],
+                            synapse=Synapse(
+                                weight=-1,
+                                delay=0,
+                                change_per_t=0,
+                            ),
+                        )
 
 
 def get_identifier_value(lif_neuron: LIF_neuron, position: int) -> int:

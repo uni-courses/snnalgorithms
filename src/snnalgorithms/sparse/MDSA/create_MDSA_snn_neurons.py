@@ -5,7 +5,6 @@ from typing import Dict
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
-from snncompare.helper import get_y_position
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
@@ -71,7 +70,6 @@ def create_MDSA_neurons(
     create_rand_node(
         input_graph,
         mdsa_snn,
-        run_config,
         spacing,
     )
 
@@ -118,7 +116,7 @@ def create_connecting_node(mdsa_snn: nx.DiGraph, spacing: float) -> None:
         du=0.0,
         dv=0.0,
         vth=1.0,
-        pos=(float(-spacing), float(spacing)),
+        pos=(float(-spacing), float(-1.5 * spacing)),
     )
     mdsa_snn.add_node(lif_neuron.full_name)
     mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
@@ -158,9 +156,10 @@ def create_degree_receiver_node(
     mdsa_snn: nx.DiGraph,
     run_config: Dict,
     spacing: float,
-) -> None:
+) -> float:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
+    max_deg_y: float = 0
     # pylint: disable=R0801
     # Create degree_receiver nodes.
     for node_index in input_graph.nodes:
@@ -176,13 +175,9 @@ def create_degree_receiver_node(
                         dv=1.0,
                         vth=1.0,
                         pos=(
-                            float(4 * spacing + m_val * 9 * spacing),
-                            get_y_position(
-                                input_graph,
-                                node_index,
-                                node_neighbour,
-                                spacing,
-                            ),
+                            float(12 * spacing + m_val * 22 * spacing),
+                            float(node_index * 4 * spacing)
+                            + node_neighbour * spacing,
                         ),
                         identifiers=[
                             Identifier(
@@ -202,45 +197,44 @@ def create_degree_receiver_node(
                             ),
                         ],
                     )
+                    max_deg_y = max(max_deg_y, node_neighbour)
 
                     mdsa_snn.add_node(lif_neuron.full_name)
                     mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [
                         lif_neuron
                     ]
+    return max_deg_y
 
 
 @typechecked
 def create_rand_node(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
     spacing: float,
 ) -> None:
     """Creates the neuron settings for the rand node in the MDSA algorithm."""
     for node_index in input_graph.nodes:
-        for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
-            lif_neuron = LIF_neuron(
-                name="rand",
-                bias=2.0,
-                du=0.0,
-                dv=0.0,
-                vth=1.0,
-                pos=(
-                    float(spacing + m_val * 9 * spacing),
-                    float(node_index * 4 * spacing) + spacing,
+        # for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        lif_neuron = LIF_neuron(
+            name="rand",
+            bias=2.0,
+            du=0.0,
+            dv=0.0,
+            vth=1.0,
+            pos=(
+                float(spacing),
+                float(node_index * 4 * spacing + 1.5 * spacing),
+            ),
+            identifiers=[
+                Identifier(
+                    description="node_index",
+                    position=0,
+                    value=node_index,
                 ),
-                identifiers=[
-                    Identifier(
-                        description="node_index",
-                        position=0,
-                        value=node_index,
-                    ),
-                    # TODO: remove m_val dependency.
-                    Identifier(description="m_val", position=1, value=m_val),
-                ],
-            )
-            mdsa_snn.add_node(lif_neuron.full_name)
-            mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
+            ],
+        )
+        mdsa_snn.add_node(lif_neuron.full_name)
+        mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [lif_neuron]
 
 
 @typechecked
@@ -268,8 +262,8 @@ def create_selector_node(
                 dv=1.0,
                 vth=4.0,
                 pos=(
-                    float(7 * spacing + m_val * 9 * spacing),
-                    float(node_index * 4 * spacing + spacing),
+                    float(22 * spacing + m_val * 22 * spacing),
+                    float((0.5 + node_index * 4) * spacing),
                 ),
                 identifiers=[
                     Identifier(
@@ -301,8 +295,8 @@ def create_counter_node(
             dv=1.0,
             vth=0.0,
             pos=(
-                float(9 * spacing + m_val * 9 * spacing),
-                float(node_index * 4 * spacing),
+                float(24 * spacing + m_val * 22 * spacing),
+                float(node_index * 4 * spacing - spacing),
             ),
             identifiers=[
                 Identifier(
@@ -336,8 +330,8 @@ def create_next_round_node(
             dv=1.0,
             vth=float(nr_of_nodes) - 1,
             pos=(
-                float(6 * spacing + (m_val - 1) * 9 * spacing),
-                -2 * spacing,
+                float(8 * spacing + (m_val - 1) * 22 * spacing),
+                -1 * spacing,
             ),
             identifiers=[
                 Identifier(description="m_val", position=0, value=m_val),
@@ -351,8 +345,11 @@ def create_next_round_node(
 def create_terminator_node(
     input_graph: nx.Graph, m_val: int, mdsa_snn: nx.DiGraph, spacing: float
 ) -> None:
-    """T800 node that stops the spiking network from proceeding, once the
-    algorithm is completed."""
+    """T800 node that stops the spiking neural network from proceeding, once
+    the algorithm is completed.
+
+    Ensures it will not start learning at the geometric rate.
+    """
     lif_neuron = LIF_neuron(
         name="terminator_node",
         bias=0.0,
@@ -360,8 +357,8 @@ def create_terminator_node(
         dv=1.0,
         vth=float(len(input_graph.nodes)) - 1,
         pos=(
-            float(6 * spacing + (m_val) * 9 * spacing),
-            -2 * spacing,
+            float(15 * spacing + m_val * 22 * spacing),
+            -1 * spacing,
         ),
     )
     mdsa_snn.add_node(lif_neuron.full_name)
