@@ -55,35 +55,32 @@ def set_mdsa_snn_results(
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=False,
                     snn_graph=snn_graph,
                 )
                 assert_valid_results(
-                    snn_graph.graph["results"],
-                    alipour_counter_marks,
-                    graph_name,
+                    actual_nodenames=snn_graph.graph["results"],
+                    expected_nodenames=alipour_counter_marks,
+                    graph_name=graph_name,
                 )
 
             elif graph_name == "adapted_snn_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=True,
                     snn_graph=snn_graph,
                 )
                 assert_valid_results(
-                    snn_graph.graph["results"],
-                    alipour_counter_marks,
-                    graph_name,
+                    actual_nodenames=snn_graph.graph["results"],
+                    expected_nodenames=alipour_counter_marks,
+                    graph_name=graph_name,
                 )
 
             elif graph_name == "rad_snn_algo_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=False,
                     snn_graph=snn_graph,
                 )
@@ -91,7 +88,6 @@ def set_mdsa_snn_results(
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=True,
                     snn_graph=snn_graph,
                 )
@@ -102,7 +98,7 @@ def set_mdsa_snn_results(
 
 @typechecked
 def assert_valid_results(
-    actual_nodenames: Dict[str, int],
+    actual_nodenames: Dict,
     expected_nodenames: Dict[str, int],
     graph_name: str,
 ) -> None:
@@ -153,7 +149,6 @@ def assert_valid_results(
 def get_snn_results(
     alipour_counter_marks: Dict[str, int],
     input_graph: nx.Graph,
-    m_val: int,
     redundant: bool,
     snn_graph: nx.DiGraph,
 ) -> dict:
@@ -173,11 +168,11 @@ def get_snn_results(
     snn_counter_marks = {}
     if not redundant:
         snn_counter_marks = get_nx_LIF_count_without_redundancy(
-            input_graph, snn_graph, m_val, sim_duration
+            input_graph, snn_graph, sim_duration
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph, snn_graph, m_val, sim_duration
+            input_graph, snn_graph, sim_duration
         )
 
     # Compare the two performances.
@@ -190,7 +185,7 @@ def get_snn_results(
 
 @typechecked
 def get_nx_LIF_count_without_redundancy(
-    input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, m_val: int, t: int
+    input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
 ) -> dict:
     """Creates a dictionary with the node name and the the current as node
     count.
@@ -207,10 +202,8 @@ def get_nx_LIF_count_without_redundancy(
 
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
-        node_counts[f"counter_{node_index}_{m_val}"] = int(
-            nx_SNN_G.nodes[f"counter_{node_index}_{m_val}"]["nx_lif"][
-                t
-            ].u.get()
+        node_counts[f"counter_{node_index}"] = int(
+            nx_SNN_G.nodes[f"counter_{node_index}"]["nx_lif"][t].u.get()
         )
     return node_counts
 
@@ -219,7 +212,6 @@ def get_nx_LIF_count_without_redundancy(
 def get_nx_LIF_count_with_redundancy(
     input_graph: nx.Graph,
     adapted_nx_snn_graph: nx.DiGraph,
-    m_val: int,
     t: int,
 ) -> dict:
     """Creates a dictionary with the node name and the the current as node
@@ -238,22 +230,14 @@ def get_nx_LIF_count_with_redundancy(
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
         # Check if counterneuron died, if yes, read out redundant neuron.
-        if counter_neuron_died(
-            adapted_nx_snn_graph, f"counter_{node_index}_{m_val}"
-        ):
+        if counter_neuron_died(adapted_nx_snn_graph, f"counter_{node_index}"):
             prefix = "red_"
         else:
             prefix = ""
 
-        node_counts[
-            f"counter_{node_index}_{m_val}"
-        ] = adapted_nx_snn_graph.nodes[
-            f"{prefix}counter_{node_index}_{m_val}"
-        ][
-            "nx_lif"
-        ][
-            t
-        ].u.get()
+        node_counts[f"counter_{node_index}"] = adapted_nx_snn_graph.nodes[
+            f"{prefix}counter_{node_index}"
+        ]["nx_lif"][t].u.get()
     return node_counts
 
 

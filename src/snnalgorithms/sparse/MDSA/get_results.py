@@ -59,7 +59,7 @@ def get_results(
     )
     counter_marks = {}
     for node_index in input_graph.nodes:
-        counter_marks[f"counter_{node_index}_{m_val}"] = input_graph.nodes[
-            node_index
-        ]["countermarks"]
+        counter_marks[f"counter_{node_index}"] = input_graph.nodes[node_index][
+            "countermarks"
+        ]
     return counter_marks

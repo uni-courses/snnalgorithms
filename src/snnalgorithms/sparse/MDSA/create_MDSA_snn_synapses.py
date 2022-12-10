@@ -183,9 +183,8 @@ def create_degree_receiver_counter_synapses(
                     [
                         (
                             f"degree_receiver_{node_index}_"
-                            # TODO: eliminate dependency on m_val
                             + f"{neighbour_index}_{m_subscript}",
-                            f"counter_{neighbour_index}_{m_subscript}",
+                            f"counter_{neighbour_index}",
                         )
                     ],
                     synapse=Synapse(

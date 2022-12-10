@@ -304,8 +304,6 @@ def create_counter_node(
                     position=0,
                     value=node_index,
                 ),
-                # TODO: remove m_val dependency.
-                Identifier(description="m_val", position=1, value=m_val),
             ],
         )
         mdsa_snn.add_node(lif_neuron.full_name)
