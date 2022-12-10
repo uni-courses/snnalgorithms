@@ -19,20 +19,12 @@ class SNN_initialisation_properties:
         rand_nrs = generate_list_of_n_random_nrs(
             G, max_val=rand_ceil, seed=seed
         )
-        delta = self.get_delta()
-        spread_rand_nrs = self.spread_rand_nrs_with_delta(delta, rand_nrs)
-        inhibition = self.get_inhibition(G)
-        initial_rand_current = self.get_initial_random_current(
-            inhibition, spread_rand_nrs
-        )
-
         # Store properties in object.
         self.rand_ceil = rand_ceil
         self.rand_nrs = rand_nrs
-        self.delta = delta
-        self.spread_rand_nrs = spread_rand_nrs
-        self.inhibition = inhibition
-        self.initial_rand_current = initial_rand_current
+        self.rand_edge_weights = self.get_rand__degree_receiver_edge_weights(
+            G, rand_ceil, rand_nrs
+        )
 
     @typechecked
     def get_random_ceiling(self, G: nx.Graph) -> int:
@@ -47,63 +39,31 @@ class SNN_initialisation_properties:
         return rand_ceil
 
     @typechecked
-    def get_delta(self) -> int:
-        """Make the random numbers differ with at least delta>=2.
+    def get_degree_receiver_offset(self, G: nx.Graph, rand_ceil: int) -> int:
+        """Compute offset to rand_nrs to ensure the degree_receiver current
+        u[1] always starts negative. That is important because otherwise
+        degree_receiver neurons in their WTA circuits might spike
+        simultaneously on t=2.
 
-        This is to prevent multiple degree_receiver_x_y neurons (that
-        differ less than delta) in a single WTA circuit to spike before
-        they are inhibited by the first winner. This inhibition goes via
-        the selector neuron and has a delay of 2. So a winner should
-        have a difference of at least 2.
+        The a_in of the degree_receiver_x_y neuron can be described as:
+            + a spike from at most n-1 spike_once neurons, with weight=n-1.
+            + a random nr in range/of weight: [0, n-1] (or [0, rand_ceil-1]).
+            + selector_excitation of weight +1
+            - this offset.
+        So at most the degree_receivers get: (n-1)*(n-1)+(n-1) as positive
+        input at the start.
         """
-        delta = 1
-        return delta
+        spike_once_offset = (len(G) - 1) * (len(G) - 1)
+        rand_nr_offset = rand_ceil
+        degree_receiver_offset = -spike_once_offset - rand_nr_offset
+        return degree_receiver_offset
 
     @typechecked
-    def spread_rand_nrs_with_delta(
-        self, delta: int, rand_nrs: List[int]
+    def get_rand__degree_receiver_edge_weights(
+        self, G: nx.Graph, rand_ceil: int, rand_nrs: List[int]
     ) -> List[int]:
-        """Spread the random numbers with delta to ensure 1 winner in WTA
-        circuit.
-
-        :param delta: Value of how far the rand_nrs are separated.
-        :param rand_nrs: List of random numbers that are used.
-        """
-        spread_rand_nrs = [x * delta for x in rand_nrs]
-        return spread_rand_nrs
-
-    @typechecked
-    def get_inhibition(self, G: nx.Graph) -> int:
-        """Add inhibition to rand_nrs to ensure the degree_receiver current
-        u[1] always starts negative. The a_in of the degree_receiver_x_y neuron
-        is.
-
-        : the incoming spike_once_x weights+rand_x neurons+selector_excitation
-        - There are at most n incoming spike signals.
-        - Each spike_once should have a weight of at least random_ceiling+1.
-        That is because the random value should map to 0<rand<1 with respect
-        to the difference of 1 spike_once more or less.
-        - The random_ceiling is specified.
-        - The excitatory neuron comes in at +1, a buffer of 1 yields+2.
-        Hence, the inhibition is computed as:
-
-        :param delta: Value of how far the rand_nrs are separated. param G:
-        :param rand_ceil: Ceiling of the range in which rand nrs can be
-        generated.
-        :param G: The original graph on which the MDSA algorithm is ran.
-        """
-        inhibition = (len(G) - 1) * (len(G) - 1)
-        return inhibition
-
-    @typechecked
-    def get_initial_random_current(
-        self, inhibition: int, rand_nrs: List[int]
-    ) -> List[int]:
-        """Returns the list with random initial currents for the rand_ neurons.
-
-        :param inhibition: Value of shift of rand_nrs to ensure
-        degree_receivers start at negative current u[t-0].
-        :param rand_nrs: List of random numbers that are used.
-        """
-        initial_rand_current = [-inhibition - x for x in rand_nrs]
-        return initial_rand_current
+        """Returns the list with random initial synaptic weights for the rand_
+        neurons."""
+        degree_receiver_offset = self.get_degree_receiver_offset(G, rand_ceil)
+        rand_edge_weights = [degree_receiver_offset - x for x in rand_nrs]
+        return rand_edge_weights
