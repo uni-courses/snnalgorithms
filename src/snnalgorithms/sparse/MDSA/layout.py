@@ -40,20 +40,23 @@ class MDSA_circuit_dimensions:
         # y0 is the starting y-coordinate of the circuit.
         self.x0 = 0
         self.y0 = 0
-        self.dx_spike_once_degree_receiver = 0.1
+        self.dx_spike_once_degree_receiver = 1
         self.dy_spike_once_rand = 0.1
         self.dy_degree_receivers = 0.1
+        self.dy_circuit = 30
+        self.dx_cicruit = 0
 
-        self.max_height = self.max_circuit_height()
-        self.max_width = self.max_circuit_width()
+        self.max_height = (
+            self.max_circuit_height(self.redundancy) + self.dy_circuit
+        )
+        self.max_width = self.max_circuit_width() + self.dx_cicruit
 
     @typechecked
-    def max_circuit_height(
-        self,
-    ) -> float:
+    def max_circuit_height(self, circuit_redundancy: int) -> float:
         """Returns the maximum height of the circuit for n=1."""
         return max(
-            self.max_circuit_height_rand(), self.max_height_degree_receiver()
+            self.max_circuit_height_rand(circuit_redundancy),
+            self.max_height_degree_receiver(circuit_redundancy),
         )
 
     def max_circuit_width(
@@ -63,14 +66,18 @@ class MDSA_circuit_dimensions:
         return self.max_width_degree_receiver()
 
     @typechecked
-    def max_circuit_height_spike_once(self) -> float:
+    def max_circuit_height_spike_once(self, circuit_redundancy: int) -> float:
         """Returns the max y-coordinate of the spike_once nodes, including
         redundant nodes, for the first circuit.
 
         # TODO: duplicate code with:max_height_degree_receiver
         """
-        spike_once_node = Node_layout("rand")
-        return spike_once_node.max_height_redundancy(self.y0, self.redundancy)
+        spike_once_node = Node_layout("spike_once")
+        return spike_once_node.max_height_redundancy(
+            circuit_redundancy,
+            "spike_once",
+            self.y0,
+        )
 
     @typechecked
     def max_circuit_width_spike_once(self) -> float:
@@ -79,27 +86,29 @@ class MDSA_circuit_dimensions:
 
         # TODO: duplicate code with:max_width_degree_receiver
         """
-        spike_once_node = Node_layout("rand")
+        spike_once_node = Node_layout("spike_once")
         return spike_once_node.max_width_redundancy(self.x0, self.redundancy)
 
     @typechecked
-    def max_circuit_height_rand(self) -> float:
+    def max_circuit_height_rand(self, circuit_redundancy: int) -> float:
         """Returns the max y-coordinate of the rand nodes, including redundant
         nodes, for the first circuit."""
-        y_0_rand = self.max_circuit_height_spike_once()
+        y_0_rand = self.max_circuit_height_spike_once(circuit_redundancy)
         rand_node = Node_layout("rand")
         return self.dy_spike_once_rand + rand_node.max_height_redundancy(
-            y_0_rand, self.redundancy
+            circuit_redundancy, "rand", y_0_rand
         )
 
     @typechecked
-    def max_height_degree_receiver(self) -> float:
+    def max_height_degree_receiver(self, circuit_redundancy: int) -> float:
         """Returns the max y-coordinate of the degree_receiver nodes, including
         redundant nodes, for the first circuit."""
-        nr_of_degree_receivers: float = self.graph_size - 1
+        max_nr_of_degree_receivers: float = self.graph_size - 1
         degree_receiver_node = Node_layout("degree_receiver")
-        return nr_of_degree_receivers * (
-            degree_receiver_node.max_height_redundancy(0, self.redundancy)
+        return max_nr_of_degree_receivers * (
+            degree_receiver_node.max_height_redundancy(
+                circuit_redundancy, "degree_receiver", self.y0
+            )
             + self.dy_degree_receivers
         )
 
@@ -134,13 +143,20 @@ class Node_layout:
         - a rectangle with neuron properties on the top right.
         The props rectangle is assumed to have zero overlap with the radius.
         """
-        self.radius: float = 160
-        self.name_fontsize: float = 6
-        self.props_fontsize: float = 6
+        # TODO: parameterize
+        # TODO: get sepparate spacing coefficients for the redundancy.
+        self.radius: float = 30
+        self.name_fontsize: float = 3
+        self.props_fontsize: float = 3
         self.name = nodename
-        self.name_width = len(self.name) * self.name_fontsize
-        self.props_width = 10 * self.props_fontsize
-        self.props_height = 20 * self.props_fontsize
+        # +4 to allow for the red_ prefix for redundant nodes.
+        self.name_width = 0.05 * (len(self.name) + 4) * self.name_fontsize
+        self.props_width = 0.1 * self.props_fontsize
+        self.props_height = 0.2 * self.props_fontsize
+        # print(f'self.name={self.name}')
+        # print(f'radius + self.props_width={self.radius + self.props_width}')
+        # print(f'self.name_width={self.name_width}')
+        # exit()
         self.eff_width = max(self.radius + self.props_width, self.name_width)
         self.eff_height = self.radius + self.props_width
 
@@ -148,13 +164,18 @@ class Node_layout:
     def max_width_redundancy(self, x0: float, redundancy: float) -> float:
         """Returns the maximum width of a redundant node."""
         node = Node_layout(self.name)
-        return x0 + node.eff_width * redundancy
+        return x0 + node.eff_width * (redundancy + 1)
 
     @typechecked
-    def max_height_redundancy(self, y0: float, redundancy: float) -> float:
+    def max_height_redundancy(
+        self,
+        circuit_redundancy: float,
+        nodename: str,
+        y0: float,
+    ) -> float:
         """Returns the maximum height of a redundant node."""
-        node = Node_layout(self.name)
-        return y0 + node.eff_height * redundancy
+        node = Node_layout(nodename)
+        return y0 + node.eff_height * circuit_redundancy
 
 
 # pylint: disable=R0913
@@ -219,8 +240,12 @@ def rand_xy(
     node = Node_layout("rand")
 
     start_height_in_circuit = (
-        circuit.max_circuit_height_spike_once() + circuit.dy_spike_once_rand
+        circuit.max_circuit_height_spike_once(circuit.redundancy)
+        + circuit.dy_spike_once_rand
     )
+    print(f"start_height_in_circuit={start_height_in_circuit}")
+    print(f"circuit.max_height={circuit.max_height}")
+    print(f"node_index={node_index}")
     return [
         node.eff_width * (node_redundancy),
         start_height_in_circuit
@@ -249,9 +274,6 @@ def degree_receiver_xy(
         circuit.max_circuit_width_spike_once()
         + circuit.dx_spike_once_degree_receiver
     )
-    print(f"degree_index_per_circuit={degree_index_per_circuit}")
-    print(f"node_redundancy={node_redundancy}")
-    print(f"node_index={node_index}")
     # TODO: include m in x coordinate.
     return [
         start_width_in_circuit
@@ -263,3 +285,19 @@ def degree_receiver_xy(
         + node.eff_height * (node_redundancy)
         + circuit.max_height * node_index,
     ]
+
+
+def get_hori_redundant_redundancy_spacing(bare_nodename: str) -> float:
+    """Returns the horizontal spacing that is relevant for redundancy.
+
+    For example, the rand neurons should not be spaced horizontally
+    right of the rand neurons, but right of the spike_once neurons.
+    """
+    if bare_nodename in ["rand", "spike_once"]:
+        widest_nodename = "spike_once"
+    elif bare_nodename in ["degree_receiver"]:
+        widest_nodename = "degree_receiver"
+    else:
+        widest_nodename = "degree_receiver"
+    node_layout = Node_layout(widest_nodename)
+    return node_layout.eff_width

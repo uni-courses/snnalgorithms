@@ -14,7 +14,6 @@ def mdsa_is_done(run_config: Dict, snn_graph: nx.DiGraph, t: int) -> bool:
     """
     if list(run_config["algorithm"].keys()) == ["MDSA"]:
         if snn_graph.nodes["terminator_node"]["nx_lif"][t].spikes:
-            print("terminated")
             return True
         if run_config["radiation"] is not None:
             # Radiation may have killed any neuron. This may have arbitrarily
@@ -26,7 +25,6 @@ def mdsa_is_done(run_config: Dict, snn_graph: nx.DiGraph, t: int) -> bool:
                         snn_graph.nodes[node_name]["nx_lif"][t].spikes
                         and t > 0
                     ):
-                        print(f"t={t},false1, nodename={node_name}")
                         return False
                 elif "terminator" in node_name:
                     if (
@@ -35,10 +33,7 @@ def mdsa_is_done(run_config: Dict, snn_graph: nx.DiGraph, t: int) -> bool:
                     ):
                         return True
             if t > 0:
-                print(f"t={t}, done.")
                 return True
-            print(f"t={t},false2")
             return False
-        print(f"t={t},false3")
         return False
     raise Exception("Algorithm termination mode not yet found.")

@@ -1,7 +1,6 @@
 """Creates the MDSA snn neurons."""
 
 
-from pprint import pprint
 from typing import Dict, List
 
 import networkx as nx
@@ -23,7 +22,6 @@ def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
     algorithm."""
     if not isinstance(input_graph.graph["alg_props"], dict):
         raise Exception("Error, algorithm properties not set.")
-    pprint(run_config)
     # exit()
     # TODO get spacing and recurrent weight form algo specification.
     layout = MDSA_layout()
@@ -148,7 +146,7 @@ def create_spike_once_node(
                 node_redundancy=0,
             )
         )
-        print(f"spike_once_xy={spike_once_xy}")
+        print(f"spike_once_xy={int(spike_once_xy[0]),int(spike_once_xy[1])}")
         lif_neuron = LIF_neuron(
             name="spike_once",
             bias=2.0,
@@ -179,7 +177,6 @@ def create_degree_receiver_node(
         for node_index in input_graph.nodes:
             degree_index: int = 0
             for node_neighbour in nx.all_neighbors(input_graph, node_index):
-                print(f"degree_index={degree_index}")
                 if node_index != node_neighbour:
                     identifiers = [
                         Identifier(
@@ -208,10 +205,6 @@ def create_degree_receiver_node(
                             degree_index=degree_index,
                         )
                     )
-                    print(
-                        f"degree_index={degree_index},degree_receiver_xy="
-                        + f"{degree_receiver_xy}"
-                    )
 
                     lif_neuron = LIF_neuron(
                         name="degree_receiver",
@@ -224,6 +217,11 @@ def create_degree_receiver_node(
                         custom_props={"degree_index": degree_index},
                     )
                     degree_index = degree_index + 1
+                    print(
+                        f"{lif_neuron.full_name}, xy="
+                        + f"{int(degree_receiver_xy[0])},"
+                        + f"{int(degree_receiver_xy[1])}"
+                    )
 
                     mdsa_snn.add_node(lif_neuron.full_name)
                     mdsa_snn.nodes[lif_neuron.full_name]["nx_lif"] = [
@@ -253,7 +251,7 @@ def create_rand_node(
                 node_redundancy=0,
             )
         )
-        print(f"rand_xy={rand_xy}")
+        print("rand_xy=" + f"{int(rand_xy[0]),int(rand_xy[1])}")
         lif_neuron = LIF_neuron(
             name="rand",
             bias=2.0,
