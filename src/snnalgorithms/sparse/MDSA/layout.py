@@ -1,4 +1,8 @@
-"""Specifies the plotting layout of the snn."""
+"""Specifies the plotting layout of the snn.
+
+TODO: instead of creating complicated relative positions, create a grid and
+pint the neurons on the grid intersections instead.
+"""
 
 from typing import List, Optional
 
@@ -41,7 +45,9 @@ class MDSA_circuit_dimensions:
         self.x0 = 0
         self.y0 = 0
         self.dx_spike_once_degree_receiver = 1
+        self.dx_degree_receiver_selector = 0.1
         self.dy_spike_once_rand = 0.1
+        self.dy_selector_counter = 0.1
         self.dy_degree_receivers = 0.1
         self.dy_circuit = 30
         self.dx_cicruit = 0
@@ -153,10 +159,7 @@ class Node_layout:
         self.name_width = 0.05 * (len(self.name) + 4) * self.name_fontsize
         self.props_width = 0.1 * self.props_fontsize
         self.props_height = 0.2 * self.props_fontsize
-        # print(f'self.name={self.name}')
-        # print(f'radius + self.props_width={self.radius + self.props_width}')
-        # print(f'self.name_width={self.name_width}')
-        # exit()
+
         self.eff_width = max(self.radius + self.props_width, self.name_width)
         self.eff_height = self.radius + self.props_width
 
@@ -178,6 +181,7 @@ class Node_layout:
         return y0 + node.eff_height * circuit_redundancy
 
 
+# pylint: disable=R0911
 # pylint: disable=R0913
 @typechecked
 def get_node_position(
@@ -216,6 +220,49 @@ def get_node_position(
             m_val=m_val,
             node_redundancy=node_redundancy,
         )
+    if node_name == "selector":
+        return selector_xy(
+            circuit=circuit,
+            circuit_redundancy=circuit.redundancy,
+            node_index=identifiers[0].value,
+            m_val=m_val,
+            node_redundancy=node_redundancy,
+        )
+
+    if node_name == "counter":
+        return counter_xy(
+            circuit=circuit,
+            circuit_redundancy=circuit.redundancy,
+            node_index=identifiers[0].value,
+            m_val=m_val,
+            node_redundancy=node_redundancy,
+        )
+
+    if node_name == "next_round":
+        return next_round_xy(
+            circuit=circuit,
+            circuit_redundancy=circuit.redundancy,
+            m_val=m_val,
+            node_redundancy=node_redundancy,
+        )
+
+    if node_name == "connecting":
+        return connecting_xy(
+            circuit=circuit,
+            circuit_redundancy=circuit.redundancy,
+            graph_size=graph_size,
+            node_redundancy=node_redundancy,
+        )
+
+    if node_name == "terminator":
+        return terminating_xy(
+            circuit=circuit,
+            circuit_redundancy=circuit.redundancy,
+            graph_size=graph_size,
+            m_val=m_val,
+            node_redundancy=node_redundancy,
+        )
+
     raise Exception(f"Error, node:{node_name} not supported.")
 
 
@@ -243,9 +290,7 @@ def rand_xy(
         circuit.max_circuit_height_spike_once(circuit.redundancy)
         + circuit.dy_spike_once_rand
     )
-    print(f"start_height_in_circuit={start_height_in_circuit}")
-    print(f"circuit.max_height={circuit.max_height}")
-    print(f"node_index={node_index}")
+
     return [
         node.eff_width * (node_redundancy),
         start_height_in_circuit
@@ -274,7 +319,6 @@ def degree_receiver_xy(
         circuit.max_circuit_width_spike_once()
         + circuit.dx_spike_once_degree_receiver
     )
-    # TODO: include m in x coordinate.
     return [
         start_width_in_circuit
         + node.eff_width * (node_redundancy)
@@ -284,6 +328,205 @@ def degree_receiver_xy(
         * circuit.redundancy
         + node.eff_height * (node_redundancy)
         + circuit.max_height * node_index,
+    ]
+
+
+@typechecked
+def selector_xy(
+    circuit: MDSA_circuit_dimensions,
+    circuit_redundancy: int,
+    node_index: int,
+    m_val: int,
+    node_redundancy: float,
+) -> List[float]:
+    """Returns the bottom left x and y coordinates of a degree_receiver node.
+
+    The degree_index_per_circuit indicates the position of the
+    degree_receiver within the circuit.
+    """
+    if m_val is None:
+        raise Exception("Error, m_val and degree_index_per_circuit required.")
+
+    degree_receiver_node = Node_layout("degree_receiver")
+    degree_receiver_x0 = circuit.max_circuit_width_spike_once()
+    start_width_in_circuit = (
+        degree_receiver_node.max_width_redundancy(
+            degree_receiver_x0, circuit_redundancy
+        )
+        + circuit.dx_degree_receiver_selector
+    )
+
+    selector_node = Node_layout("selector")
+    return [
+        start_width_in_circuit
+        + selector_node.eff_width * (node_redundancy)
+        + circuit.max_width * m_val,
+        selector_node.eff_height * (node_redundancy)
+        + circuit.max_height * node_index,
+    ]
+
+
+@typechecked
+def counter_xy(
+    circuit: MDSA_circuit_dimensions,
+    circuit_redundancy: int,
+    node_index: int,
+    m_val: int,
+    node_redundancy: float,
+) -> List[float]:
+    """Returns the bottom left x and y coordinates of a counter node.
+
+    The degree_index_per_circuit indicates the position of the
+    degree_receiver within the circuit.
+    """
+    if m_val is None:
+        raise Exception("Error, m_val and degree_index_per_circuit required.")
+
+    # Compute starting width.
+    degree_receiver_node = Node_layout("degree_receiver")
+    degree_receiver_x0 = circuit.max_circuit_width_spike_once()
+    start_width_in_circuit = (
+        degree_receiver_node.max_width_redundancy(
+            degree_receiver_x0, circuit_redundancy
+        )
+        + circuit.dx_degree_receiver_selector
+    )
+
+    # Compute starting height.
+    selector = Node_layout("selector")
+    start_height_in_circuit = (
+        selector.max_height_redundancy(
+            circuit_redundancy,
+            "selector",
+            circuit.y0,
+        )
+        + circuit.dy_selector_counter
+    )
+
+    counter_node = Node_layout("counter")
+    return [
+        start_width_in_circuit
+        + counter_node.eff_width * (node_redundancy)
+        + circuit.max_width * m_val,
+        start_height_in_circuit
+        + counter_node.eff_height * (node_redundancy)
+        + circuit.max_height * node_index,
+    ]
+
+
+@typechecked
+def next_round_xy(
+    circuit: MDSA_circuit_dimensions,
+    circuit_redundancy: int,
+    m_val: int,
+    node_redundancy: float,
+) -> List[float]:
+    """Returns the bottom left x and y coordinates of a degree_receiver node.
+
+    The degree_index_per_circuit indicates the position of the
+    degree_receiver within the circuit.
+    """
+    if m_val is None:
+        raise Exception("Error, m_val and degree_index_per_circuit required.")
+
+    degree_receiver_node = Node_layout("degree_receiver")
+    degree_receiver_x0 = circuit.max_circuit_width_spike_once()
+    start_width_in_circuit = (
+        degree_receiver_node.max_width_redundancy(
+            degree_receiver_x0, circuit_redundancy
+        )
+        + circuit.dx_degree_receiver_selector
+    )
+
+    start_height_in_circuit = (
+        circuit.max_circuit_height_spike_once(circuit.redundancy)
+        + circuit.dy_spike_once_rand
+    )
+
+    next_round_node = Node_layout("next_round")
+    return [
+        start_width_in_circuit
+        + next_round_node.eff_width * (node_redundancy)
+        + circuit.max_width * m_val,
+        start_height_in_circuit
+        + next_round_node.eff_height * (node_redundancy)
+        + circuit.max_height * 1,  # move to second row from bottom.
+    ]
+
+
+@typechecked
+def connecting_xy(
+    circuit: MDSA_circuit_dimensions,
+    circuit_redundancy: int,
+    graph_size: int,
+    node_redundancy: float,
+) -> List[float]:
+    """Returns the bottom left x and y coordinates of a degree_receiver node.
+
+    The degree_index_per_circuit indicates the position of the
+    degree_receiver within the circuit.
+    """
+
+    degree_receiver_node = Node_layout("degree_receiver")
+    degree_receiver_x0 = circuit.max_circuit_width_spike_once()
+    start_width_in_circuit = (
+        degree_receiver_node.max_width_redundancy(
+            degree_receiver_x0, circuit_redundancy
+        )
+        + circuit.dx_degree_receiver_selector
+    )
+
+    start_height_in_circuit = (
+        circuit.max_circuit_height_spike_once(circuit.redundancy)
+        + circuit.dy_spike_once_rand
+    )
+
+    connecting_node = Node_layout("connecting")
+    return [
+        start_width_in_circuit + connecting_node.eff_width * (node_redundancy),
+        start_height_in_circuit
+        + connecting_node.eff_height * (node_redundancy)
+        + circuit.max_height * (graph_size - 1),
+    ]
+
+
+@typechecked
+def terminating_xy(
+    circuit: MDSA_circuit_dimensions,
+    circuit_redundancy: int,
+    graph_size: int,
+    m_val: int,
+    node_redundancy: float,
+) -> List[float]:
+    """Returns the bottom left x and y coordinates of a degree_receiver node.
+
+    The degree_index_per_circuit indicates the position of the
+    degree_receiver within the circuit.
+    """
+
+    # Compute starting width.
+    degree_receiver_node = Node_layout("degree_receiver")
+    degree_receiver_x0 = circuit.max_circuit_width_spike_once()
+    start_width_in_circuit = (
+        degree_receiver_node.max_width_redundancy(
+            degree_receiver_x0, circuit_redundancy
+        )
+        + circuit.dx_degree_receiver_selector
+    )
+
+    start_height_in_circuit = (
+        circuit.max_circuit_height_spike_once(circuit.redundancy)
+        + circuit.dy_spike_once_rand
+    )
+
+    terminating_node = Node_layout("terminating")
+    return [
+        start_width_in_circuit
+        + terminating_node.eff_width * (node_redundancy)
+        + circuit.max_width * (m_val - 1),  # Shift 1 m_val to left.
+        start_height_in_circuit
+        + terminating_node.eff_height * (node_redundancy)
+        + circuit.max_height * (graph_size - 1),
     ]
 
 
