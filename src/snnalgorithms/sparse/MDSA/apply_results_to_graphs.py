@@ -9,7 +9,7 @@ and the SNN match.
 These results are returned in the form of a dict.
 """
 import copy
-from typing import Dict
+from typing import Dict, Optional
 
 import networkx as nx
 from snncompare.helper import get_actual_duration
@@ -70,6 +70,7 @@ def set_mdsa_snn_results(
                     stage_2_graphs["input_graph"],
                     redundant=True,
                     snn_graph=snn_graph,
+                    red_level=snn_graph.graph["red_level"],
                 )
                 assert_valid_results(
                     actual_nodenames=snn_graph.graph["results"],
@@ -90,6 +91,7 @@ def set_mdsa_snn_results(
                     stage_2_graphs["input_graph"],
                     redundant=True,
                     snn_graph=snn_graph,
+                    rad_level=snn_graph.graph["red_level"],
                 )
             else:
                 raise Exception(f"Invalid graph name:{graph_name}")
@@ -151,6 +153,7 @@ def get_snn_results(
     input_graph: nx.Graph,
     redundant: bool,
     snn_graph: nx.DiGraph,
+    red_level: Optional[int] = None,
 ) -> dict:
     """Returns the marks per node that are selected by the snn simulation.
 
@@ -172,7 +175,7 @@ def get_snn_results(
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph, snn_graph, sim_duration
+            input_graph, snn_graph, red_level, sim_duration
         )
 
     # Compare the two performances.
@@ -212,6 +215,7 @@ def get_nx_LIF_count_without_redundancy(
 def get_nx_LIF_count_with_redundancy(
     input_graph: nx.Graph,
     adapted_nx_snn_graph: nx.DiGraph,
+    red_level: int,
     t: int,
 ) -> dict:
     """Creates a dictionary with the node name and the the current as node
@@ -231,7 +235,7 @@ def get_nx_LIF_count_with_redundancy(
     for node_index in range(0, len(input_graph)):
         # Check if counterneuron died, if yes, read out redundant neuron.
         if counter_neuron_died(adapted_nx_snn_graph, f"counter_{node_index}"):
-            prefix = "red_"
+            prefix = f"r_{red_level}_"
         else:
             prefix = ""
 

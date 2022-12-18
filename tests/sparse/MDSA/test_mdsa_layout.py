@@ -2,7 +2,7 @@
 specifications."""
 # pylint: disable=R0801
 import unittest
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 from snnbackends.networkx.LIF_neuron import Identifier
@@ -44,6 +44,8 @@ class Test_mdsa(unittest.TestCase):
         expected_xy[2, 1] = [220, 1100.4]
         expected_xy[2, 2] = [440, 1320.4]
 
+        # TODO: fill with minimum required values.
+        run_config: Dict = {}
         for i, node_index in enumerate(range(0, graph_size)):
             for j, node_redundancy in enumerate(range(0, redundancy)):
                 identifiers: List = [
@@ -58,6 +60,7 @@ class Test_mdsa(unittest.TestCase):
                     node_name="spike_once",
                     identifiers=identifiers,
                     node_redundancy=node_redundancy,
+                    run_config=run_config,
                 )
 
                 print(f"node_index={i},redundancy={j}")

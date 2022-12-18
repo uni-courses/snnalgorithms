@@ -4,7 +4,7 @@ TODO: instead of creating complicated relative positions, create a grid and
 pint the neurons on the grid intersections instead.
 """
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from snnbackends.networkx.LIF_neuron import Identifier
 from typeguard import typechecked
@@ -28,7 +28,7 @@ class MDSA_circuit_dimensions:
     """Contains the dimensions of the MDSA circuit for n=1,m=1."""
 
     @typechecked
-    def __init__(self, graph_size: float, redundancy: float) -> None:
+    def __init__(self, graph_size: float, redundancy: int) -> None:
         """Gets the layout of the first MDSA circuit with in it the:
 
         - spike_once
@@ -188,14 +188,15 @@ def get_node_position(
     graph_size: float,
     node_name: str,
     identifiers: List[Identifier],
-    node_redundancy: float,
+    node_redundancy: int,
+    run_config: Dict,
     m_val: Optional[int] = None,
     degree_index: Optional[int] = None,
 ) -> List[float]:
     """Returns the node position."""
     # 0 redundancy is default, 1 redundancy is 1 backup neuron etc.
     # redundancy:int = run_config["adaptation"]["redundancy"] # TODO: apply
-    redundancy: float = 1
+    redundancy: int = run_config["adaptation"]["redundancy"]
     circuit = MDSA_circuit_dimensions(graph_size, redundancy)
 
     if node_name == "spike_once":
@@ -305,7 +306,7 @@ def degree_receiver_xy(
     node_index: int,
     degree_index_per_circuit: int,
     m_val: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a degree_receiver node.
 
@@ -337,7 +338,7 @@ def selector_xy(
     circuit_redundancy: int,
     node_index: int,
     m_val: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a degree_receiver node.
 
@@ -372,7 +373,7 @@ def counter_xy(
     circuit_redundancy: int,
     node_index: int,
     m_val: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a counter node.
 
@@ -419,7 +420,7 @@ def next_round_xy(
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     m_val: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a degree_receiver node.
 
@@ -459,7 +460,7 @@ def connecting_xy(
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     graph_size: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a degree_receiver node.
 
@@ -496,7 +497,7 @@ def terminating_xy(
     circuit_redundancy: int,
     graph_size: int,
     m_val: int,
-    node_redundancy: float,
+    node_redundancy: int,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a degree_receiver node.
 

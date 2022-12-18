@@ -58,10 +58,10 @@ def create_MDSA_neurons(
     mdsa_snn = nx.DiGraph()
 
     # Create connecting node.
-    create_connecting_node(mdsa_snn, len(input_graph))
+    create_connecting_node(mdsa_snn, len(input_graph), run_config)
 
     # Create spike_once nodes.
-    create_spike_once_node(input_graph, mdsa_snn)
+    create_spike_once_node(input_graph, mdsa_snn, run_config)
 
     create_degree_receiver_node(
         input_graph,
@@ -73,6 +73,7 @@ def create_MDSA_neurons(
     create_rand_node(
         input_graph,
         mdsa_snn,
+        run_config,
     )
 
     # Create selector nodes.
@@ -87,6 +88,7 @@ def create_MDSA_neurons(
         input_graph,
         run_config["algorithm"]["MDSA"]["m_val"],
         mdsa_snn,
+        run_config,
     )
 
     create_next_round_node(
@@ -99,13 +101,16 @@ def create_MDSA_neurons(
         mdsa_snn,
         run_config["algorithm"]["MDSA"]["m_val"],
         len(input_graph.nodes),
+        run_config,
     )
 
     return mdsa_snn
 
 
 @typechecked
-def create_connecting_node(mdsa_snn: nx.DiGraph, nr_of_nodes: int) -> None:
+def create_connecting_node(
+    mdsa_snn: nx.DiGraph, nr_of_nodes: int, run_config: Dict
+) -> None:
     """Creates the neuron settings for the connecting node in the MDSA
     algorithm."""
     connecting_xy = tuple(
@@ -114,6 +119,7 @@ def create_connecting_node(mdsa_snn: nx.DiGraph, nr_of_nodes: int) -> None:
             node_name="connecting",
             identifiers=[],
             node_redundancy=0,
+            run_config=run_config,
         )
     )
     print(f"connecting_xy={connecting_xy}")
@@ -131,7 +137,7 @@ def create_connecting_node(mdsa_snn: nx.DiGraph, nr_of_nodes: int) -> None:
 
 @typechecked
 def create_spike_once_node(
-    input_graph: nx.Graph, mdsa_snn: nx.DiGraph
+    input_graph: nx.Graph, mdsa_snn: nx.DiGraph, run_config: Dict
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
@@ -149,6 +155,7 @@ def create_spike_once_node(
                 node_name="spike_once",
                 identifiers=identifiers,
                 node_redundancy=0,
+                run_config=run_config,
             )
         )
         lif_neuron = LIF_neuron(
@@ -205,6 +212,7 @@ def create_degree_receiver_node(
                             node_name="degree_receiver",
                             identifiers=identifiers,
                             node_redundancy=0,
+                            run_config=run_config,
                             m_val=m_val,
                             degree_index=degree_index,
                         )
@@ -231,6 +239,7 @@ def create_degree_receiver_node(
 def create_rand_node(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    run_config: Dict,
 ) -> None:
     """Creates the neuron settings for the rand node in the MDSA algorithm."""
     for node_index in input_graph.nodes:
@@ -247,6 +256,7 @@ def create_rand_node(
                 node_name="rand",
                 identifiers=identifiers,
                 node_redundancy=0,
+                run_config=run_config,
             )
         )
         lif_neuron = LIF_neuron(
@@ -295,6 +305,7 @@ def create_selector_node(
                     node_name="selector",
                     identifiers=identifiers,
                     node_redundancy=0,
+                    run_config=run_config,
                     m_val=m_val,
                 )
             )
@@ -317,6 +328,7 @@ def create_counter_node(
     input_graph: nx.Graph,
     m_val: int,
     mdsa_snn: nx.DiGraph,
+    run_config: Dict,
 ) -> None:
     """Creates the neuron settings for the counter node in the MDSA
     algorithm."""
@@ -335,6 +347,7 @@ def create_counter_node(
                 node_name="counter",
                 identifiers=identifiers,
                 node_redundancy=0,
+                run_config=run_config,
                 m_val=m_val,
             )
         )
@@ -373,6 +386,7 @@ def create_next_round_node(
                 node_name="next_round",
                 identifiers=identifiers,
                 node_redundancy=0,
+                run_config=run_config,
                 m_val=m_val - 1,
             )
         )
@@ -392,7 +406,7 @@ def create_next_round_node(
 
 @typechecked
 def create_terminator_node(
-    mdsa_snn: nx.DiGraph, m_val: int, nr_of_nodes: int
+    mdsa_snn: nx.DiGraph, m_val: int, nr_of_nodes: int, run_config: Dict
 ) -> None:
     """T800 node that stops the spiking neural network from proceeding, once
     the algorithm is completed.
@@ -405,6 +419,7 @@ def create_terminator_node(
             node_name="terminator",
             identifiers=[],
             node_redundancy=0,
+            run_config=run_config,
             m_val=m_val,
         )
     )
