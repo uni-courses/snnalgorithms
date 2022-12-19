@@ -1,10 +1,8 @@
 """Creates the MDSA snn synapses."""
 
-
-from typing import Dict
-
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import LIF_neuron, Synapse
+from snncompare.exp_setts.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 
@@ -12,7 +10,7 @@ from typeguard import typechecked
 def create_MDSA_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> nx.DiGraph:
     """Creates the synapses between the neurons for the MDSA algorithm."""
 
@@ -137,7 +135,7 @@ def create_outgoing_spike_once_synapses(
 def create_degree_receiver_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm."""
@@ -147,7 +145,7 @@ def create_degree_receiver_selector_synapses(
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
                 for m_val in range(
-                    0, run_config["algorithm"]["MDSA"]["m_val"] + 1
+                    0, run_config.algorithm["MDSA"]["m_val"] + 1
                 ):
                     mdsa_snn.add_edges_from(
                         [
@@ -168,7 +166,7 @@ def create_degree_receiver_selector_synapses(
 def create_degree_receiver_counter_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm."""
@@ -178,7 +176,7 @@ def create_degree_receiver_counter_synapses(
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
                 # TODO: Remove the m_val dependency
-                m_subscript = max(0, run_config["algorithm"]["MDSA"]["m_val"])
+                m_subscript = max(0, run_config.algorithm["MDSA"]["m_val"])
                 mdsa_snn.add_edges_from(
                     [
                         (
@@ -198,7 +196,7 @@ def create_degree_receiver_counter_synapses(
 def create_degree_receiver_next_round_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm."""
@@ -210,7 +208,7 @@ def create_degree_receiver_next_round_synapses(
                 # Check if there is an edge from neighbour_a to neighbour_b.
                 if node_index in nx.all_neighbors(input_graph, circuit_target):
                     for m_val in range(
-                        1, run_config["algorithm"]["MDSA"]["m_val"] + 1
+                        1, run_config.algorithm["MDSA"]["m_val"] + 1
                     ):
                         mdsa_snn.add_edges_from(
                             [
@@ -232,7 +230,7 @@ def create_degree_receiver_next_round_synapses(
 def create_outgoing_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the rand node in the MDSA
     algorithm."""
@@ -241,7 +239,7 @@ def create_outgoing_selector_synapses(
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
                 for m_val in range(
-                    0, run_config["algorithm"]["MDSA"]["m_val"] + 1
+                    0, run_config.algorithm["MDSA"]["m_val"] + 1
                 ):
                     mdsa_snn.add_edges_from(
                         [
@@ -263,7 +261,7 @@ def create_outgoing_selector_synapses(
 def create_outgoing_rand_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the selector node in the MDSA
     algorithm."""
@@ -274,7 +272,7 @@ def create_outgoing_rand_synapses(
                 # Check if there is an edge from neighbour_a to neighbour_b.
                 if node_index in nx.all_neighbors(input_graph, circuit_target):
                     for m_val in range(
-                        0, run_config["algorithm"]["MDSA"]["m_val"] + 1
+                        0, run_config.algorithm["MDSA"]["m_val"] + 1
                     ):
                         mdsa_snn.add_edges_from(
                             [
@@ -298,7 +296,7 @@ def create_outgoing_rand_synapses(
 def create_degree_to_degree_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> nx.DiGraph:
     """
 
@@ -312,7 +310,7 @@ def create_degree_to_degree_synapses(
     # pylint: disable=R0913
     # Currently no method is found to reduce the 6/5 nested blocks.
     rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
-    for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+    for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
         for node_index_left in input_graph.nodes:
             for y in input_graph.nodes:
                 for node_index_right in input_graph.nodes:
@@ -346,7 +344,7 @@ def create_degree_to_degree_synapses(
 def create_outgoing_next_round_selector_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the d_charger node in the MDSA
     algorithm.
@@ -357,7 +355,7 @@ def create_outgoing_next_round_selector_synapses(
     """
 
     # Create outgoing synapses
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+    for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
         for node_index in input_graph.nodes:
             mdsa_snn.add_edges_from(
                 [
@@ -377,7 +375,7 @@ def create_outgoing_next_round_selector_synapses(
 def create_degree_receiver_terminator_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm."""
@@ -387,7 +385,7 @@ def create_degree_receiver_terminator_synapses(
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
                 # TODO: Remove the m_val dependency
-                m_subscript = max(0, run_config["algorithm"]["MDSA"]["m_val"])
+                m_subscript = max(0, run_config.algorithm["MDSA"]["m_val"])
                 mdsa_snn.add_edges_from(
                     [
                         (
@@ -408,7 +406,7 @@ def create_degree_receiver_terminator_synapses(
 def create_degree_receiver_inhibitory_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the degree_receiver node in the MDSA
     algorithm.
@@ -421,7 +419,7 @@ def create_degree_receiver_inhibitory_synapses(
     # Create synapse to inhibitory neuron.
     # pylint: disable=R1702
     for node_index in input_graph.nodes:
-        for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
             circuit_degree_receivers = []
             for nodename in mdsa_snn.nodes:
                 deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]

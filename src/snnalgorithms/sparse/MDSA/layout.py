@@ -3,10 +3,10 @@
 TODO: instead of creating complicated relative positions, create a grid and
 pint the neurons on the grid intersections instead.
 """
-
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from snnbackends.networkx.LIF_neuron import Identifier
+from snncompare.exp_setts.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 
@@ -189,14 +189,14 @@ def get_node_position(
     node_name: str,
     identifiers: List[Identifier],
     node_redundancy: int,
-    run_config: Dict,
+    run_config: Run_config,
     m_val: Optional[int] = None,
     degree_index: Optional[int] = None,
 ) -> List[float]:
     """Returns the node position."""
     # 0 redundancy is default, 1 redundancy is 1 backup neuron etc.
-    # redundancy:int = run_config["adaptation"]["redundancy"] # TODO: apply
-    redundancy: int = run_config["adaptation"]["redundancy"]
+    # redundancy:int = run_config.adaptation["redundancy"] # TODO: apply
+    redundancy: int = run_config.adaptation["redundancy"]
     circuit = MDSA_circuit_dimensions(graph_size, redundancy)
 
     if node_name == "spike_once":

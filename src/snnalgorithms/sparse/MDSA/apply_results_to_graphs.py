@@ -12,6 +12,7 @@ import copy
 from typing import Dict, Optional
 
 import networkx as nx
+from snncompare.exp_setts.run_config.Run_config import Run_config
 from snncompare.helper import get_actual_duration
 from typeguard import typechecked
 
@@ -20,7 +21,9 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 
 @typechecked
 def set_mdsa_snn_results(
-    m_val: int, run_config: dict, stage_2_graphs: dict
+    m_val: int,
+    run_config: Run_config,
+    stage_2_graphs: dict,
 ) -> None:
     """Returns the nodes and counts per node that were computed by the SNN
     algorithm.
@@ -34,11 +37,11 @@ def set_mdsa_snn_results(
     # Compute the count for each node according to Alipour et al.'s algorithm.
     alipour_counter_marks = get_results(
         input_graph=stage_2_graphs["input_graph"],
-        iteration=run_config["iteration"],
+        iteration=run_config.iteration,
         m_val=m_val,
         rand_props=stage_2_graphs["input_graph"].graph["alg_props"],
-        seed=run_config["seed"],
-        size=run_config["graph_size"],
+        seed=run_config.seed,
+        size=run_config.graph_size,
     )
 
     # Compute SNN results
@@ -91,7 +94,7 @@ def set_mdsa_snn_results(
                     stage_2_graphs["input_graph"],
                     redundant=True,
                     snn_graph=snn_graph,
-                    rad_level=snn_graph.graph["red_level"],
+                    red_level=snn_graph.graph["red_level"],
                 )
             else:
                 raise Exception(f"Invalid graph name:{graph_name}")

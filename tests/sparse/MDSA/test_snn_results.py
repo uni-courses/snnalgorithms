@@ -11,6 +11,7 @@ from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
     long_exp_setts_for_mdsa_testing,
     run_config_with_error,
 )
+from snncompare.exp_setts.run_config.Run_config import Run_config
 from snncompare.exp_setts.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
@@ -96,14 +97,16 @@ def override_with_single_run_setting(mdsa_settings: dict) -> Experiment_runner:
     }
     mdsa_settings["algorithms"] = algorithms
     some_run_config_with_error = run_config_with_error()
-    some_run_config_with_error["export_images"] = True
+    some_run_config_with_error.export_images = True
     exp_runner = Experiment_runner(mdsa_settings, some_run_config_with_error)
     return exp_runner
 
 
 @typechecked
 def assert_run_config_json_results(
-    test_object: Any, exp_runner: Experiment_runner, run_config: dict
+    test_object: Any,
+    exp_runner: Experiment_runner,
+    run_config: Run_config,
 ) -> None:
     """Verifies the results of a run config using the json result output."""
 
@@ -114,11 +117,11 @@ def assert_run_config_json_results(
     # Verify results are as expected.
     expected_nodenames: Dict[str, int] = get_results(
         input_graph=nx_graphs["input_graph"],
-        iteration=run_config["iteration"],
-        m_val=run_config["algorithm"]["MDSA"]["m_val"],
+        iteration=run_config.iteration,
+        m_val=run_config.algorithm["MDSA"]["m_val"],
         rand_props=nx_graphs["input_graph"].graph["alg_props"],
-        seed=run_config["seed"],
-        size=run_config["graph_size"],
+        seed=run_config.seed,
+        size=run_config.graph_size,
     )
 
     for graph_name, snn_graph in nx_graphs.items():

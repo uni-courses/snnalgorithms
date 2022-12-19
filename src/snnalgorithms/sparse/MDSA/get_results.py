@@ -1,6 +1,6 @@
 """Computes which nodes are selected by the MDSA algorithm presented by Alipour
 et al."""
-from typing import Any, Dict
+from typing import Dict
 
 import networkx as nx
 from snncompare.helper import (
@@ -17,7 +17,7 @@ def get_results(
     input_graph: nx.Graph,
     iteration: int,
     m_val: int,
-    rand_props: Dict[str, Any],
+    rand_props: Dict,
     seed: int,
     size: int,
 ) -> Dict[str, int]:

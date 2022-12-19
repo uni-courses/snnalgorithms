@@ -1,6 +1,6 @@
 """Used to verify the algorithm specifications in an experiment
 configuration."""
-from typing import Any, List, Union
+from typing import List, Union
 
 from typeguard import typechecked
 
@@ -25,7 +25,7 @@ def verify_list_with_numbers(
     elem_type: type,
     min_val: Union[float, int],
     max_val: Union[float, int],
-    some_vals: List[Any],
+    some_vals: List[Union[float, int]],
     var_name: str,
 ) -> None:
     """Verifies the some_vals parameter setting of the algorithm."""

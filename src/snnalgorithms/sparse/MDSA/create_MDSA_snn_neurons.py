@@ -2,12 +2,11 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
-
-
-from typing import Dict, List
+from typing import List
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
+from snncompare.exp_setts.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
@@ -20,7 +19,10 @@ from snnalgorithms.sparse.MDSA.layout import get_node_position
 
 
 @typechecked
-def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
+def get_new_mdsa_graph(
+    run_config: Run_config,
+    input_graph: nx.Graph,
+) -> nx.DiGraph:
     """Creates the networkx snn for a run configuration for the MDSA
     algorithm."""
     if not isinstance(input_graph.graph["alg_props"], dict):
@@ -52,7 +54,7 @@ def get_new_mdsa_graph(run_config: dict, input_graph: nx.Graph) -> nx.DiGraph:
 @typechecked
 def create_MDSA_neurons(
     input_graph: nx.Graph,
-    run_config: dict,
+    run_config: Run_config,
 ) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
     mdsa_snn = nx.DiGraph()
@@ -86,7 +88,7 @@ def create_MDSA_neurons(
     # Create selector nodes.
     create_counter_node(
         input_graph,
-        run_config["algorithm"]["MDSA"]["m_val"],
+        run_config.algorithm["MDSA"]["m_val"],
         mdsa_snn,
         run_config,
     )
@@ -99,7 +101,7 @@ def create_MDSA_neurons(
 
     create_terminator_node(
         mdsa_snn,
-        run_config["algorithm"]["MDSA"]["m_val"],
+        run_config.algorithm["MDSA"]["m_val"],
         len(input_graph.nodes),
         run_config,
     )
@@ -109,7 +111,9 @@ def create_MDSA_neurons(
 
 @typechecked
 def create_connecting_node(
-    mdsa_snn: nx.DiGraph, nr_of_nodes: int, run_config: Dict
+    mdsa_snn: nx.DiGraph,
+    nr_of_nodes: int,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the connecting node in the MDSA
     algorithm."""
@@ -137,7 +141,9 @@ def create_connecting_node(
 
 @typechecked
 def create_spike_once_node(
-    input_graph: nx.Graph, mdsa_snn: nx.DiGraph, run_config: Dict
+    input_graph: nx.Graph,
+    mdsa_snn: nx.DiGraph,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
@@ -177,14 +183,14 @@ def create_spike_once_node(
 def create_degree_receiver_node(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
 
     # pylint: disable=R0801
     # Create degree_receiver nodes.
-    for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+    for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
         for node_index in input_graph.nodes:
             degree_index: int = 0
             for node_neighbour in nx.all_neighbors(input_graph, node_index):
@@ -239,7 +245,7 @@ def create_degree_receiver_node(
 def create_rand_node(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the rand node in the MDSA algorithm."""
     for node_index in input_graph.nodes:
@@ -276,12 +282,12 @@ def create_rand_node(
 def create_selector_node(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the selector node in the MDSA
     algorithm."""
     for node_index in input_graph.nodes:
-        for m_val in range(0, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+        for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
             # TODO: why. This is probably for the delay in activation for m>0.
             bias: float
             if m_val == 0:
@@ -328,7 +334,7 @@ def create_counter_node(
     input_graph: nx.Graph,
     m_val: int,
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the counter node in the MDSA
     algorithm."""
@@ -369,12 +375,12 @@ def create_counter_node(
 def create_next_round_node(
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the counter node in the MDSA
     algorithm."""
     # NOTE, for loop starts at index 1, instead of 0!
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+    for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
 
         identifiers = [
             Identifier(description="m_val", position=0, value=m_val),
@@ -406,7 +412,10 @@ def create_next_round_node(
 
 @typechecked
 def create_terminator_node(
-    mdsa_snn: nx.DiGraph, m_val: int, nr_of_nodes: int, run_config: Dict
+    mdsa_snn: nx.DiGraph,
+    m_val: int,
+    nr_of_nodes: int,
+    run_config: Run_config,
 ) -> None:
     """T800 node that stops the spiking neural network from proceeding, once
     the algorithm is completed.
