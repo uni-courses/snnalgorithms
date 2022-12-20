@@ -195,8 +195,11 @@ def get_node_position(
 ) -> List[float]:
     """Returns the node position."""
     # 0 redundancy is default, 1 redundancy is 1 backup neuron etc.
-    # redundancy:int = run_config.adaptation["redundancy"] # TODO: apply
-    redundancy: int = run_config.adaptation["redundancy"]
+    redundancy: int
+    if run_config.adaptation is None:
+        redundancy = 0
+    else:
+        redundancy = run_config.adaptation["redundancy"]
     circuit = MDSA_circuit_dimensions(graph_size, redundancy)
 
     if node_name == "spike_once":
@@ -405,9 +408,11 @@ def counter_xy(
     )
 
     counter_node = Node_layout("counter")
+
+    redundancy_spacing = get_spacing(node_redundancy)
     return [
         start_width_in_circuit
-        + counter_node.eff_width * (node_redundancy)
+        + counter_node.eff_width * (redundancy_spacing)
         + circuit.max_width * m_val,
         start_height_in_circuit
         + counter_node.eff_height * (node_redundancy)
@@ -483,10 +488,12 @@ def connecting_xy(
     )
 
     connecting_node = Node_layout("connecting")
+
+    redundancy_spacing = get_spacing(node_redundancy)
     return [
         start_width_in_circuit + connecting_node.eff_width * (node_redundancy),
         start_height_in_circuit
-        + connecting_node.eff_height * (node_redundancy)
+        + connecting_node.eff_height * (redundancy_spacing)
         + circuit.max_height * (graph_size - 1),
     ]
 
@@ -521,12 +528,13 @@ def terminating_xy(
     )
 
     terminating_node = Node_layout("terminating")
+    redundancy_spacing = get_spacing(node_redundancy)
     return [
         start_width_in_circuit
         + terminating_node.eff_width * (node_redundancy)
         + circuit.max_width * (m_val - 1),  # Shift 1 m_val to left.
         start_height_in_circuit
-        + terminating_node.eff_height * (node_redundancy)
+        + terminating_node.eff_height * (redundancy_spacing)
         + circuit.max_height * (graph_size - 1),
     ]
 
@@ -545,3 +553,15 @@ def get_hori_redundant_redundancy_spacing(bare_nodename: str) -> float:
         widest_nodename = "degree_receiver"
     node_layout = Node_layout(widest_nodename)
     return node_layout.eff_width
+
+
+def get_spacing(node_redundancy: int) -> int:
+    """Returns an extra spacing in case there is no redundancy.
+
+    Used to prevent overlapping node positions.
+    """
+    if node_redundancy == 0:
+        redundancy_spacing = 1
+    else:
+        redundancy_spacing = node_redundancy
+    return redundancy_spacing

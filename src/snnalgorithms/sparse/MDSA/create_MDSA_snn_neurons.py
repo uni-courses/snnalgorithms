@@ -126,7 +126,6 @@ def create_connecting_node(
             run_config=run_config,
         )
     )
-    print(f"connecting_xy={connecting_xy}")
     lif_neuron = LIF_neuron(
         name="connecting_node",
         bias=0.0,
@@ -396,7 +395,6 @@ def create_next_round_node(
                 m_val=m_val - 1,
             )
         )
-        print(f"next_round_xy={next_round_xy}")
         lif_neuron = LIF_neuron(
             name="next_round",
             bias=0.0,
@@ -432,7 +430,6 @@ def create_terminator_node(
             m_val=m_val,
         )
     )
-    print(f"terminator_xy={terminator_xy}")
 
     lif_neuron = LIF_neuron(
         name="terminator_node",

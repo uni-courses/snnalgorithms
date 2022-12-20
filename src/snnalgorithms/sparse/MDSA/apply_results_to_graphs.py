@@ -169,16 +169,16 @@ def get_snn_results(
     """
     # Determine why the duration is used here to get a time step.
     sim_duration = get_actual_duration(snn_graph)
-    # get runtime
+    final_timestep = sim_duration - 1  # Because all indices start at 0.
 
     snn_counter_marks = {}
     if not redundant:
         snn_counter_marks = get_nx_LIF_count_without_redundancy(
-            input_graph, snn_graph, sim_duration
+            input_graph, snn_graph, final_timestep
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph, snn_graph, red_level, sim_duration
+            input_graph, snn_graph, red_level, final_timestep
         )
 
     # Compare the two performances.
