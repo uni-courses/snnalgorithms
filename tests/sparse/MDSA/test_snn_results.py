@@ -39,8 +39,24 @@ class Test_mdsa_snn_results(unittest.TestCase):
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
 
+    def create_exp_setts(self) -> None:
+        """Generates the default test settings for the MDSA SNN
+        implementations."""
+        # Generate default experiment config.
+        # pylint: disable=W0201
+        self.mdsa_settings: dict = long_exp_setts_for_mdsa_testing()
+        # self.mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
+        # self.mdsa_creation_only_size_3_4: dict =minimal_mdsa_test_exp_setts()
+
+        # Do not output images.
+        self.mdsa_settings["overwrite_snn_propagation"] = True
+        self.mdsa_settings["overwrite_visualisation"] = False
+        self.mdsa_settings["show_snns"] = False
+        self.mdsa_settings["export_images"] = False
+        self.mdsa_settings["export_types"] = ["png"]
+
     @typechecked
-    def test_snn_results_equal_neumann_results(self) -> None:
+    def helper(self, mdsa_settings: Dict) -> None:
         """Tests whether the results of the snn implementation of the MDSA
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
@@ -50,18 +66,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
             shutil.rmtree("results")
         if os.path.exists("latex"):
             shutil.rmtree("latex")
-
-        # Generate default experiment config.
-        mdsa_settings: dict = long_exp_setts_for_mdsa_testing()
-        # mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
-        # mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
-
-        # Do not output images.
-        mdsa_settings["overwrite_snn_propagation"] = True
-        mdsa_settings["overwrite_visualisation"] = False
-        mdsa_settings["show_snns"] = False
-        mdsa_settings["export_images"] = False
-        mdsa_settings["export_types"] = ["png"]
 
         verify_experiment_config(
             Supported_experiment_settings(),
@@ -149,10 +153,6 @@ def assert_run_config_json_results(
 
             # Verify the expected nodes are the same as the actual nodes.
             for key, expected_val in expected_nodenames.items():
-                print(
-                    f"key={key},expected={expected_val},"
-                    + f"actual={copy_actual_nodenames[key]}"
-                )
                 test_object.assertEquals(
                     expected_val, copy_actual_nodenames[key]
                 )
