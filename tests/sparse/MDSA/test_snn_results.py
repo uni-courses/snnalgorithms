@@ -5,6 +5,7 @@ import copy
 import os
 import shutil
 import unittest
+from pprint import pprint
 from typing import Any, Dict
 
 from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
@@ -60,6 +61,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         """Tests whether the results of the snn implementation of the MDSA
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
+        pprint(mdsa_settings)
 
         # Remove results directory if it exists.
         if os.path.exists("results"):
@@ -114,7 +116,6 @@ def assert_run_config_json_results(
     run_config: Run_config,
 ) -> None:
     """Verifies the results of a run config using the json result output."""
-
     nx_graphs = load_json_to_nx_graph_from_file(
         run_config=run_config, stage_index=4, to_run=exp_runner.to_run
     )

@@ -397,16 +397,6 @@ def counter_xy(
     )
 
     # Compute starting height.
-    selector = Node_layout("selector")
-    start_height_in_circuit = (
-        selector.max_height_redundancy(
-            circuit_redundancy,
-            "selector",
-            circuit.y0,
-        )
-        + circuit.dy_selector_counter
-    )
-
     counter_node = Node_layout("counter")
 
     redundancy_spacing = get_spacing(node_redundancy)
@@ -414,8 +404,8 @@ def counter_xy(
         start_width_in_circuit
         + counter_node.eff_width * (redundancy_spacing)
         + circuit.max_width * m_val,
-        start_height_in_circuit
-        + counter_node.eff_height * (node_redundancy)
+        # start_height_in_circuit
+        +counter_node.eff_height * (node_redundancy)
         + circuit.max_height * node_index,
     ]
 
