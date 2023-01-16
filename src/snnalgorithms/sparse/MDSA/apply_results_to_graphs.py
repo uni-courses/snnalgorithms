@@ -23,7 +23,7 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 def set_mdsa_snn_results(
     m_val: int,
     run_config: Run_config,
-    stage_2_graphs: dict,
+    stage_2_graphs: Dict,
 ) -> None:
     """Returns the nodes and counts per node that were computed by the SNN
     algorithm.

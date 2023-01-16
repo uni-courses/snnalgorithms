@@ -45,9 +45,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
         implementations."""
         # Generate default experiment config.
         # pylint: disable=W0201
-        self.mdsa_settings: dict = long_exp_setts_for_mdsa_testing()
-        # self.mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
-        # self.mdsa_creation_only_size_3_4: dict =minimal_mdsa_test_exp_setts()
+        self.mdsa_settings: Dict = long_exp_setts_for_mdsa_testing()
+        # self.mdsa_creation_only_size_3_4: Dict = short_mdsa_test_exp_setts()
+        # self.mdsa_creation_only_size_3_4: Dict =minimal_mdsa_test_exp_setts()
 
         # Do not output images.
         self.mdsa_settings["overwrite_snn_propagation"] = True
@@ -96,7 +96,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
 
 @typechecked
-def override_with_single_run_setting(mdsa_settings: dict) -> Experiment_runner:
+def override_with_single_run_setting(mdsa_settings: Dict) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
     algorithms = {

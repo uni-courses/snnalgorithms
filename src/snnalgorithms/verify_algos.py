@@ -1,6 +1,6 @@
 """Used to verify the algorithm specifications in an experiment
 configuration."""
-from typing import List, Union
+from typing import Dict, List, Union
 
 from typeguard import typechecked
 
@@ -9,7 +9,7 @@ from .helper import assert_parameter_is_list
 
 
 @typechecked
-def verify_algos_in_experiment_config(exp_setts: dict) -> None:
+def verify_algos_in_experiment_config(exp_setts: Dict) -> None:
     """Verifies an algorithm specification is valid."""
     for algo_name, algo_spec in exp_setts["algorithms"].items():
         if algo_name == "MDSA":

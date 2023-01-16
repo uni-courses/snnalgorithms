@@ -9,7 +9,7 @@ from .sparse.MDSA.alg_params import MDSA, MDSA_config
 
 
 @typechecked
-def get_algo_configs(algo_spec: dict) -> List[dict]:
+def get_algo_configs(algo_spec: Dict) -> List[dict]:
     """Returns a list of MDSA_config objects."""
     algo_configs: List[Dict] = []
 

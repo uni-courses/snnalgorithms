@@ -1,6 +1,6 @@
 """Contains the specification of and maximum values of the algorithm
 settings."""
-from typing import List
+from typing import Dict, List
 
 from typeguard import typechecked
 
@@ -13,7 +13,7 @@ class DUMMY_config:
     """Create a particular configuration for the MDSA algorithm."""
 
     @typechecked
-    def __init__(self, dummy_config: dict) -> None:
+    def __init__(self, dummy_config: Dict) -> None:
 
         for some_property, value in dummy_config.items():
             if some_property == "some_vals":
