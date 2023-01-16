@@ -2,7 +2,7 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
-from typing import List
+from typing import Dict, List
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
@@ -25,7 +25,7 @@ def get_new_mdsa_graph(
 ) -> nx.DiGraph:
     """Creates the networkx snn for a run configuration for the MDSA
     algorithm."""
-    if not isinstance(input_graph.graph["alg_props"], dict):
+    if not isinstance(input_graph.graph["alg_props"], Dict):
         raise Exception("Error, algorithm properties not set.")
     # exit()
     # TODO get recurrent weight form algo specification.

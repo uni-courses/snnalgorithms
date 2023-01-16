@@ -9,7 +9,7 @@ from .sparse.MDSA.alg_params import MDSA, MDSA_config
 
 
 @typechecked
-def get_algo_configs(algo_spec: Dict) -> List[dict]:
+def get_algo_configs(algo_spec: Dict) -> List[Dict]:
     """Returns a list of MDSA_config objects."""
     algo_configs: List[Dict] = []
 
@@ -33,7 +33,7 @@ def get_algo_configs(algo_spec: Dict) -> List[dict]:
 
 
 @typechecked
-def verify_algo_configs(algo_name: str, algo_configs: List[dict]) -> None:
+def verify_algo_configs(algo_name: str, algo_configs: List[Dict]) -> None:
     """Verifies the MDSA algorithm configurations are valid."""
     for algo_config_dict in algo_configs:
         if algo_name == "MDSA":

@@ -157,7 +157,7 @@ def get_snn_results(
     redundant: bool,
     snn_graph: nx.DiGraph,
     red_level: Optional[int] = None,
-) -> dict:
+) -> Dict:
     """Returns the marks per node that are selected by the snn simulation.
 
     If the simulation is ran with adaptation in the form of redundancy,
@@ -192,7 +192,7 @@ def get_snn_results(
 @typechecked
 def get_nx_LIF_count_without_redundancy(
     input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
-) -> dict:
+) -> Dict:
     """Creates a dictionary with the node name and the the current as node
     count.
 
@@ -220,7 +220,7 @@ def get_nx_LIF_count_with_redundancy(
     adapted_nx_snn_graph: nx.DiGraph,
     red_level: int,
     t: int,
-) -> dict:
+) -> Dict:
     """Creates a dictionary with the node name and the the current as node
     count.
 
