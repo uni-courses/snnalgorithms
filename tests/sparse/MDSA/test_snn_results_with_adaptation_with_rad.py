@@ -1,5 +1,5 @@
-"""Tests whether the snn MDSA algorithm results with adaptation equal those of
-the default/Neumann implementation."""
+"""Tests whether the snn MDSA algorithm results with adaptation and radiation
+equal those of the default/Neumann implementation."""
 # pylint: disable=R0801
 
 
@@ -27,14 +27,15 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
         for redundancy in range(2, 6, 2):
             # Modify configuration to include adaptation.
             self.mdsa_settings["adaptations"] = {"redundancy": [redundancy]}
-            self.mdsa_settings["overwrite_visualisation"] = False
-            self.mdsa_settings["export_images"] = False
+            self.mdsa_settings["overwrite_visualisation"] = True
+            self.mdsa_settings["export_images"] = True
+            self.mdsa_settings["radiations"] = {"neuron_death": [0.25]}
 
             # Narrow down test scope by overriding experiment settings.
             # self.mdsa_settings["size_and_max_graphs"] = [(4, 1)]
             self.mdsa_settings["algorithms"] = {
                 "MDSA": [
-                    {"m_val": 0},
+                    # {"m_val": 0},
                     {"m_val": 1},
                 ]
             }
