@@ -24,7 +24,7 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
     def test_something(self) -> None:
         """Tests whether the MDSA algorithm with adaptation yields the same
         results as without adaptation."""
-        for redundancy in range(3, 4):
+        for redundancy in range(2, 6, 2):
             # Modify configuration to include adaptation.
             self.mdsa_settings["adaptations"] = {"redundancy": [redundancy]}
             self.mdsa_settings["overwrite_visualisation"] = False

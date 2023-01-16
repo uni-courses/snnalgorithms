@@ -238,9 +238,9 @@ def get_nx_LIF_count_with_redundancy(
     node_counts: Dict = {}
 
     # Verify redundancy level is positive and odd. (E.g. 1,3,5 etc.).
-    if red_level < 1 or red_level % 2 == 0:
+    if red_level < 1 or red_level % 2 == 1:
         raise ValueError(
-            "Error, redundancy should be 1 or larger and odd, it is:"
+            "Error, redundancy should be 2 or larger and even, it is:"
             + f"{red_level}."
         )
 
