@@ -312,7 +312,6 @@ def get_redundant_node_counts(
 
     redundant_node_counts: List[float] = []
     for redundancy in list(range(1, red_level + 1, 2)):
-        print(f"redundancy={redundancy}")
 
         # Get redundant node counts:
         prefix = f"r_{redundancy}_"
@@ -380,7 +379,6 @@ def find_majority(votes: List[float], position: int) -> Tuple[float, int]:
     is in the list.
     """
     vote_count = Counter(votes)
-    print(f"vote_count={vote_count}")
     return vote_count.most_common(position)[0]  # Unpack list into Tuple.
 
 
