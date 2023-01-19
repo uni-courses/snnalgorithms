@@ -4,13 +4,13 @@ specifications."""
 import copy
 import unittest
 
-from snncompare.exp_setts.default_setts.create_default_settings import (
+from snncompare.exp_config.default_setts.create_default_settings import (
     default_experiment_config,
 )
-from snncompare.exp_setts.Supported_experiment_settings import (
+from snncompare.exp_config.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
-from snncompare.exp_setts.verify_experiment_settings import (
+from snncompare.exp_config.verify_experiment_settings import (
     verify_experiment_config,
 )
 from typeguard import typechecked
@@ -32,7 +32,7 @@ class Test_mdsa(unittest.TestCase):
         verify_algo_configs("MDSA", self.mdsa_configs)
 
         # Create experiment settings.
-        self.supp_exp_setts = (
+        self.supp_exp_config = (
             Supported_experiment_settings()
         )  # Needed for verification.
         self.default_exp_config = default_experiment_config()
@@ -50,7 +50,7 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_experiment_config(
-            self.supp_exp_setts,
+            self.supp_exp_config,
             experiment_config,
             has_unique_id=False,
             allow_optional=False,
@@ -61,7 +61,7 @@ class Test_mdsa(unittest.TestCase):
         experiment_config["algorithms"]["MDSA"][0].pop("m_val")
         with self.assertRaises(KeyError) as context:
             verify_experiment_config(
-                self.supp_exp_setts,
+                self.supp_exp_config,
                 experiment_config,
                 has_unique_id=False,
                 allow_optional=False,
@@ -82,7 +82,7 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_experiment_config(
-            self.supp_exp_setts,
+            self.supp_exp_config,
             experiment_config,
             has_unique_id=False,
             allow_optional=False,
@@ -93,7 +93,7 @@ class Test_mdsa(unittest.TestCase):
         experiment_config["algorithms"]["MDSA"][0]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
             verify_experiment_config(
-                self.supp_exp_setts,
+                self.supp_exp_config,
                 experiment_config,
                 has_unique_id=False,
                 allow_optional=False,
@@ -114,7 +114,7 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_experiment_config(
-            self.supp_exp_setts,
+            self.supp_exp_config,
             experiment_config,
             has_unique_id=False,
             allow_optional=False,
@@ -128,7 +128,7 @@ class Test_mdsa(unittest.TestCase):
         )
         with self.assertRaises(ValueError) as context:
             verify_experiment_config(
-                self.supp_exp_setts,
+                self.supp_exp_config,
                 experiment_config,
                 has_unique_id=False,
                 allow_optional=False,
@@ -152,7 +152,7 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_experiment_config(
-            self.supp_exp_setts,
+            self.supp_exp_config,
             experiment_config,
             has_unique_id=False,
             allow_optional=False,
@@ -166,7 +166,7 @@ class Test_mdsa(unittest.TestCase):
         )
         with self.assertRaises(ValueError) as context:
             verify_experiment_config(
-                self.supp_exp_setts,
+                self.supp_exp_config,
                 experiment_config,
                 has_unique_id=False,
                 allow_optional=False,

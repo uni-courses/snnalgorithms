@@ -13,7 +13,7 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
-from snncompare.exp_setts.run_config.Run_config import Run_config
+from snncompare.exp_config.run_config.Run_config import Run_config
 from snncompare.helper import get_actual_duration
 from typeguard import typechecked
 

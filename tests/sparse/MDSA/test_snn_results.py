@@ -8,15 +8,15 @@ import unittest
 from pprint import pprint
 from typing import Any, Dict
 
-from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
-    long_exp_setts_for_mdsa_testing,
+from snncompare.exp_config.custom_setts.run_configs.algo_test import (
+    long_exp_config_for_mdsa_testing,
     run_config_with_error,
 )
-from snncompare.exp_setts.run_config.Run_config import Run_config
-from snncompare.exp_setts.Supported_experiment_settings import (
+from snncompare.exp_config.run_config.Run_config import Run_config
+from snncompare.exp_config.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
-from snncompare.exp_setts.verify_experiment_settings import (
+from snncompare.exp_config.verify_experiment_settings import (
     verify_experiment_config,
 )
 from snncompare.Experiment_runner import Experiment_runner
@@ -40,14 +40,16 @@ class Test_mdsa_snn_results(unittest.TestCase):
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
 
-    def create_exp_setts(self) -> None:
+    def create_exp_config(self) -> None:
         """Generates the default test settings for the MDSA SNN
         implementations."""
         # Generate default experiment config.
         # pylint: disable=W0201
-        self.mdsa_settings: Dict = long_exp_setts_for_mdsa_testing()
-        # self.mdsa_creation_only_size_3_4: Dict = short_mdsa_test_exp_setts()
-        # self.mdsa_creation_only_size_3_4: Dict =minimal_mdsa_test_exp_setts()
+        self.mdsa_settings: Dict = long_exp_config_for_mdsa_testing()
+        # self.mdsa_creation_only_size_3_4: Dict = short_mdsa_test_exp_config()
+        # self.mdsa_creation_only_size_3_4: Dict =(
+        # minimal_mdsa_test_exp_config()
+        # )
 
         # Do not output images.
         self.mdsa_settings["overwrite_snn_propagation"] = True

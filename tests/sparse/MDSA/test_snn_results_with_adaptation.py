@@ -18,7 +18,7 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super(Test_mdsa_snn_results, self).__init__(*args, **kwargs)
         # Generate default experiment config.
-        self.create_exp_setts()
+        self.create_exp_config()
 
     @typechecked
     def test_something(self) -> None:

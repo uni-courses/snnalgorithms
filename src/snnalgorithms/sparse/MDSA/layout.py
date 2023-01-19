@@ -6,7 +6,7 @@ pint the neurons on the grid intersections instead.
 from typing import List, Optional
 
 from snnbackends.networkx.LIF_neuron import Identifier
-from snncompare.exp_setts.run_config.Run_config import Run_config
+from snncompare.exp_config.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 
