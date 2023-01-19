@@ -36,10 +36,8 @@ class Test_mdsa(unittest.TestCase):
             Supported_experiment_settings()
         )  # Needed for verification.
         self.default_exp_config = default_experiment_config()
-        self.default_exp_config["algorithms"]["MDSA"] = self.mdsa_configs
-        verify_algo_configs(
-            "MDSA", self.default_exp_config["algorithms"]["MDSA"]
-        )
+        self.default_exp_config.algorithms["MDSA"] = self.mdsa_configs
+        verify_algo_configs("MDSA", self.default_exp_config.algorithms["MDSA"])
 
     @typechecked
     def test_error_is_thrown_if_m_val_key_is_missing(self) -> None:
