@@ -5,14 +5,12 @@ import copy
 import unittest
 
 from snncompare.exp_config.default_setts.create_default_settings import (
-    default_experiment_config,
+    default_exp_config,
 )
 from snncompare.exp_config.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
-from snncompare.exp_config.verify_experiment_settings import (
-    verify_experiment_config,
-)
+from snncompare.exp_config.verify_experiment_settings import verify_exp_config
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs, verify_algo_configs
@@ -35,7 +33,7 @@ class Test_mdsa(unittest.TestCase):
         self.supp_exp_config = (
             Supported_experiment_settings()
         )  # Needed for verification.
-        self.default_exp_config = default_experiment_config()
+        self.default_exp_config = default_exp_config()
         self.default_exp_config.algorithms["MDSA"] = self.mdsa_configs
         verify_algo_configs("MDSA", self.default_exp_config.algorithms["MDSA"])
 
@@ -44,23 +42,23 @@ class Test_mdsa(unittest.TestCase):
         """Verifies an exception is thrown if the m_val key is missing from
         (one of the) the mdsa_configs."""
         # Create deepcopy of configuration settings.
-        experiment_config = copy.deepcopy(self.default_exp_config)
+        exp_config = copy.deepcopy(self.default_exp_config)
 
         # First verify the mdsa_configs are valid.
-        verify_experiment_config(
+        verify_exp_config(
             self.supp_exp_config,
-            experiment_config,
+            exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
-        experiment_config["algorithms"]["MDSA"][0].pop("m_val")
+        exp_config["algorithms"]["MDSA"][0].pop("m_val")
         with self.assertRaises(KeyError) as context:
-            verify_experiment_config(
+            verify_exp_config(
                 self.supp_exp_config,
-                experiment_config,
+                exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -76,23 +74,23 @@ class Test_mdsa(unittest.TestCase):
         the mdsa configs."""
 
         # Create deepcopy of configuration settings.
-        experiment_config = copy.deepcopy(self.default_exp_config)
+        exp_config = copy.deepcopy(self.default_exp_config)
 
         # First verify the mdsa_configs are valid.
-        verify_experiment_config(
+        verify_exp_config(
             self.supp_exp_config,
-            experiment_config,
+            exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
-        experiment_config["algorithms"]["MDSA"][0]["m_val"] = "somestring"
+        exp_config["algorithms"]["MDSA"][0]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
-            verify_experiment_config(
+            verify_exp_config(
                 self.supp_exp_config,
-                experiment_config,
+                exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -108,12 +106,12 @@ class Test_mdsa(unittest.TestCase):
         """Verifies an exception is thrown if the m_vals key is too large in
         the mdsa configs."""
         # Create deepcopy of configuration settings.
-        experiment_config = copy.deepcopy(self.default_exp_config)
+        exp_config = copy.deepcopy(self.default_exp_config)
 
         # First verify the mdsa_configs are valid.
-        verify_experiment_config(
+        verify_exp_config(
             self.supp_exp_config,
-            experiment_config,
+            exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -121,13 +119,11 @@ class Test_mdsa(unittest.TestCase):
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.max_m_vals + 1
-        experiment_config["algorithms"]["MDSA"][0]["m_val"] = (
-            self.mdsa.max_m_vals + 1
-        )
+        exp_config["algorithms"]["MDSA"][0]["m_val"] = self.mdsa.max_m_vals + 1
         with self.assertRaises(ValueError) as context:
-            verify_experiment_config(
+            verify_exp_config(
                 self.supp_exp_config,
-                experiment_config,
+                exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -136,7 +132,7 @@ class Test_mdsa(unittest.TestCase):
             (
                 "Error, the maximum supported value for m_vals is:"
                 + f"{self.mdsa.min_m_vals}, yet we found:"
-                + f'{[experiment_config["algorithms"]["MDSA"][0]["m_val"]]}'
+                + f'{[exp_config["algorithms"]["MDSA"][0]["m_val"]]}'
             ),
             str(context.exception),
         )
@@ -146,12 +142,12 @@ class Test_mdsa(unittest.TestCase):
         """Verifies an exception is thrown if the m_vals key is too low in the
         mdsa configs."""
         # Create deepcopy of configuration settings.
-        experiment_config = copy.deepcopy(self.default_exp_config)
+        exp_config = copy.deepcopy(self.default_exp_config)
 
         # First verify the mdsa_configs are valid.
-        verify_experiment_config(
+        verify_exp_config(
             self.supp_exp_config,
-            experiment_config,
+            exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -159,13 +155,11 @@ class Test_mdsa(unittest.TestCase):
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.min_m_vals - 1
-        experiment_config["algorithms"]["MDSA"][2]["m_val"] = (
-            self.mdsa.min_m_vals - 1
-        )
+        exp_config["algorithms"]["MDSA"][2]["m_val"] = self.mdsa.min_m_vals - 1
         with self.assertRaises(ValueError) as context:
-            verify_experiment_config(
+            verify_exp_config(
                 self.supp_exp_config,
-                experiment_config,
+                exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -174,7 +168,7 @@ class Test_mdsa(unittest.TestCase):
             (
                 "Error, the minimum supported value for m_vals is:"
                 + f"{self.mdsa.min_m_vals}, yet we found:"
-                + f'{[experiment_config["algorithms"]["MDSA"][2]["m_val"]]}'
+                + f'{[exp_config["algorithms"]["MDSA"][2]["m_val"]]}'
             ),
             str(context.exception),
         )

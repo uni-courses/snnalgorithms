@@ -10,7 +10,7 @@ from .helper import assert_parameter_is_list
 
 
 @typechecked
-def verify_algos_in_experiment_config(exp_config: Exp_config) -> None:
+def verify_algos_in_exp_config(exp_config: Exp_config) -> None:
     """Verifies an algorithm specification is valid."""
     for algo_name, algo_spec in exp_config.algorithms.items():
         if algo_name == "MDSA":

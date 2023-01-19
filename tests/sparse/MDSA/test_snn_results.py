@@ -16,9 +16,7 @@ from snncompare.exp_config.run_config.Run_config import Run_config
 from snncompare.exp_config.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
-from snncompare.exp_config.verify_experiment_settings import (
-    verify_experiment_config,
-)
+from snncompare.exp_config.verify_experiment_settings import verify_exp_config
 from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_results.load_json_to_nx_graph import (
     load_json_to_nx_graph_from_file,
@@ -73,7 +71,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         if os.path.exists("latex"):
             shutil.rmtree("latex")
 
-        verify_experiment_config(
+        verify_exp_config(
             Supported_experiment_settings(),
             mdsa_settings,
             has_unique_id=False,
