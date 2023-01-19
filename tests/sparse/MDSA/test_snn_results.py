@@ -46,7 +46,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # Generate default experiment config.
         # pylint: disable=W0201
         self.mdsa_settings: Dict = long_exp_config_for_mdsa_testing()
-        # self.mdsa_creation_only_size_3_4: Dict = short_mdsa_test_exp_config()
+        # self.mdsa_creation_only_size_3_4: Dict = (
+        # short_mdsa_test_exp_config()
+        # )
         # self.mdsa_creation_only_size_3_4: Dict =(
         # minimal_mdsa_test_exp_config()
         # )

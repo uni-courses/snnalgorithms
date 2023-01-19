@@ -13,7 +13,6 @@ class MDSA_config:
 
     @typechecked
     def __init__(self, mdsa_config: Dict) -> None:
-
         for some_property, value in mdsa_config.items():
             if some_property == "m_vals":
                 # Verify type of parameters

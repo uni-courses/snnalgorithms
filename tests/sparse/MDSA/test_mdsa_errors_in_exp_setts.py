@@ -56,7 +56,7 @@ class Test_mdsa(unittest.TestCase):
             allow_optional=False,
         )
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         experiment_config["algorithms"]["MDSA"][0].pop("m_val")
         with self.assertRaises(KeyError) as context:
@@ -88,7 +88,7 @@ class Test_mdsa(unittest.TestCase):
             allow_optional=False,
         )
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         experiment_config["algorithms"]["MDSA"][0]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
@@ -120,7 +120,7 @@ class Test_mdsa(unittest.TestCase):
             allow_optional=False,
         )
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.max_m_vals + 1
         experiment_config["algorithms"]["MDSA"][0]["m_val"] = (
@@ -158,7 +158,7 @@ class Test_mdsa(unittest.TestCase):
             allow_optional=False,
         )
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.min_m_vals - 1
         experiment_config["algorithms"]["MDSA"][2]["m_val"] = (

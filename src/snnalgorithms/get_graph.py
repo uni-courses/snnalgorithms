@@ -54,7 +54,7 @@ def gnp_random_connected_graph(
     test_scope: Long_scope_of_tests,
 ) -> DiGraph:
     """Generates a random undirected graph, similarly to an Erdős-Rényi graph,
-    but enforcing that the resulting graph is conneted.
+    but enforcing that the resulting graph is connected.
 
     :param density: param size:
     :param test_scope:
