@@ -2,7 +2,7 @@
 configuration."""
 from typing import List, Union
 
-from snncompare.exp_config import Exp_config
+from snncompare.exp_config.Exp_config import Exp_config
 from typeguard import typechecked
 
 from .get_alg_configs import verify_algo_configs
