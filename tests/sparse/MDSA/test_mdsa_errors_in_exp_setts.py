@@ -54,7 +54,7 @@ class Test_mdsa(unittest.TestCase):
 
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
-        exp_config["algorithms"]["MDSA"][0].pop("m_val")
+        exp_config.algorithms["MDSA"][0].pop("m_val")
         with self.assertRaises(KeyError) as context:
             verify_exp_config(
                 self.supp_exp_config,
@@ -86,7 +86,7 @@ class Test_mdsa(unittest.TestCase):
 
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
-        exp_config["algorithms"]["MDSA"][0]["m_val"] = "somestring"
+        exp_config.algorithms["MDSA"][0]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
             verify_exp_config(
                 self.supp_exp_config,
@@ -119,7 +119,7 @@ class Test_mdsa(unittest.TestCase):
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.max_m_vals + 1
-        exp_config["algorithms"]["MDSA"][0]["m_val"] = self.mdsa.max_m_vals + 1
+        exp_config.algorithms["MDSA"][0]["m_val"] = self.mdsa.max_m_vals + 1
         with self.assertRaises(ValueError) as context:
             verify_exp_config(
                 self.supp_exp_config,
@@ -132,7 +132,7 @@ class Test_mdsa(unittest.TestCase):
             (
                 "Error, the maximum supported value for m_vals is:"
                 + f"{self.mdsa.min_m_vals}, yet we found:"
-                + f'{[exp_config["algorithms"]["MDSA"][0]["m_val"]]}'
+                + f'{[exp_config.algorithms["MDSA"][0]["m_val"]]}'
             ),
             str(context.exception),
         )
@@ -155,7 +155,7 @@ class Test_mdsa(unittest.TestCase):
         # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         # self.mdsa_configs[2]["m_val"] = self.mdsa.min_m_vals - 1
-        exp_config["algorithms"]["MDSA"][2]["m_val"] = self.mdsa.min_m_vals - 1
+        exp_config.algorithms["MDSA"][2]["m_val"] = self.mdsa.min_m_vals - 1
         with self.assertRaises(ValueError) as context:
             verify_exp_config(
                 self.supp_exp_config,
@@ -168,7 +168,7 @@ class Test_mdsa(unittest.TestCase):
             (
                 "Error, the minimum supported value for m_vals is:"
                 + f"{self.mdsa.min_m_vals}, yet we found:"
-                + f'{[exp_config["algorithms"]["MDSA"][2]["m_val"]]}'
+                + f'{[exp_config.algorithms["MDSA"][2]["m_val"]]}'
             ),
             str(context.exception),
         )
