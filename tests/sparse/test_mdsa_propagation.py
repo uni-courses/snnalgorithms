@@ -28,7 +28,7 @@ class Test_mdsa(unittest.TestCase):
         # First verify the mdsa_configs are valid.
         verify_algo_configs("MDSA", self.mdsa_configs)
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         self.mdsa_configs[1].pop("m_val")
         with self.assertRaises(KeyError) as context:
@@ -46,7 +46,7 @@ class Test_mdsa(unittest.TestCase):
         # First verify the mdsa_configs are valid.
         verify_algo_configs("MDSA", self.mdsa_configs)
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         self.mdsa_configs[1]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
@@ -64,7 +64,7 @@ class Test_mdsa(unittest.TestCase):
         # First verify the mdsa_configs are valid.
         verify_algo_configs("MDSA", self.mdsa_configs)
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         self.mdsa_configs[2]["m_val"] = self.mdsa.max_m_vals + 1
         with self.assertRaises(ValueError) as context:
@@ -86,7 +86,7 @@ class Test_mdsa(unittest.TestCase):
         # First verify the mdsa_configs are valid.
         verify_algo_configs("MDSA", self.mdsa_configs)
 
-        # Then remove one m_val parameter from a congig and assert KeyError is
+        # Then remove one m_val parameter from a config and assert KeyError is
         # thrown.
         self.mdsa_configs[2]["m_val"] = self.mdsa.min_m_vals - 1
         with self.assertRaises(ValueError) as context:

@@ -1,10 +1,8 @@
 """Creates the MDSA snn synapses."""
 
-
-from typing import Dict
-
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Synapse
+from snncompare.exp_config.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 
@@ -13,7 +11,7 @@ def create_MDSA_recurrent_synapses(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
-    run_config: dict,
+    run_config: Run_config,
 ) -> nx.DiGraph:
     """Creates the synapses between the neurons for the MDSA algorithm."""
 
@@ -76,7 +74,7 @@ def create_recurrent_degree_receiver_synapse(
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
     algorithm."""
@@ -86,7 +84,7 @@ def create_recurrent_degree_receiver_synapse(
         for node_neighbour in nx.all_neighbors(input_graph, node_index):
             if node_index != node_neighbour:
                 for m_val in range(
-                    0, run_config["algorithm"]["MDSA"]["m_val"] + 1
+                    0, run_config.algorithm["MDSA"]["m_val"] + 1
                 ):
                     mdsa_snn.add_edges_from(
                         [
@@ -133,12 +131,12 @@ def create_recurrent_rand_synapse(
 @typechecked
 def create_recurrent_next_round_synapse(
     mdsa_snn: nx.DiGraph,
-    run_config: Dict,
+    run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
     algorithm."""
     # Create recurrent synapse
-    for m_val in range(1, run_config["algorithm"]["MDSA"]["m_val"] + 1):
+    for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
         mdsa_snn.add_edges_from(
             [
                 (

@@ -1,7 +1,8 @@
 """Used to verify the algorithm specifications in an experiment
 configuration."""
-from typing import Any, List, Union
+from typing import List, Union
 
+from snncompare.exp_config.Exp_config import Exp_config
 from typeguard import typechecked
 
 from .get_alg_configs import verify_algo_configs
@@ -9,9 +10,9 @@ from .helper import assert_parameter_is_list
 
 
 @typechecked
-def verify_algos_in_experiment_config(exp_setts: dict) -> None:
+def verify_algos_in_exp_config(exp_config: Exp_config) -> None:
     """Verifies an algorithm specification is valid."""
-    for algo_name, algo_spec in exp_setts["algorithms"].items():
+    for algo_name, algo_spec in exp_config.algorithms.items():
         if algo_name == "MDSA":
             verify_algo_configs("MDSA", algo_spec)
         else:
@@ -25,7 +26,7 @@ def verify_list_with_numbers(
     elem_type: type,
     min_val: Union[float, int],
     max_val: Union[float, int],
-    some_vals: List[Any],
+    some_vals: List[Union[float, int]],
     var_name: str,
 ) -> None:
     """Verifies the some_vals parameter setting of the algorithm."""

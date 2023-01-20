@@ -13,7 +13,6 @@ class SNN_initialisation_properties:
 
     @typechecked
     def __init__(self, G: nx.Graph, seed: int) -> None:
-
         # Initialise properties for Alipour algorithm
         rand_ceil = self.get_random_ceiling(G)
         rand_nrs = generate_list_of_n_random_nrs(

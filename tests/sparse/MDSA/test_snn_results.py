@@ -5,18 +5,18 @@ import copy
 import os
 import shutil
 import unittest
-from typing import Any, Dict
+from pprint import pprint
+from typing import TYPE_CHECKING, Any, Dict
 
-from snncompare.exp_setts.custom_setts.run_configs.algo_test import (
-    long_exp_setts_for_mdsa_testing,
+from snncompare.exp_config.custom_setts.run_configs.algo_test import (
+    long_exp_config_for_mdsa_testing,
     run_config_with_error,
 )
-from snncompare.exp_setts.Supported_experiment_settings import (
+from snncompare.exp_config.run_config.Run_config import Run_config
+from snncompare.exp_config.Supported_experiment_settings import (
     Supported_experiment_settings,
 )
-from snncompare.exp_setts.verify_experiment_settings import (
-    verify_experiment_config,
-)
+from snncompare.exp_config.verify_experiment_settings import verify_exp_config
 from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_results.load_json_to_nx_graph import (
     load_json_to_nx_graph_from_file,
@@ -26,6 +26,9 @@ from typeguard import typechecked
 from snnalgorithms.get_alg_configs import get_algo_configs
 from snnalgorithms.sparse.MDSA.alg_params import MDSA
 from snnalgorithms.sparse.MDSA.get_results import get_results
+
+if TYPE_CHECKING:
+    from snncompare.exp_config.Exp_config import Exp_config
 
 
 class Test_mdsa_snn_results(unittest.TestCase):
@@ -39,10 +42,31 @@ class Test_mdsa_snn_results(unittest.TestCase):
         super().__init__(*args, **kwargs)
 
     @typechecked
-    def test_snn_results_equal_neumann_results(self) -> None:
+    def create_exp_config(self) -> None:
+        """Generates the default test settings for the MDSA SNN
+        implementations."""
+        # Generate default experiment config.
+        # pylint: disable=W0201
+        self.mdsa_settings: Exp_config = long_exp_config_for_mdsa_testing()
+        # self.mdsa_creation_only_size_3_4: Dict = (
+        # short_mdsa_test_exp_config()
+        # )
+        # self.mdsa_creation_only_size_3_4: Dict =(
+        # minimal_mdsa_test_exp_config()
+        # )
+
+        # Do not output images.
+        self.mdsa_settings.recreate_s2 = True
+        self.mdsa_settings.overwrite_images_only = False
+        self.mdsa_settings.export_images = False
+        self.mdsa_settings.export_types = ["png"]
+
+    @typechecked
+    def helper(self, mdsa_settings: Dict) -> None:
         """Tests whether the results of the snn implementation of the MDSA
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
+        pprint(mdsa_settings)
 
         # Remove results directory if it exists.
         if os.path.exists("results"):
@@ -50,18 +74,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         if os.path.exists("latex"):
             shutil.rmtree("latex")
 
-        # Generate default experiment config.
-        mdsa_settings: dict = long_exp_setts_for_mdsa_testing()
-        # mdsa_creation_only_size_3_4: dict = short_mdsa_test_exp_setts()
-        # mdsa_creation_only_size_3_4: dict = minimal_mdsa_test_exp_setts()
-
-        # Do not output images.
-        mdsa_settings["overwrite_snn_propagation"] = True
-        mdsa_settings["overwrite_visualisation"] = True
-        mdsa_settings["show_snns"] = False
-        mdsa_settings["export_images"] = True
-
-        verify_experiment_config(
+        verify_exp_config(
             Supported_experiment_settings(),
             mdsa_settings,
             has_unique_id=False,
@@ -88,25 +101,28 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
 
 @typechecked
-def override_with_single_run_setting(mdsa_settings: dict) -> Experiment_runner:
+def override_with_single_run_setting(
+    mdsa_settings: Exp_config,
+) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
     algorithms = {
         "MDSA": get_algo_configs(MDSA(list(range(0, 1, 1))).__dict__)
     }
-    mdsa_settings["algorithms"] = algorithms
+    mdsa_settings.algorithms = algorithms
     some_run_config_with_error = run_config_with_error()
-    some_run_config_with_error["export_images"] = True
+    some_run_config_with_error.export_images = True
     exp_runner = Experiment_runner(mdsa_settings, some_run_config_with_error)
     return exp_runner
 
 
 @typechecked
 def assert_run_config_json_results(
-    test_object: Any, exp_runner: Experiment_runner, run_config: dict
+    test_object: Any,
+    exp_runner: Experiment_runner,
+    run_config: Run_config,
 ) -> None:
     """Verifies the results of a run config using the json result output."""
-
     nx_graphs = load_json_to_nx_graph_from_file(
         run_config=run_config, stage_index=4, to_run=exp_runner.to_run
     )
@@ -114,11 +130,11 @@ def assert_run_config_json_results(
     # Verify results are as expected.
     expected_nodenames: Dict[str, int] = get_results(
         input_graph=nx_graphs["input_graph"],
-        iteration=run_config["iteration"],
-        m_val=run_config["algorithm"]["MDSA"]["m_val"],
+        iteration=run_config.iteration,
+        m_val=run_config.algorithm["MDSA"]["m_val"],
         rand_props=nx_graphs["input_graph"].graph["alg_props"],
-        seed=run_config["seed"],
-        size=run_config["graph_size"],
+        seed=run_config.seed,
+        size=run_config.graph_size,
     )
 
     for graph_name, snn_graph in nx_graphs.items():
@@ -145,10 +161,6 @@ def assert_run_config_json_results(
 
             # Verify the expected nodes are the same as the actual nodes.
             for key, expected_val in expected_nodenames.items():
-                print(
-                    f"key={key},expected={expected_val},"
-                    + f"actual={copy_actual_nodenames[key]}"
-                )
                 test_object.assertEquals(
                     expected_val, copy_actual_nodenames[key]
                 )

@@ -1,6 +1,6 @@
 """Computes which nodes are selected by the MDSA algorithm presented by Alipour
 et al."""
-from typing import Any, Dict
+from typing import Dict
 
 import networkx as nx
 from snncompare.helper import (
@@ -15,9 +15,8 @@ from typeguard import typechecked
 @typechecked
 def get_results(
     input_graph: nx.Graph,
-    iteration: int,
     m_val: int,
-    rand_props: Dict[str, Any],
+    rand_props: Dict,
     seed: int,
     size: int,
 ) -> Dict[str, int]:
@@ -49,7 +48,6 @@ def get_results(
 
     compute_marks_for_m_larger_than_one(
         input_graph=input_graph,
-        iteration=iteration,
         m=m_val,
         seed=seed,
         size=size,
@@ -59,7 +57,7 @@ def get_results(
     )
     counter_marks = {}
     for node_index in input_graph.nodes:
-        counter_marks[f"counter_{node_index}_{m_val}"] = input_graph.nodes[
-            node_index
-        ]["countermarks"]
+        counter_marks[f"counter_{node_index}"] = input_graph.nodes[node_index][
+            "countermarks"
+        ]
     return counter_marks

@@ -9,9 +9,11 @@ and the SNN match.
 These results are returned in the form of a dict.
 """
 import copy
-from typing import Dict
+from collections import Counter
+from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
+from snncompare.exp_config.run_config.Run_config import Run_config
 from snncompare.helper import get_actual_duration
 from typeguard import typechecked
 
@@ -20,7 +22,9 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 
 @typechecked
 def set_mdsa_snn_results(
-    m_val: int, run_config: dict, stage_2_graphs: dict
+    m_val: int,
+    run_config: Run_config,
+    stage_2_graphs: Dict,
 ) -> None:
     """Returns the nodes and counts per node that were computed by the SNN
     algorithm.
@@ -34,11 +38,10 @@ def set_mdsa_snn_results(
     # Compute the count for each node according to Alipour et al.'s algorithm.
     alipour_counter_marks = get_results(
         input_graph=stage_2_graphs["input_graph"],
-        iteration=run_config["iteration"],
         m_val=m_val,
         rand_props=stage_2_graphs["input_graph"].graph["alg_props"],
-        seed=run_config["seed"],
-        size=run_config["graph_size"],
+        seed=run_config.seed,
+        size=run_config.graph_size,
     )
 
     # Compute SNN results
@@ -55,35 +58,33 @@ def set_mdsa_snn_results(
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=False,
                     snn_graph=snn_graph,
                 )
                 assert_valid_results(
-                    snn_graph.graph["results"],
-                    alipour_counter_marks,
-                    graph_name,
+                    actual_nodenames=snn_graph.graph["results"],
+                    expected_nodenames=alipour_counter_marks,
+                    graph_name=graph_name,
                 )
 
             elif graph_name == "adapted_snn_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=True,
                     snn_graph=snn_graph,
+                    red_level=snn_graph.graph["red_level"],
                 )
                 assert_valid_results(
-                    snn_graph.graph["results"],
-                    alipour_counter_marks,
-                    graph_name,
+                    actual_nodenames=snn_graph.graph["results"],
+                    expected_nodenames=alipour_counter_marks,
+                    graph_name=graph_name,
                 )
 
             elif graph_name == "rad_snn_algo_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=False,
                     snn_graph=snn_graph,
                 )
@@ -91,9 +92,9 @@ def set_mdsa_snn_results(
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
                     stage_2_graphs["input_graph"],
-                    m_val,
                     redundant=True,
                     snn_graph=snn_graph,
+                    red_level=snn_graph.graph["red_level"],
                 )
             else:
                 raise Exception(f"Invalid graph name:{graph_name}")
@@ -102,7 +103,7 @@ def set_mdsa_snn_results(
 
 @typechecked
 def assert_valid_results(
-    actual_nodenames: Dict[str, int],
+    actual_nodenames: Dict,
     expected_nodenames: Dict[str, int],
     graph_name: str,
 ) -> None:
@@ -153,10 +154,10 @@ def assert_valid_results(
 def get_snn_results(
     alipour_counter_marks: Dict[str, int],
     input_graph: nx.Graph,
-    m_val: int,
     redundant: bool,
     snn_graph: nx.DiGraph,
-) -> dict:
+    red_level: Optional[int] = None,
+) -> Dict:
     """Returns the marks per node that are selected by the snn simulation.
 
     If the simulation is ran with adaptation in the form of redundancy,
@@ -168,16 +169,16 @@ def get_snn_results(
     """
     # Determine why the duration is used here to get a time step.
     sim_duration = get_actual_duration(snn_graph)
-    # get runtime
+    final_timestep = sim_duration - 1  # Because all indices start at 0.
 
     snn_counter_marks = {}
     if not redundant:
         snn_counter_marks = get_nx_LIF_count_without_redundancy(
-            input_graph, snn_graph, m_val, sim_duration
+            input_graph, snn_graph, final_timestep
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph, snn_graph, m_val, sim_duration
+            input_graph, snn_graph, red_level, final_timestep
         )
 
     # Compare the two performances.
@@ -190,8 +191,8 @@ def get_snn_results(
 
 @typechecked
 def get_nx_LIF_count_without_redundancy(
-    input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, m_val: int, t: int
-) -> dict:
+    input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
+) -> Dict:
     """Creates a dictionary with the node name and the the current as node
     count.
 
@@ -207,10 +208,8 @@ def get_nx_LIF_count_without_redundancy(
 
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
-        node_counts[f"counter_{node_index}_{m_val}"] = int(
-            nx_SNN_G.nodes[f"counter_{node_index}_{m_val}"]["nx_lif"][
-                t
-            ].u.get()
+        node_counts[f"counter_{node_index}"] = int(
+            nx_SNN_G.nodes[f"counter_{node_index}"]["nx_lif"][t].u.get()
         )
     return node_counts
 
@@ -219,11 +218,13 @@ def get_nx_LIF_count_without_redundancy(
 def get_nx_LIF_count_with_redundancy(
     input_graph: nx.Graph,
     adapted_nx_snn_graph: nx.DiGraph,
-    m_val: int,
+    red_level: int,
     t: int,
-) -> dict:
-    """Creates a dictionary with the node name and the the current as node
-    count.
+    majority_vote: Optional[bool] = True,
+) -> Dict:
+    """Creates a dictionary with the node name and the current as node count.
+    This assumes the algorithm was generated with redundancy, and it uses
+    majority voting.
 
     # TODO: build support for Lava NX neuron.
 
@@ -232,29 +233,152 @@ def get_nx_LIF_count_with_redundancy(
     :param m: The amount of approximation iterations used in the MDSA
     approximation.
     """
-    # Initialise the node counts
-    node_counts = {}
+    # Initialise the node counts.
+    node_counts: Dict = {}
+
+    # Verify redundancy level is positive and odd. (E.g. 1,3,5 etc.).
+    if red_level < 1 or red_level % 2 == 1:
+        raise ValueError(
+            "Error, redundancy should be 2 or larger and even, it is:"
+            + f"{red_level}."
+        )
 
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
-        # Check if counterneuron died, if yes, read out redundant neuron.
-        if counter_neuron_died(
-            adapted_nx_snn_graph, f"counter_{node_index}_{m_val}"
-        ):
-            prefix = "red_"
-        else:
-            prefix = ""
 
-        node_counts[
-            f"counter_{node_index}_{m_val}"
-        ] = adapted_nx_snn_graph.nodes[
-            f"{prefix}counter_{node_index}_{m_val}"
-        ][
-            "nx_lif"
-        ][
+        if not majority_vote:
+            get_node_count(
+                adapted_nx_snn_graph=adapted_nx_snn_graph,
+                node_counts=node_counts,
+                node_index=node_index,
+                red_level=red_level,
+                t=t,
+            )
+        else:
+            node_counts[f"counter_{node_index}"] = get_majority_node_count(
+                adapted_nx_snn_graph,
+                node_index,
+                red_level,
+                t,
+            )
+    return node_counts
+
+
+@typechecked
+def get_node_count(
+    adapted_nx_snn_graph: nx.DiGraph,
+    node_counts: Dict,
+    node_index: int,
+    red_level: int,
+    t: int,
+) -> None:
+    """If a counter neuron fires, which it always does when it gets an input
+    signal, if it is working properly.
+
+    If so, it inhibits the redundant counter neurons. So by checking
+    whether they have a negative current u, one can see which neuron
+    stored the actual count.
+    """
+    # Check if counterneuron died, if yes, read out redundant neuron.
+    if counter_neuron_died(adapted_nx_snn_graph, f"counter_{node_index}"):
+        prefix = f"r_{red_level}_"
+    else:
+        prefix = ""
+
+    redundant_node_counts = get_redundant_node_counts(
+        adapted_nx_snn_graph,
+        node_index,
+        red_level,
+        t,
+    )
+    for node_count in redundant_node_counts:
+        if node_count >= 0:
+            node_counts[f"counter_{node_index}"] = node_count
+
+    node_counts[f"counter_{node_index}"] = adapted_nx_snn_graph.nodes[
+        f"{prefix}counter_{node_index}"
+    ]["nx_lif"][t].u.get()
+
+
+@typechecked
+def get_redundant_node_counts(
+    adapted_nx_snn_graph: nx.DiGraph,
+    node_index: int,
+    red_level: int,
+    t: int,
+) -> List[float]:
+    """Returns the count stored in the redundant counter neurons."""
+
+    redundant_node_counts: List[float] = []
+    for redundancy in list(range(1, red_level + 1, 2)):
+
+        # Get redundant node counts:
+        prefix = f"r_{redundancy}_"
+        redundant_node_counts.append(
+            adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"][
+                "nx_lif"
+            ][t].u.get()
+        )
+    return redundant_node_counts
+
+
+@typechecked
+def get_majority_node_count(
+    adapted_nx_snn_graph: nx.DiGraph,
+    node_index: int,
+    red_level: int,
+    t: int,
+    remove_negatives: Optional[bool] = True,
+) -> float:
+    """Returns the node count according to a majority vote between the original
+    and redundant nodes of a count node in the MDSA neuron."""
+
+    node_counts = []
+
+    # Get original node count:
+    prefix = ""
+    node_counts.append(
+        adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"]["nx_lif"][
             t
         ].u.get()
-    return node_counts
+    )
+
+    node_counts.extend(
+        get_redundant_node_counts(
+            adapted_nx_snn_graph,
+            node_index,
+            red_level,
+            t,
+        )
+    )
+
+    if remove_negatives:
+        node_counts = [item for item in node_counts if item >= 0]
+
+    # Verify there are at most 2 different values, one for died neurons,
+    # and one for functional count neurons.
+    if len(set(node_counts)) > 2:
+        raise ValueError(
+            "Error, the node count contains more than 2 different values."
+            "Only a valid, and an invalid value for died neurons may exist."
+            f"However, we found:{node_counts}."
+        )
+
+    return find_majority(node_counts, 1)[0]  # Return value that occurred most.
+
+
+@typechecked
+def find_majority(votes: List[float], position: int) -> Tuple[float, int]:
+    """Returns the value, and number of votes in the list of numbers. First
+    place is position=1 (not 0).
+
+    Negatives may be removed because they are from inhibited counter neurons.
+
+    Return index 0 is the value. Return index 1 is how often that value
+    is in the list.
+    """
+    vote_count = Counter(votes)
+    return vote_count.most_common(position)[0]  # Unpack list into Tuple.
 
 
 @typechecked

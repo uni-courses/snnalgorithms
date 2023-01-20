@@ -67,7 +67,7 @@ class Test_dummy(unittest.TestCase):
         # First verify the dummy_configs are valid.
         verify_algo_configs("DUMMY", self.dummy_configs)
 
-        # Then remove one some_val parameter from a congig and assert KeyError
+        # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1]["some_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
@@ -85,7 +85,7 @@ class Test_dummy(unittest.TestCase):
         # First verify the dummy_configs are valid.
         verify_algo_configs("DUMMY", self.dummy_configs)
 
-        # Then remove one other_val parameter from a congig and assert KeyError
+        # Then remove one other_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1]["other_val"] = 42
         with self.assertRaises(TypeError) as context:
@@ -103,7 +103,7 @@ class Test_dummy(unittest.TestCase):
         # First verify the dummy_configs are valid.
         verify_algo_configs("DUMMY", self.dummy_configs)
 
-        # Then remove one some_val parameter from a congig and assert KeyError
+        # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[2]["some_val"] = self.dummy.max_some_vals + 1
         with self.assertRaises(ValueError) as context:
@@ -125,7 +125,7 @@ class Test_dummy(unittest.TestCase):
         # First verify the dummy_configs are valid.
         verify_algo_configs("DUMMY", self.dummy_configs)
 
-        # Then remove one some_val parameter from a congig and assert KeyError
+        # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[2]["some_val"] = self.dummy.min_some_vals - 1
         with self.assertRaises(ValueError) as context:

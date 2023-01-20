@@ -1,6 +1,6 @@
 """Returns a list with all possible algorithm configurations."""
 import itertools
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from typeguard import typechecked
 
@@ -9,9 +9,9 @@ from .sparse.MDSA.alg_params import MDSA, MDSA_config
 
 
 @typechecked
-def get_algo_configs(algo_spec: dict) -> List[dict]:
+def get_algo_configs(algo_spec: Dict) -> List[Dict]:
     """Returns a list of MDSA_config objects."""
-    algo_configs: List[Dict[str, Any]] = []
+    algo_configs: List[Dict] = []
 
     keys = algo_spec["alg_parameters"].keys()
     values = (algo_spec["alg_parameters"][key] for key in keys)
@@ -33,7 +33,7 @@ def get_algo_configs(algo_spec: dict) -> List[dict]:
 
 
 @typechecked
-def verify_algo_configs(algo_name: str, algo_configs: List[dict]) -> None:
+def verify_algo_configs(algo_name: str, algo_configs: List[Dict]) -> None:
     """Verifies the MDSA algorithm configurations are valid."""
     for algo_config_dict in algo_configs:
         if algo_name == "MDSA":
