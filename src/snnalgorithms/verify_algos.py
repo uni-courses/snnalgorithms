@@ -1,6 +1,6 @@
 """Used to verify the algorithm specifications in an experiment
 configuration."""
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
 from typeguard import typechecked
 
@@ -8,11 +8,11 @@ from .get_alg_configs import verify_algo_configs
 from .helper import assert_parameter_is_list
 
 if TYPE_CHECKING:
-    from snncompare.exp_config.Exp_config import Exp_config
+    pass
 
 
 @typechecked
-def verify_algos_in_exp_config(exp_config: "Exp_config") -> None:
+def verify_algos_in_exp_config(exp_config: Any) -> None:
     """Verifies an algorithm specification is valid."""
     for algo_name, algo_spec in exp_config.algorithms.items():
         if algo_name == "MDSA":

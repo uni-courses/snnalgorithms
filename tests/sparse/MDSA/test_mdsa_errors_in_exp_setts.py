@@ -7,10 +7,10 @@ import unittest
 from snncompare.exp_config.default_setts.create_default_settings import (
     default_exp_config,
 )
-from snncompare.exp_config.Supported_experiment_settings import (
+from snncompare.exp_config.Exp_config import (
     Supported_experiment_settings,
+    verify_exp_config,
 )
-from snncompare.exp_config.verify_experiment_settings import verify_exp_config
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs, verify_algo_configs
