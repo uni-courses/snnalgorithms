@@ -48,12 +48,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # Generate default experiment config.
         # pylint: disable=W0201
         self.mdsa_settings: Exp_config = long_exp_config_for_mdsa_testing()
-        # self.mdsa_creation_only_size_3_4: Dict = (
-        # short_mdsa_test_exp_config()
-        # )
-        # self.mdsa_creation_only_size_3_4: Dict =(
-        # minimal_mdsa_test_exp_config()
-        # )
 
         # Do not output images.
         self.mdsa_settings.recreate_s2 = True
