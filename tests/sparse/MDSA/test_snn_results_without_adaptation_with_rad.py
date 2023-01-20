@@ -24,14 +24,13 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
         """Tests whether the SNN MDSA algorithm without adaptation yields the
         same results as the original Neumann version of the MDSA algorithm."""
 
-        self.mdsa_settings["seed"] = 7
-        self.mdsa_settings["overwrite_images_only"] = True
-        self.mdsa_settings["export_images"] = True
-        self.mdsa_settings["radiations"] = {"neuron_death": [0.25]}
+        self.mdsa_settings.overwrite_images_only = True
+        self.mdsa_settings.export_images = True
+        self.mdsa_settings.radiations = {"neuron_death": [0.25]}
 
         # Narrow down test scope by overriding experiment settings.
-        # self.mdsa_settings["size_and_max_graphs"] = [(4, 1)]
-        self.mdsa_settings["algorithms"] = {
+        # self.mdsa_settings.size_and_max_graphs = [(4, 1)]
+        self.mdsa_settings.algorithms = {
             "MDSA": [
                 # {"m_val": 0},
                 {"m_val": 1},

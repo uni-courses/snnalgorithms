@@ -6,7 +6,7 @@ import os
 import shutil
 import unittest
 from pprint import pprint
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict
 
 from snncompare.exp_config.custom_setts.run_configs.algo_test import (
     long_exp_config_for_mdsa_testing,
@@ -27,6 +27,9 @@ from snnalgorithms.get_alg_configs import get_algo_configs
 from snnalgorithms.sparse.MDSA.alg_params import MDSA
 from snnalgorithms.sparse.MDSA.get_results import get_results
 
+if TYPE_CHECKING:
+    from snncompare.exp_config.Exp_config import Exp_config
+
 
 class Test_mdsa_snn_results(unittest.TestCase):
     """Tests whether the snn implementation of the MDSA algorithm yields the
@@ -38,12 +41,13 @@ class Test_mdsa_snn_results(unittest.TestCase):
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
 
+    @typechecked
     def create_exp_config(self) -> None:
         """Generates the default test settings for the MDSA SNN
         implementations."""
         # Generate default experiment config.
         # pylint: disable=W0201
-        self.mdsa_settings: Dict = long_exp_config_for_mdsa_testing()
+        self.mdsa_settings: Exp_config = long_exp_config_for_mdsa_testing()
         # self.mdsa_creation_only_size_3_4: Dict = (
         # short_mdsa_test_exp_config()
         # )
@@ -52,11 +56,10 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # )
 
         # Do not output images.
-        self.mdsa_settings["recreate_s2"] = True
-        self.mdsa_settings["overwrite_images_only"] = False
-        self.mdsa_settings["show_snns"] = False
-        self.mdsa_settings["export_images"] = False
-        self.mdsa_settings["export_types"] = ["png"]
+        self.mdsa_settings.recreate_s2 = True
+        self.mdsa_settings.overwrite_images_only = False
+        self.mdsa_settings.export_images = False
+        self.mdsa_settings.export_types = ["png"]
 
     @typechecked
     def helper(self, mdsa_settings: Dict) -> None:
@@ -98,13 +101,15 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
 
 @typechecked
-def override_with_single_run_setting(mdsa_settings: Dict) -> Experiment_runner:
+def override_with_single_run_setting(
+    mdsa_settings: Exp_config,
+) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
     algorithms = {
         "MDSA": get_algo_configs(MDSA(list(range(0, 1, 1))).__dict__)
     }
-    mdsa_settings["algorithms"] = algorithms
+    mdsa_settings.algorithms = algorithms
     some_run_config_with_error = run_config_with_error()
     some_run_config_with_error.export_images = True
     exp_runner = Experiment_runner(mdsa_settings, some_run_config_with_error)

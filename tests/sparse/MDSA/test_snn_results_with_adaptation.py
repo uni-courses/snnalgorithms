@@ -26,13 +26,13 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
         results as without adaptation."""
         for redundancy in range(2, 6, 2):
             # Modify configuration to include adaptation.
-            self.mdsa_settings["adaptations"] = {"redundancy": [redundancy]}
-            self.mdsa_settings["overwrite_images_only"] = False
-            self.mdsa_settings["export_images"] = False
+            self.mdsa_settings.adaptations = {"redundancy": [redundancy]}
+            self.mdsa_settings.overwrite_images_only = False
+            self.mdsa_settings.export_images = False
 
             # Narrow down test scope by overriding experiment settings.
-            # self.mdsa_settings["size_and_max_graphs"] = [(4, 1)]
-            self.mdsa_settings["algorithms"] = {
+            # self.mdsa_settings.size_and_max_graphs = [(4, 1)]
+            self.mdsa_settings.algorithms = {
                 "MDSA": [
                     {"m_val": 0},
                     {"m_val": 1},

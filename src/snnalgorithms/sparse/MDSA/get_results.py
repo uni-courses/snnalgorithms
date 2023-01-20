@@ -15,7 +15,6 @@ from typeguard import typechecked
 @typechecked
 def get_results(
     input_graph: nx.Graph,
-    iteration: int,
     m_val: int,
     rand_props: Dict,
     seed: int,
@@ -49,7 +48,6 @@ def get_results(
 
     compute_marks_for_m_larger_than_one(
         input_graph=input_graph,
-        iteration=iteration,
         m=m_val,
         seed=seed,
         size=size,

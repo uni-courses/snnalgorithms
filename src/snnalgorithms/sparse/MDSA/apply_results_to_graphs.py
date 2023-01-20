@@ -38,7 +38,6 @@ def set_mdsa_snn_results(
     # Compute the count for each node according to Alipour et al.'s algorithm.
     alipour_counter_marks = get_results(
         input_graph=stage_2_graphs["input_graph"],
-        iteration=run_config.iteration,
         m_val=m_val,
         rand_props=stage_2_graphs["input_graph"].graph["alg_props"],
         seed=run_config.seed,
