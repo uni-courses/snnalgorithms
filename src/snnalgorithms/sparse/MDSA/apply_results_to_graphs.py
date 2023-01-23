@@ -10,6 +10,7 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
+from pprint import pprint
 from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
@@ -88,6 +89,8 @@ def set_mdsa_snn_results(
                     redundant=False,
                     snn_graph=snn_graph,
                 )
+                print("INVALID_RESULTS: rad_snn_algo_graph")
+                pprint(snn_graph.graph["results"])
             elif graph_name == "rad_adapted_snn_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks,
@@ -144,7 +147,7 @@ def assert_valid_results(
     print("")
     for node_index, expected_count in expected_nodenames.items():
         print(
-            f"node_index:{node_index}, ali-mark:"
+            f"{graph_name}: node_index:{node_index}, ali-mark:"
             + f"{expected_count}, snn:{copy_actual_nodenames[node_index]}"
         )
 
