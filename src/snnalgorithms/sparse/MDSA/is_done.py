@@ -24,13 +24,17 @@ def mdsa_is_done(
             # caused the neuron to not spike. This algorithm requires that
             # at least 1 selector neuron is firing within if t>1.
             for node_name in snn_graph.nodes:
-                if "selector" in node_name:
-                    if (
-                        snn_graph.nodes[node_name]["nx_lif"][t].spikes
-                        and t > 0
-                    ):
-                        return False
-                elif "terminator" in node_name:
+                if a_neuron_is_spiking(
+                    identifier="selector",
+                    snn_graph=snn_graph,
+                    t=t,
+                ) or a_neuron_is_spiking(
+                    identifier="next_round",
+                    snn_graph=snn_graph,
+                    t=t,
+                ):
+                    return False
+                if "terminator" in node_name:
                     if (
                         snn_graph.nodes[node_name]["nx_lif"][t].spikes
                         and t > 0
@@ -41,3 +45,14 @@ def mdsa_is_done(
             return False
         return False
     raise Exception("Algorithm termination mode not yet found.")
+
+
+def a_neuron_is_spiking(
+    t: int, snn_graph: nx.DiGraph, identifier: str
+) -> bool:
+    """Returns True if a nextround neuron is spiking at timestep t."""
+    for node_name in snn_graph.nodes:
+        if identifier in node_name:
+            if snn_graph.nodes[node_name]["nx_lif"][t].spikes and t > 0:
+                return True
+    return False
