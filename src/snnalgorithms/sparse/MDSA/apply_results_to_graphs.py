@@ -57,8 +57,8 @@ def set_mdsa_snn_results(
         if graph_name != "input_graph":
             if graph_name == "snn_algo_graph":
                 snn_graph.graph["results"] = get_snn_results(
-                    alipour_counter_marks,
-                    stage_2_graphs["input_graph"],
+                    alipour_counter_marks=alipour_counter_marks,
+                    input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
                     snn_graph=snn_graph,
                 )
@@ -70,8 +70,8 @@ def set_mdsa_snn_results(
 
             elif graph_name == "adapted_snn_graph":
                 snn_graph.graph["results"] = get_snn_results(
-                    alipour_counter_marks,
-                    stage_2_graphs["input_graph"],
+                    alipour_counter_marks=alipour_counter_marks,
+                    input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
                     snn_graph=snn_graph,
                     red_level=snn_graph.graph["red_level"],
@@ -84,8 +84,8 @@ def set_mdsa_snn_results(
 
             elif graph_name == "rad_snn_algo_graph":
                 snn_graph.graph["results"] = get_snn_results(
-                    alipour_counter_marks,
-                    stage_2_graphs["input_graph"],
+                    alipour_counter_marks=alipour_counter_marks,
+                    input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
                     snn_graph=snn_graph,
                 )
@@ -93,8 +93,8 @@ def set_mdsa_snn_results(
                 pprint(snn_graph.graph["results"])
             elif graph_name == "rad_adapted_snn_graph":
                 snn_graph.graph["results"] = get_snn_results(
-                    alipour_counter_marks,
-                    stage_2_graphs["input_graph"],
+                    alipour_counter_marks=alipour_counter_marks,
+                    input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
                     snn_graph=snn_graph,
                     red_level=snn_graph.graph["red_level"],
@@ -166,9 +166,6 @@ def get_snn_results(
     If the simulation is ran with adaptation in the form of redundancy,
     the code automatically selects the working node, and returns its
     count in the list.
-    TODO: make it more biologically plausible by using majority voting.
-    TODO: determine what to do in a draw: random pick. Allow specifying
-    picking heuristic.
     """
     # Determine why the duration is used here to get a time step.
     sim_duration = get_actual_duration(snn_graph)
