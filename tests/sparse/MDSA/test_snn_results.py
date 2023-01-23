@@ -84,14 +84,14 @@ class Test_mdsa_snn_results(unittest.TestCase):
             perform_run=False,
         )
         for run_config in full_exp_runner.run_configs:
-            exp_runner = Experiment_runner(
+            Experiment_runner(
                 mdsa_settings,
                 specific_run_config=run_config,
                 perform_run=True,
             )
 
             # Verify results are identical using the json results file.
-            assert_run_config_json_results(self, exp_runner, run_config)
+            assert_run_config_json_results(self, run_config)
 
 
 @typechecked
@@ -113,12 +113,11 @@ def override_with_single_run_setting(
 @typechecked
 def assert_run_config_json_results(
     test_object: Any,
-    exp_runner: Experiment_runner,
     run_config: Run_config,
 ) -> None:
     """Verifies the results of a run config using the json result output."""
     nx_graphs = load_json_to_nx_graph_from_file(
-        run_config=run_config, stage_index=4, to_run=exp_runner.to_run
+        run_config=run_config, stage_index=4
     )
 
     # Verify results are as expected.
