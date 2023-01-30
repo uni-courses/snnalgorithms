@@ -16,7 +16,7 @@ class SNN_initialisation_properties:
         # Initialise properties for Alipour algorithm
         rand_ceil = self.get_random_ceiling(G)
         rand_nrs = generate_list_of_n_random_nrs(
-            G, max_val=rand_ceil, seed=seed
+            G=G, max_val=rand_ceil, seed=seed
         )
         # Store properties in object.
         self.rand_ceil = rand_ceil
