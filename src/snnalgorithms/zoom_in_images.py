@@ -9,6 +9,7 @@ from typeguard import typechecked
 
 @typechecked
 def copy_region_of_img(
+    *,
     src_path: str,
     dst_dir: str,
     x_coords: Tuple[float, float],

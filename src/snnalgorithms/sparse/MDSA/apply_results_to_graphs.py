@@ -22,6 +22,7 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 
 @typechecked
 def set_mdsa_snn_results(
+    *,
     m_val: int,
     run_config: Run_config,
     stage_2_graphs: Dict,
@@ -62,8 +63,8 @@ def set_mdsa_snn_results(
                     snn_graph=snn_graph,
                 )
                 assert_valid_results(
-                    actual_nodenames=snn_graph.graph["results"],
-                    expected_nodenames=alipour_counter_marks,
+                    actual_node_names=snn_graph.graph["results"],
+                    expected_node_names=alipour_counter_marks,
                     graph_name=graph_name,
                 )
 
@@ -76,8 +77,8 @@ def set_mdsa_snn_results(
                     red_level=snn_graph.graph["red_level"],
                 )
                 assert_valid_results(
-                    actual_nodenames=snn_graph.graph["results"],
-                    expected_nodenames=alipour_counter_marks,
+                    actual_node_names=snn_graph.graph["results"],
+                    expected_node_names=alipour_counter_marks,
                     graph_name=graph_name,
                 )
 
@@ -103,38 +104,39 @@ def set_mdsa_snn_results(
 
 @typechecked
 def assert_valid_results(
-    actual_nodenames: Dict,
-    expected_nodenames: Dict[str, int],
+    *,
+    actual_node_names: Dict,
+    expected_node_names: Dict[str, int],
     graph_name: str,
 ) -> None:
     """Assert results are equal to the Alipour default algorithm."""
 
     # Remove the passed boolean, and redo results verification.
-    copy_actual_nodenames = copy.deepcopy(actual_nodenames)
-    copy_actual_nodenames.pop("passed")
+    copy_actual_node_names = copy.deepcopy(actual_node_names)
+    copy_actual_node_names.pop("passed")
 
     # Verify node names are identical.
-    if copy_actual_nodenames.keys() != expected_nodenames.keys():
+    if copy_actual_node_names.keys() != expected_node_names.keys():
         raise KeyError(
-            f"Selected SNN nodenames for: {graph_name}, are "
+            f"Selected SNN node_names for: {graph_name}, are "
             "not equal to the default/Neumann selected nodes:\n"
-            f"SNN nodes:    {copy_actual_nodenames.keys()}\n"
+            f"SNN nodes:    {copy_actual_node_names.keys()}\n"
             "!=\n"
-            f"Neumann nodes:{expected_nodenames.keys()}\n"
+            f"Neumann nodes:{expected_node_names.keys()}\n"
         )
 
     # Verify the expected nodes are the same as the actual nodes.
-    for key in expected_nodenames.keys():
-        if expected_nodenames[key] != copy_actual_nodenames[key]:
+    for key in expected_node_names.keys():
+        if expected_node_names[key] != copy_actual_node_names[key]:
             raise ValueError(
                 f"SNN count per node for: {graph_name}, are not equal to "
                 " the default/Neumann node counts:\n"
-                f"SNN nodes:    {actual_nodenames}\n"
+                f"SNN nodes:    {actual_node_names}\n"
                 "!=\n"
-                f"Neumann nodes:{expected_nodenames}\n"
+                f"Neumann nodes:{expected_node_names}\n"
                 f"Node:{key} has different counts."
             )
-    if not actual_nodenames["passed"]:
+    if not actual_node_names["passed"]:
         raise Exception(
             "Error, did not detect a difference between SNN "
             "and Neumann mark count in the nodes. Yet "
@@ -142,16 +144,17 @@ def assert_valid_results(
         )
 
     print("")
-    for node_index, expected_count in expected_nodenames.items():
+    for node_index, expected_count in expected_node_names.items():
         print(
             f"{graph_name}: node_index:{node_index}, ali-mark:"
-            + f"{expected_count}, snn:{copy_actual_nodenames[node_index]}"
+            + f"{expected_count}, snn:{copy_actual_node_names[node_index]}"
         )
 
 
 # pylint: disable=R0913
 @typechecked
 def get_snn_results(
+    *,
     alipour_counter_marks: Dict[str, int],
     input_graph: nx.Graph,
     redundant: bool,
@@ -165,17 +168,20 @@ def get_snn_results(
     count in the list.
     """
     # Determine why the duration is used here to get a time step.
-    sim_duration = get_actual_duration(snn_graph)
+    sim_duration = get_actual_duration(snn_graph=snn_graph)
     final_timestep = sim_duration - 1  # Because all indices start at 0.
 
     snn_counter_marks = {}
     if not redundant:
         snn_counter_marks = get_nx_LIF_count_without_redundancy(
-            input_graph, snn_graph, final_timestep
+            input_graph=input_graph, nx_SNN_G=snn_graph, t=final_timestep
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph, snn_graph, red_level, final_timestep
+            input_graph=input_graph,
+            adapted_nx_snn_graph=snn_graph,
+            red_level=red_level,
+            t=final_timestep,
         )
 
     # Compare the two performances.
@@ -188,7 +194,7 @@ def get_snn_results(
 
 @typechecked
 def get_nx_LIF_count_without_redundancy(
-    input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
+    *, input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
 ) -> Dict:
     """Creates a dictionary with the node name and the the current as node
     count.
@@ -213,6 +219,7 @@ def get_nx_LIF_count_without_redundancy(
 
 @typechecked
 def get_nx_LIF_count_with_redundancy(
+    *,
     input_graph: nx.Graph,
     adapted_nx_snn_graph: nx.DiGraph,
     red_level: int,
@@ -253,16 +260,17 @@ def get_nx_LIF_count_with_redundancy(
             )
         else:
             node_counts[f"counter_{node_index}"] = get_majority_node_count(
-                adapted_nx_snn_graph,
-                node_index,
-                red_level,
-                t,
+                adapted_nx_snn_graph=adapted_nx_snn_graph,
+                node_index=node_index,
+                red_level=red_level,
+                t=t,
             )
     return node_counts
 
 
 @typechecked
 def get_node_count(
+    *,
     adapted_nx_snn_graph: nx.DiGraph,
     node_counts: Dict,
     node_index: int,
@@ -277,16 +285,19 @@ def get_node_count(
     stored the actual count.
     """
     # Check if counterneuron died, if yes, read out redundant neuron.
-    if counter_neuron_died(adapted_nx_snn_graph, f"counter_{node_index}"):
+    if counter_neuron_died(
+        snn_graph=adapted_nx_snn_graph,
+        counter_neuron_name=f"counter_{node_index}",
+    ):
         prefix = f"r_{red_level}_"
     else:
         prefix = ""
 
     redundant_node_counts = get_redundant_node_counts(
-        adapted_nx_snn_graph,
-        node_index,
-        red_level,
-        t,
+        adapted_nx_snn_graph=adapted_nx_snn_graph,
+        node_index=node_index,
+        red_level=red_level,
+        t=t,
     )
     for node_count in redundant_node_counts:
         if node_count >= 0:
@@ -299,6 +310,7 @@ def get_node_count(
 
 @typechecked
 def get_redundant_node_counts(
+    *,
     adapted_nx_snn_graph: nx.DiGraph,
     node_index: int,
     red_level: int,
@@ -321,6 +333,7 @@ def get_redundant_node_counts(
 
 @typechecked
 def get_majority_node_count(
+    *,
     adapted_nx_snn_graph: nx.DiGraph,
     node_index: int,
     red_level: int,
@@ -342,10 +355,10 @@ def get_majority_node_count(
 
     node_counts.extend(
         get_redundant_node_counts(
-            adapted_nx_snn_graph,
-            node_index,
-            red_level,
-            t,
+            adapted_nx_snn_graph=adapted_nx_snn_graph,
+            node_index=node_index,
+            red_level=red_level,
+            t=t,
         )
     )
 
@@ -361,11 +374,13 @@ def get_majority_node_count(
             f"However, we found:{node_counts}."
         )
 
-    return find_majority(node_counts, 1)[0]  # Return value that occurred most.
+    return find_majority(votes=node_counts, position=1)[
+        0
+    ]  # Return value that occurred most.
 
 
 @typechecked
-def find_majority(votes: List[float], position: int) -> Tuple[float, int]:
+def find_majority(*, votes: List[float], position: int) -> Tuple[float, int]:
     """Returns the value, and number of votes in the list of numbers. First
     place is position=1 (not 0).
 
@@ -380,7 +395,7 @@ def find_majority(votes: List[float], position: int) -> Tuple[float, int]:
 
 @typechecked
 def counter_neuron_died(
-    snn_graph: nx.DiGraph, counter_neuron_name: str
+    *, snn_graph: nx.DiGraph, counter_neuron_name: str
 ) -> bool:
     """Returns True if the counter neuron died, and False otherwise. This
     method assumes the chip is able to probe a particular neuron to determine
@@ -391,23 +406,23 @@ def counter_neuron_died(
     """
 
     # Determine whether the graph has rad_death property:
-    if graph_has_dead_neurons(snn_graph):
+    if graph_has_dead_neurons(snn_graph=snn_graph):
         return snn_graph.nodes[counter_neuron_name]["rad_death"]
     return False
 
 
 @typechecked
-def graph_has_dead_neurons(snn_graph: nx.DiGraph) -> bool:
+def graph_has_dead_neurons(*, snn_graph: nx.DiGraph) -> bool:
     """Checks whether the "rad_death" key is in any of the nodes of the graph,
     and if it is, verifies it is in all of the nodes."""
     rad_death_found = False
-    for nodename in snn_graph.nodes:
-        if "rad_death" in snn_graph.nodes[nodename].keys():
+    for node_name in snn_graph.nodes:
+        if "rad_death" in snn_graph.nodes[node_name].keys():
             rad_death_found = True
 
     if rad_death_found:
-        for nodename in snn_graph.nodes:
-            if "rad_death" not in snn_graph.nodes[nodename].keys():
+        for node_name in snn_graph.nodes:
+            if "rad_death" not in snn_graph.nodes[node_name].keys():
                 raise Exception(
                     "Error, rad_death key not set in all nodes of"
                     + "graph, yet it was set for at least one node in graph:"

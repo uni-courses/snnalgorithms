@@ -8,6 +8,7 @@ from typeguard import typechecked
 
 @typechecked
 def create_MDSA_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -15,70 +16,75 @@ def create_MDSA_synapses(
     """Creates the synapses between the neurons for the MDSA algorithm."""
 
     # Create synapses for connecting node.
-    create_outgoing_connecting_synapses(input_graph, mdsa_snn)
+    create_outgoing_connecting_synapses(
+        input_graph=input_graph, mdsa_snn=mdsa_snn
+    )
 
     # Create spike_once nodes.
     for _ in input_graph.nodes:
-        create_outgoing_spike_once_synapses(input_graph, mdsa_snn)
+        create_outgoing_spike_once_synapses(
+            input_graph=input_graph, mdsa_snn=mdsa_snn
+        )
 
     create_degree_receiver_selector_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     # pylint: disable=R0801
     create_degree_receiver_counter_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_degree_receiver_next_round_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_outgoing_selector_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_outgoing_rand_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_degree_to_degree_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_outgoing_next_round_selector_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
     # pylint: disable=R0801
     create_degree_receiver_terminator_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
     create_degree_receiver_inhibitory_synapses(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
     return mdsa_snn
 
 
 @typechecked
 def create_outgoing_connecting_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
 ) -> None:
@@ -104,6 +110,7 @@ def create_outgoing_connecting_synapses(
 
 @typechecked
 def create_outgoing_spike_once_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
 ) -> None:
@@ -133,6 +140,7 @@ def create_outgoing_spike_once_synapses(
 
 @typechecked
 def create_degree_receiver_selector_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -164,6 +172,7 @@ def create_degree_receiver_selector_synapses(
 
 
 def create_degree_receiver_counter_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -194,6 +203,7 @@ def create_degree_receiver_counter_synapses(
 
 
 def create_degree_receiver_next_round_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -228,6 +238,7 @@ def create_degree_receiver_next_round_synapses(
 
 @typechecked
 def create_outgoing_selector_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -259,6 +270,7 @@ def create_outgoing_selector_synapses(
 
 @typechecked
 def create_outgoing_rand_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -294,6 +306,7 @@ def create_outgoing_rand_synapses(
 
 @typechecked
 def create_degree_to_degree_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -342,6 +355,7 @@ def create_degree_to_degree_synapses(
 
 @typechecked
 def create_outgoing_next_round_selector_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -373,6 +387,7 @@ def create_outgoing_next_round_selector_synapses(
 
 
 def create_degree_receiver_terminator_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -404,6 +419,7 @@ def create_degree_receiver_terminator_synapses(
 
 
 def create_degree_receiver_inhibitory_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -421,13 +437,21 @@ def create_degree_receiver_inhibitory_synapses(
     for node_index in input_graph.nodes:
         for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
             circuit_degree_receivers = []
-            for nodename in mdsa_snn.nodes:
-                deg_lif = mdsa_snn.nodes[nodename]["nx_lif"][0]
+            for node_name in mdsa_snn.nodes:
+                deg_lif = mdsa_snn.nodes[node_name]["nx_lif"][0]
 
                 if deg_lif.name == "degree_receiver":
                     # Get the degree_receivers with the correct index.
-                    if get_identifier_value(deg_lif, 0) == node_index:
-                        if get_identifier_value(deg_lif, 2) == m_val:
+                    if (
+                        get_identifier_value(lif_neuron=deg_lif, position=0)
+                        == node_index
+                    ):
+                        if (
+                            get_identifier_value(
+                                lif_neuron=deg_lif, position=2
+                            )
+                            == m_val
+                        ):
                             circuit_degree_receivers.append(deg_lif)
             # Within all the degree receivers of a single circuit, set create
             # the inhibitory synapses.
@@ -444,7 +468,7 @@ def create_degree_receiver_inhibitory_synapses(
                         )
 
 
-def get_identifier_value(lif_neuron: LIF_neuron, position: int) -> int:
+def get_identifier_value(*, lif_neuron: LIF_neuron, position: int) -> int:
     """Returns the identifier value of a Lif neuron at the desired position.
 
     The positions represent the subscript indice positions in the neuron

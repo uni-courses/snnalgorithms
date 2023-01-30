@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 @typechecked
 def get_networkx_graph_of_2_neurons() -> nx.DiGraph:
     """Returns graph with 2 neurons with a synapse with weight of 4 from
-    nodename 0 to nodename 1."""
+    node_name 0 to node_name 1."""
     graph = nx.DiGraph()
     graph.add_nodes_from(
         [0, 1],
@@ -48,6 +48,7 @@ def get_networkx_graph_of_2_neurons() -> nx.DiGraph:
 
 @typechecked
 def gnp_random_connected_graph(
+    *,
     density: float,
     recurrent_density: int | float,
     size: int,
@@ -81,27 +82,29 @@ def gnp_random_connected_graph(
                 G.add_edge(*e)
 
     set_random_edge_weights(
-        G,
-        test_scope.min_edge_weight,
-        test_scope.max_edge_weight,
-        test_scope.seed,
+        G=G,
+        min_weight=test_scope.min_edge_weight,
+        max_weight=test_scope.max_edge_weight,
+        seed=test_scope.seed,
     )
 
-    add_random_recurrent_edges(G, recurrent_density, test_scope)
+    add_random_recurrent_edges(
+        G=G, recurrent_edge_density=recurrent_density, test_scope=test_scope
+    )
 
-    set_rand_neuron_properties(G, test_scope)
+    set_rand_neuron_properties(G=G, test_scope=test_scope)
     plot_circular_graph(
-        density,
-        G,
-        recurrent_density,
-        test_scope,
+        density=density,
+        G=G,
+        recurrent_edge_density=recurrent_density,
+        test_scope=test_scope,
     )
     return G
 
 
 @typechecked
 def add_random_recurrent_edges(
-    G: nx.DiGraph, recurrent_edge_density: float, test_scope: Any
+    *, G: nx.DiGraph, recurrent_edge_density: float, test_scope: Any
 ) -> None:
     """Adds random recurrent edges.
 
@@ -114,15 +117,17 @@ def add_random_recurrent_edges(
     # Use seed.
     # Get list of random booleans to decide which recurrent edges are created.
     rand_bools = get_list_with_rand_bools(
-        len(G), recurrent_edge_density, test_scope.seed
+        length=len(G),
+        recurrent_edge_density=recurrent_edge_density,
+        seed=test_scope.seed,
     )
 
     # Get list of random edge values (un-used weights are ignored/skipped).
     rand_edge_weights = get_list_with_rand_ints_in_range(
-        test_scope.min_edge_weight,
-        test_scope.max_edge_weight,
-        G.number_of_edges(),
-        test_scope.seed,
+        min_val=test_scope.min_edge_weight,
+        max_val=test_scope.max_edge_weight,
+        length=G.number_of_edges(),
+        seed=test_scope.seed,
     )
 
     for node in G.nodes:
@@ -140,7 +145,7 @@ def add_random_recurrent_edges(
 
 @typechecked
 def set_random_edge_weights(
-    G: DiGraph, min_weight: int, max_weight: int, seed: int
+    *, G: DiGraph, min_weight: int, max_weight: int, seed: int
 ) -> None:
     """Creates random edge weights and assigns them to the edge objects in the
     graph.
@@ -157,7 +162,10 @@ def set_random_edge_weights(
     nx.set_edge_attributes(G, None, "weight")
 
     rand_edge_weights = get_list_with_rand_ints_in_range(
-        min_weight, max_weight, G.number_of_edges(), seed
+        min_val=min_weight,
+        max_val=max_weight,
+        length=G.number_of_edges(),
+        seed=seed,
     )
 
     # Overwrite each individual edge weight with random edge weight.
@@ -167,6 +175,7 @@ def set_random_edge_weights(
 
 @typechecked
 def set_rand_neuron_properties(
+    *,
     G: DiGraph,
     test_scope: Long_scope_of_tests,
 ) -> None:
@@ -177,12 +186,22 @@ def set_rand_neuron_properties(
     :param test_scope:
     """
     biases = get_list_with_rand_floats_in_range(
-        test_scope.min_bias, test_scope.max_bias, len(G), test_scope.seed
+        min_val=test_scope.min_bias,
+        max_val=test_scope.max_bias,
+        length=len(G),
+        seed=test_scope.seed,
     )
-    dus = get_list_with_rand_floats_in_range(0, 1, len(G), test_scope.seed)
-    dvs = get_list_with_rand_floats_in_range(0, 1, len(G), test_scope.seed)
+    dus = get_list_with_rand_floats_in_range(
+        min_val=0, max_val=1, length=len(G), seed=test_scope.seed
+    )
+    dvs = get_list_with_rand_floats_in_range(
+        min_val=0, max_val=1, length=len(G), seed=test_scope.seed
+    )
     v_thresholds = get_list_with_rand_floats_in_range(
-        test_scope.min_vth, test_scope.max_vth, len(G), test_scope.seed
+        min_val=test_scope.min_vth,
+        max_val=test_scope.max_vth,
+        length=len(G),
+        seed=test_scope.seed,
     )
 
     # Create a LIF neuron object.
@@ -200,7 +219,7 @@ def set_rand_neuron_properties(
 
 @typechecked
 def get_list_with_rand_ints_in_range(
-    min_val: int, max_val: int, length: int, seed: int
+    *, min_val: int, max_val: int, length: int, seed: int
 ) -> Any:
     """Generates and returns a list with random integers in range [min,max] of
     length length.
@@ -223,7 +242,7 @@ def get_list_with_rand_ints_in_range(
 
 @typechecked
 def get_list_with_rand_floats_in_range(
-    min_val: int, max_val: int, length: int, seed: int
+    *, min_val: int, max_val: int, length: int, seed: int
 ) -> ndarray:
     """Generates and returns a list with random integers in range [min,max] of
     length length.
@@ -243,7 +262,7 @@ def get_list_with_rand_floats_in_range(
 
 @typechecked
 def get_list_with_rand_bools(
-    length: int, recurrent_edge_density: int | float, seed: int
+    *, length: int, recurrent_edge_density: int | float, seed: int
 ) -> list[bool]:
     """Generates and returns a list with random booleans of length length. The
     amount of True values is determined by: recurrent_edge_density*length.

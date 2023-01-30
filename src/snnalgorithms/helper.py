@@ -5,7 +5,7 @@ from typeguard import typechecked
 
 
 @typechecked
-def assert_parameter_is_list(parameter: List) -> None:
+def assert_parameter_is_list(*, parameter: List) -> None:
     """Asserts the incoming parameter is of type list.
 
     Throws error if it is of another type.

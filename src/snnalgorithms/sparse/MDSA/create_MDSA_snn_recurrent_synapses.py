@@ -8,6 +8,7 @@ from typeguard import typechecked
 
 @typechecked
 def create_MDSA_recurrent_synapses(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
@@ -18,26 +19,28 @@ def create_MDSA_recurrent_synapses(
     # Create spike_once nodes.
 
     create_recurrent_spike_once_synapse(
-        input_graph, mdsa_snn, recurrent_weight
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        recurrent_weight=recurrent_weight,
     )
 
     create_recurrent_degree_receiver_synapse(
-        input_graph,
-        mdsa_snn,
-        recurrent_weight,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        recurrent_weight=recurrent_weight,
+        run_config=run_config,
     )
 
     # Create recurrent rand_synapses
     create_recurrent_rand_synapse(
-        input_graph,
-        mdsa_snn,
-        recurrent_weight,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        recurrent_weight=recurrent_weight,
     )
 
     create_recurrent_next_round_synapse(
-        mdsa_snn,
-        run_config,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     return mdsa_snn
@@ -45,6 +48,7 @@ def create_MDSA_recurrent_synapses(
 
 @typechecked
 def create_recurrent_spike_once_synapse(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
@@ -71,6 +75,7 @@ def create_recurrent_spike_once_synapse(
 # pylint: disable=R0913
 @typechecked
 def create_recurrent_degree_receiver_synapse(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
@@ -105,6 +110,7 @@ def create_recurrent_degree_receiver_synapse(
 
 @typechecked
 def create_recurrent_rand_synapse(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     recurrent_weight: int,
@@ -130,6 +136,7 @@ def create_recurrent_rand_synapse(
 
 @typechecked
 def create_recurrent_next_round_synapse(
+    *,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
 ) -> None:

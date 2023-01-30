@@ -7,8 +7,8 @@ from .get_alg_configs import get_algo_configs, verify_algo_configs
 from .sparse.MDSA.alg_params import MDSA
 
 mdsa = MDSA(list(range(0, 4, 1)))
-mdsa_configs = get_algo_configs(mdsa.__dict__)
-verify_algo_configs("MDSA", mdsa_configs)
+mdsa_configs = get_algo_configs(algo_spec=mdsa.__dict__)
+verify_algo_configs(algo_name="MDSA", algo_configs=mdsa_configs)
 
 # Parse command line interface arguments to determine what this script does.
 # args = parse_cli_args()

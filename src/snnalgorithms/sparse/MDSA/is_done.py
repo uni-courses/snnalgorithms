@@ -7,6 +7,7 @@ from typeguard import typechecked
 
 @typechecked
 def mdsa_is_done(
+    *,
     run_config: Run_config,
     snn_graph: nx.DiGraph,
     t: int,
@@ -48,7 +49,7 @@ def mdsa_is_done(
 
 
 def a_neuron_is_spiking(
-    t: int, snn_graph: nx.DiGraph, identifier: str
+    *, t: int, snn_graph: nx.DiGraph, identifier: str
 ) -> bool:
     """Returns True if a nextround neuron is spiking at timestep t."""
     for node_name in snn_graph.nodes:

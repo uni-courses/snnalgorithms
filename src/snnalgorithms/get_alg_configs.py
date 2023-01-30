@@ -9,7 +9,7 @@ from .sparse.MDSA.alg_params import MDSA, MDSA_config
 
 
 @typechecked
-def get_algo_configs(algo_spec: Dict) -> List[Dict]:
+def get_algo_configs(*, algo_spec: Dict) -> List[Dict]:
     """Returns a list of MDSA_config objects."""
     algo_configs: List[Dict] = []
 
@@ -33,17 +33,17 @@ def get_algo_configs(algo_spec: Dict) -> List[Dict]:
 
 
 @typechecked
-def verify_algo_configs(algo_name: str, algo_configs: List[Dict]) -> None:
+def verify_algo_configs(*, algo_name: str, algo_configs: List[Dict]) -> None:
     """Verifies the MDSA algorithm configurations are valid."""
     for algo_config_dict in algo_configs:
         if algo_name == "MDSA":
             mdsa = MDSA([algo_config_dict["m_val"]])
-            get_algo_configs(mdsa.__dict__)
+            get_algo_configs(algo_spec=mdsa.__dict__)
         elif algo_name == "DUMMY":
             dummy = DUMMY(
                 some_vals=[algo_config_dict["some_val"]],
                 other_vals=[algo_config_dict["other_val"]],
             )
-            get_algo_configs(dummy.__dict__)
+            get_algo_configs(algo_spec=dummy.__dict__)
         else:
             raise NameError(f"Algorithm:{algo_name} not yet supported.")
