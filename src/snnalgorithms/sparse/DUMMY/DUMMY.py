@@ -77,7 +77,7 @@ class DUMMY:
     @typechecked
     def verify_some_vals(self, some_vals: List[int]) -> None:
         """Verifies the some_vals parameter setting of the algorithm."""
-        assert_parameter_is_list(some_vals)
+        assert_parameter_is_list(parameter=some_vals)
 
         # Verify values of parameters.
         for some_val in some_vals:
@@ -101,7 +101,7 @@ class DUMMY:
     @typechecked
     def verify_other_vals(self, other_vals: List[str]) -> None:
         """Verifies the other_vals parameter setting of the algorithm."""
-        assert_parameter_is_list(other_vals)
+        assert_parameter_is_list(parameter=other_vals)
 
         # Verify values of parameters.
         for other_val in other_vals:

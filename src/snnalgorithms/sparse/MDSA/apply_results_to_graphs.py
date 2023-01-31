@@ -48,13 +48,13 @@ def set_mdsa_snn_results(
     # Compute SNN results
     for graph_name, snn_graph in stage_2_graphs.items():
         # Verify the SNN graphs have completed simulation stage 2.
-        if 2 not in stage_2_graphs[graph_name].graph["completed_stages"]:
-            raise Exception(
-                "Error, the stage 2 simulation is not yet"
-                + f" completed for: {graph_name}"
-            )
-
         if graph_name != "input_graph":
+            if 2 not in stage_2_graphs[graph_name].graph["completed_stages"]:
+                raise Exception(
+                    "Error, the stage 2 simulation is not yet"
+                    + f" completed for: {graph_name}"
+                )
+
             if graph_name == "snn_algo_graph":
                 snn_graph.graph["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
