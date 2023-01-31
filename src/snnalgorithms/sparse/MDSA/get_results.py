@@ -14,6 +14,7 @@ from typeguard import typechecked
 # pylint: disable=R0913
 @typechecked
 def get_results(
+    *,
     input_graph: nx.Graph,
     m_val: int,
     rand_props: Dict,
@@ -37,14 +38,14 @@ def get_results(
 
     for node in input_graph.nodes:
         set_node_default_values(
-            input_graph,
-            node,
-            rand_ceil,
-            rand_nrs,
+            input_graph=input_graph,
+            node=node,
+            rand_ceil=rand_ceil,
+            uninhibited_spread_rand_nrs=rand_nrs,
         )
 
     # pylint: disable=R0801
-    compute_mark(input_graph, rand_ceil)
+    compute_mark(input_graph=input_graph, rand_ceil=rand_ceil)
 
     compute_marks_for_m_larger_than_one(
         input_graph=input_graph,

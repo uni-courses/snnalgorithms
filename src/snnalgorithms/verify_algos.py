@@ -12,11 +12,11 @@ if TYPE_CHECKING:
 
 
 @typechecked
-def verify_algos_in_exp_config(exp_config: Any) -> None:
+def verify_algos_in_exp_config(*, exp_config: Any) -> None:
     """Verifies an algorithm specification is valid."""
     for algo_name, algo_spec in exp_config.algorithms.items():
         if algo_name == "MDSA":
-            verify_algo_configs("MDSA", algo_spec)
+            verify_algo_configs(algo_name="MDSA", algo_configs=algo_spec)
         else:
             raise NameError(
                 f"Error, algo_name:{algo_name} is not yet supported."
@@ -25,6 +25,7 @@ def verify_algos_in_exp_config(exp_config: Any) -> None:
 
 @typechecked
 def verify_list_with_numbers(
+    *,
     elem_type: type,
     min_val: Union[float, int],
     max_val: Union[float, int],
@@ -32,7 +33,7 @@ def verify_list_with_numbers(
     var_name: str,
 ) -> None:
     """Verifies the some_vals parameter setting of the algorithm."""
-    assert_parameter_is_list(some_vals)
+    assert_parameter_is_list(parameter=some_vals)
     if not isinstance(elem_type, type):
         raise Exception(
             "Error, the elem_type is not of type type. It is "
@@ -44,16 +45,25 @@ def verify_list_with_numbers(
         if isinstance(some_val, List):
             for elem in some_val:
                 verify_val_bound_and_type(
-                    elem_type, min_val, max_val, elem, var_name
+                    elem_type=elem_type,
+                    min_val=min_val,
+                    max_val=max_val,
+                    some_val=elem,
+                    var_name=var_name,
                 )
         elif isinstance(some_val, (float, int)):
             verify_val_bound_and_type(
-                elem_type, min_val, max_val, some_val, var_name
+                elem_type=elem_type,
+                min_val=min_val,
+                max_val=max_val,
+                some_val=some_val,
+                var_name=var_name,
             )
 
 
 @typechecked
 def verify_val_bound_and_type(
+    *,
     elem_type: type,
     min_val: Union[float, int],
     max_val: Union[float, int],

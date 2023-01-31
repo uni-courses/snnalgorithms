@@ -140,7 +140,7 @@ class Node_layout:
     @typechecked
     def __init__(
         self,
-        nodename: str,
+        node_name: str,
     ) -> None:
         """A node is assumed to have:
 
@@ -154,7 +154,7 @@ class Node_layout:
         self.radius: float = 30
         self.name_fontsize: float = 3
         self.props_fontsize: float = 3
-        self.name = nodename
+        self.name = node_name
         # +4 to allow for the red_ prefix for redundant nodes.
         self.name_width = 0.05 * (len(self.name) + 4) * self.name_fontsize
         self.props_width = 0.1 * self.props_fontsize
@@ -173,11 +173,11 @@ class Node_layout:
     def max_height_redundancy(
         self,
         circuit_redundancy: float,
-        nodename: str,
+        node_name: str,
         y0: float,
     ) -> float:
         """Returns the maximum height of a redundant node."""
-        node = Node_layout(nodename)
+        node = Node_layout(node_name)
         return y0 + node.eff_height * circuit_redundancy
 
 
@@ -185,6 +185,7 @@ class Node_layout:
 # pylint: disable=R0913
 @typechecked
 def get_node_position(
+    *,
     graph_size: float,
     node_name: str,
     identifiers: List[Identifier],
@@ -272,7 +273,10 @@ def get_node_position(
 
 @typechecked
 def spike_once_xy(
-    circuit: MDSA_circuit_dimensions, node_index: int, node_redundancy: float
+    *,
+    circuit: MDSA_circuit_dimensions,
+    node_index: int,
+    node_redundancy: float,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a spike_once node."""
     node = Node_layout("spike_once")
@@ -285,7 +289,10 @@ def spike_once_xy(
 
 @typechecked
 def rand_xy(
-    circuit: MDSA_circuit_dimensions, node_index: int, node_redundancy: float
+    *,
+    circuit: MDSA_circuit_dimensions,
+    node_index: int,
+    node_redundancy: float,
 ) -> List[float]:
     """Returns the bottom left x and y coordinates of a rand node."""
     node = Node_layout("rand")
@@ -305,6 +312,7 @@ def rand_xy(
 
 @typechecked
 def degree_receiver_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     node_index: int,
     degree_index_per_circuit: int,
@@ -337,6 +345,7 @@ def degree_receiver_xy(
 
 @typechecked
 def selector_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     node_index: int,
@@ -372,6 +381,7 @@ def selector_xy(
 
 @typechecked
 def counter_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     node_index: int,
@@ -399,7 +409,7 @@ def counter_xy(
     # Compute starting height.
     counter_node = Node_layout("counter")
 
-    redundancy_spacing = get_spacing(node_redundancy)
+    redundancy_spacing = get_spacing(node_redundancy=node_redundancy)
     return [
         start_width_in_circuit
         + counter_node.eff_width * (redundancy_spacing)
@@ -412,6 +422,7 @@ def counter_xy(
 
 @typechecked
 def next_round_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     m_val: int,
@@ -452,6 +463,7 @@ def next_round_xy(
 
 @typechecked
 def connecting_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     graph_size: int,
@@ -479,7 +491,7 @@ def connecting_xy(
 
     connecting_node = Node_layout("connecting")
 
-    redundancy_spacing = get_spacing(node_redundancy)
+    redundancy_spacing = get_spacing(node_redundancy=node_redundancy)
     return [
         start_width_in_circuit + connecting_node.eff_width * (node_redundancy),
         start_height_in_circuit
@@ -490,6 +502,7 @@ def connecting_xy(
 
 @typechecked
 def terminating_xy(
+    *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
     graph_size: int,
@@ -518,7 +531,7 @@ def terminating_xy(
     )
 
     terminating_node = Node_layout("terminating")
-    redundancy_spacing = get_spacing(node_redundancy)
+    redundancy_spacing = get_spacing(node_redundancy=node_redundancy)
     return [
         start_width_in_circuit
         + terminating_node.eff_width * (node_redundancy)
@@ -529,23 +542,23 @@ def terminating_xy(
     ]
 
 
-def get_hori_redundant_redundancy_spacing(bare_nodename: str) -> float:
+def get_hori_redundant_redundancy_spacing(*, bare_node_name: str) -> float:
     """Returns the horizontal spacing that is relevant for redundancy.
 
     For example, the rand neurons should not be spaced horizontally
     right of the rand neurons, but right of the spike_once neurons.
     """
-    if bare_nodename in ["rand", "spike_once"]:
-        widest_nodename = "spike_once"
-    elif bare_nodename in ["degree_receiver"]:
-        widest_nodename = "degree_receiver"
+    if bare_node_name in ["rand", "spike_once"]:
+        widest_node_name = "spike_once"
+    elif bare_node_name in ["degree_receiver"]:
+        widest_node_name = "degree_receiver"
     else:
-        widest_nodename = "degree_receiver"
-    node_layout = Node_layout(widest_nodename)
+        widest_node_name = "degree_receiver"
+    node_layout = Node_layout(widest_node_name)
     return node_layout.eff_width
 
 
-def get_spacing(node_redundancy: int) -> int:
+def get_spacing(*, node_redundancy: int) -> int:
     """Returns an extra spacing in case there is no redundancy.
 
     Used to prevent overlapping node positions.

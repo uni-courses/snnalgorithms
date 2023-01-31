@@ -20,6 +20,7 @@ from snnalgorithms.sparse.MDSA.layout import get_node_position
 
 @typechecked
 def get_new_mdsa_graph(
+    *,
     run_config: Run_config,
     input_graph: nx.Graph,
 ) -> nx.DiGraph:
@@ -31,19 +32,21 @@ def get_new_mdsa_graph(
     # TODO get recurrent weight form algo specification.
     recurrent_weight: int = -10
 
-    snn_graph = create_MDSA_neurons(input_graph, run_config)
+    snn_graph = create_MDSA_neurons(
+        input_graph=input_graph, run_config=run_config
+    )
 
     create_MDSA_recurrent_synapses(
-        input_graph,
-        snn_graph,
-        recurrent_weight,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=snn_graph,
+        recurrent_weight=recurrent_weight,
+        run_config=run_config,
     )
 
     create_MDSA_synapses(
-        input_graph,
-        snn_graph,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=snn_graph,
+        run_config=run_config,
     )
 
     return snn_graph
@@ -53,6 +56,7 @@ def get_new_mdsa_graph(
 # pylint: disable=R0914
 @typechecked
 def create_MDSA_neurons(
+    *,
     input_graph: nx.Graph,
     run_config: Run_config,
 ) -> nx.DiGraph:
@@ -60,50 +64,54 @@ def create_MDSA_neurons(
     mdsa_snn = nx.DiGraph()
 
     # Create connecting node.
-    create_connecting_node(mdsa_snn, len(input_graph), run_config)
+    create_connecting_node(
+        mdsa_snn=mdsa_snn, nr_of_nodes=len(input_graph), run_config=run_config
+    )
 
     # Create spike_once nodes.
-    create_spike_once_node(input_graph, mdsa_snn, run_config)
+    create_spike_once_node(
+        input_graph=input_graph, mdsa_snn=mdsa_snn, run_config=run_config
+    )
 
     create_degree_receiver_node(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     # Create random spike nodes.
     create_rand_node(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     # Create selector nodes.
     create_selector_node(
-        input_graph,
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     # Create selector nodes.
     create_counter_node(
-        input_graph,
-        run_config.algorithm["MDSA"]["m_val"],
-        mdsa_snn,
-        run_config,
+        input_graph=input_graph,
+        m_val=run_config.algorithm["MDSA"]["m_val"],
+        mdsa_snn=mdsa_snn,
+        run_config=run_config,
     )
 
     create_next_round_node(
-        mdsa_snn,
-        len(input_graph.nodes),
-        run_config,
+        mdsa_snn=mdsa_snn,
+        nr_of_nodes=len(input_graph.nodes),
+        run_config=run_config,
     )
 
     create_terminator_node(
-        mdsa_snn,
-        run_config.algorithm["MDSA"]["m_val"],
-        len(input_graph.nodes),
-        run_config,
+        mdsa_snn=mdsa_snn,
+        m_val=run_config.algorithm["MDSA"]["m_val"],
+        nr_of_nodes=len(input_graph.nodes),
+        run_config=run_config,
     )
 
     return mdsa_snn
@@ -111,6 +119,7 @@ def create_MDSA_neurons(
 
 @typechecked
 def create_connecting_node(
+    *,
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
     run_config: Run_config,
@@ -140,6 +149,7 @@ def create_connecting_node(
 
 @typechecked
 def create_spike_once_node(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -180,6 +190,7 @@ def create_spike_once_node(
 # pylint: disable=R0913
 @typechecked
 def create_degree_receiver_node(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -242,6 +253,7 @@ def create_degree_receiver_node(
 
 @typechecked
 def create_rand_node(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -279,6 +291,7 @@ def create_rand_node(
 
 @typechecked
 def create_selector_node(
+    *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
@@ -330,6 +343,7 @@ def create_selector_node(
 
 @typechecked
 def create_counter_node(
+    *,
     input_graph: nx.Graph,
     m_val: int,
     mdsa_snn: nx.DiGraph,
@@ -372,6 +386,7 @@ def create_counter_node(
 
 @typechecked
 def create_next_round_node(
+    *,
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
     run_config: Run_config,
@@ -410,6 +425,7 @@ def create_next_round_node(
 
 @typechecked
 def create_terminator_node(
+    *,
     mdsa_snn: nx.DiGraph,
     m_val: int,
     nr_of_nodes: int,

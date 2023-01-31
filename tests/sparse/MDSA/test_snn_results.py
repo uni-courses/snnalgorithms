@@ -69,8 +69,8 @@ class Test_mdsa_snn_results(unittest.TestCase):
             shutil.rmtree("latex")
 
         verify_exp_config(
-            Supported_experiment_settings(),
-            mdsa_settings,
+            supp_exp_config=Supported_experiment_settings(),
+            exp_config=mdsa_settings,
             has_unique_id=False,
             allow_optional=True,
         )
@@ -91,17 +91,20 @@ class Test_mdsa_snn_results(unittest.TestCase):
             )
 
             # Verify results are identical using the json results file.
-            assert_run_config_json_results(self, run_config)
+            assert_run_config_json_results(
+                test_object=self, run_config=run_config
+            )
 
 
 @typechecked
 def override_with_single_run_setting(
+    *,
     mdsa_settings: Exp_config,
 ) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
     algorithms = {
-        "MDSA": get_algo_configs(MDSA(list(range(0, 1, 1))).__dict__)
+        "MDSA": get_algo_configs(algo_spec=MDSA(list(range(0, 1, 1))).__dict__)
     }
     mdsa_settings.algorithms = algorithms
     some_run_config_with_error = run_config_with_error()
@@ -112,16 +115,21 @@ def override_with_single_run_setting(
 
 @typechecked
 def assert_run_config_json_results(
+    *,
     test_object: Any,
     run_config: Run_config,
 ) -> None:
-    """Verifies the results of a run config using the json result output."""
+    """Verifies the results of a run config using the json result output.
+
+    TODO: update expected_stages.
+    """
+
     nx_graphs = load_json_to_nx_graph_from_file(
-        run_config=run_config, stage_index=4
+        run_config=run_config, stage_index=4, expected_stages=[1, 2, 3, 4]
     )
 
     # Verify results are as expected.
-    expected_nodenames: Dict[str, int] = get_results(
+    expected_node_names: Dict[str, int] = get_results(
         input_graph=nx_graphs["input_graph"],
         iteration=run_config.iteration,
         m_val=run_config.algorithm["MDSA"]["m_val"],
@@ -141,21 +149,21 @@ def assert_run_config_json_results(
                 in nx_graphs[graph_name].graph["completed_stages"]
             )
 
-            actual_nodenames: Dict[str, int] = snn_graph.graph["results"]
+            actual_node_names: Dict[str, int] = snn_graph.graph["results"]
 
             # Remove the passed boolean, and redo results verification.
-            copy_actual_nodenames = copy.deepcopy(actual_nodenames)
-            copy_actual_nodenames.pop("passed")
+            copy_actual_node_names = copy.deepcopy(actual_node_names)
+            copy_actual_node_names.pop("passed")
 
             # Verify node names are identical.
             test_object.assertEquals(
-                copy_actual_nodenames.keys(), expected_nodenames.keys()
+                copy_actual_node_names.keys(), expected_node_names.keys()
             )
 
             # Verify the expected nodes are the same as the actual nodes.
-            for key, expected_val in expected_nodenames.items():
+            for key, expected_val in expected_node_names.items():
                 test_object.assertEquals(
-                    expected_val, copy_actual_nodenames[key]
+                    expected_val, copy_actual_node_names[key]
                 )
 
-            test_object.assertTrue(actual_nodenames["passed"])
+            test_object.assertTrue(actual_node_names["passed"])

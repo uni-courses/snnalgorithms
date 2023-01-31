@@ -21,21 +21,23 @@ class Test_dummy(unittest.TestCase):
             some_vals=list(range(4, 8, 1)),
             other_vals=["onestring", "anotherstring"],
         )
-        self.dummy_configs = get_algo_configs(self.dummy.__dict__)
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        self.dummy_configs = get_algo_configs(algo_spec=self.dummy.__dict__)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
     @typechecked
     def test_error_is_thrown_if_some_val_key_is_missing(self) -> None:
         """Verifies an exception is thrown if the some_val key is missing from
         (one of the) the dummy_configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1].pop("some_val")
         with self.assertRaises(KeyError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             "'some_val'",
@@ -47,13 +49,15 @@ class Test_dummy(unittest.TestCase):
         """Verifies an exception is thrown if the other_val key is missing from
         (one of the) the dummy_configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one other_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1].pop("other_val")
         with self.assertRaises(KeyError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             "'other_val'",
@@ -65,13 +69,15 @@ class Test_dummy(unittest.TestCase):
         """Verifies an exception is thrown if the some_vals key is missing from
         the dummy configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1]["some_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             'type of argument "some_vals"[0] must be int; got str instead',
@@ -83,13 +89,15 @@ class Test_dummy(unittest.TestCase):
         """Verifies an exception is thrown if the other_vals key is missing
         from the dummy configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one other_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[1]["other_val"] = 42
         with self.assertRaises(TypeError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             'type of argument "other_vals"[0] must be str; got int instead',
@@ -101,13 +109,15 @@ class Test_dummy(unittest.TestCase):
         """Verifies an exception is thrown if the some_vals key is too large in
         the dummy configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[2]["some_val"] = self.dummy.max_some_vals + 1
         with self.assertRaises(ValueError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             (
@@ -123,13 +133,15 @@ class Test_dummy(unittest.TestCase):
         """Verifies an exception is thrown if the some_vals key is too low in
         the dummy configs."""
         # First verify the dummy_configs are valid.
-        verify_algo_configs("DUMMY", self.dummy_configs)
+        verify_algo_configs(algo_name="DUMMY", algo_configs=self.dummy_configs)
 
         # Then remove one some_val parameter from a config and assert KeyError
         # is thrown.
         self.dummy_configs[2]["some_val"] = self.dummy.min_some_vals - 1
         with self.assertRaises(ValueError) as context:
-            verify_algo_configs("DUMMY", self.dummy_configs)
+            verify_algo_configs(
+                algo_name="DUMMY", algo_configs=self.dummy_configs
+            )
 
         self.assertEqual(
             (

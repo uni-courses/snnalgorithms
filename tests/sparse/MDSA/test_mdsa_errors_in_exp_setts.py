@@ -26,8 +26,8 @@ class Test_mdsa(unittest.TestCase):
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
         self.mdsa = MDSA(list(range(0, 4, 1)))
-        self.mdsa_configs = get_algo_configs(self.mdsa.__dict__)
-        verify_algo_configs("MDSA", self.mdsa_configs)
+        self.mdsa_configs = get_algo_configs(algo_spec=self.mdsa.__dict__)
+        verify_algo_configs(algo_name="MDSA", algo_configs=self.mdsa_configs)
 
         # Create experiment settings.
         self.supp_exp_config = (
@@ -35,7 +35,10 @@ class Test_mdsa(unittest.TestCase):
         )  # Needed for verification.
         self.default_exp_config = default_exp_config()
         self.default_exp_config.algorithms["MDSA"] = self.mdsa_configs
-        verify_algo_configs("MDSA", self.default_exp_config.algorithms["MDSA"])
+        verify_algo_configs(
+            algo_name="MDSA",
+            algo_configs=self.default_exp_config.algorithms["MDSA"],
+        )
 
     @typechecked
     def test_error_is_thrown_if_m_val_key_is_missing(self) -> None:
@@ -46,8 +49,8 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_exp_config(
-            self.supp_exp_config,
-            exp_config,
+            supp_exp_config=self.supp_exp_config,
+            exp_config=exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -57,8 +60,8 @@ class Test_mdsa(unittest.TestCase):
         exp_config.algorithms["MDSA"][0].pop("m_val")
         with self.assertRaises(KeyError) as context:
             verify_exp_config(
-                self.supp_exp_config,
-                exp_config,
+                supp_exp_config=self.supp_exp_config,
+                exp_config=exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -78,8 +81,8 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_exp_config(
-            self.supp_exp_config,
-            exp_config,
+            supp_exp_config=self.supp_exp_config,
+            exp_config=exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -89,8 +92,8 @@ class Test_mdsa(unittest.TestCase):
         exp_config.algorithms["MDSA"][0]["m_val"] = "somestring"
         with self.assertRaises(TypeError) as context:
             verify_exp_config(
-                self.supp_exp_config,
-                exp_config,
+                supp_exp_config=self.supp_exp_config,
+                exp_config=exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -110,8 +113,8 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_exp_config(
-            self.supp_exp_config,
-            exp_config,
+            supp_exp_config=self.supp_exp_config,
+            exp_config=exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -122,8 +125,8 @@ class Test_mdsa(unittest.TestCase):
         exp_config.algorithms["MDSA"][0]["m_val"] = self.mdsa.max_m_vals + 1
         with self.assertRaises(ValueError) as context:
             verify_exp_config(
-                self.supp_exp_config,
-                exp_config,
+                supp_exp_config=self.supp_exp_config,
+                exp_config=exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )
@@ -146,8 +149,8 @@ class Test_mdsa(unittest.TestCase):
 
         # First verify the mdsa_configs are valid.
         verify_exp_config(
-            self.supp_exp_config,
-            exp_config,
+            supp_exp_config=self.supp_exp_config,
+            exp_config=exp_config,
             has_unique_id=False,
             allow_optional=False,
         )
@@ -158,8 +161,8 @@ class Test_mdsa(unittest.TestCase):
         exp_config.algorithms["MDSA"][2]["m_val"] = self.mdsa.min_m_vals - 1
         with self.assertRaises(ValueError) as context:
             verify_exp_config(
-                self.supp_exp_config,
-                exp_config,
+                supp_exp_config=self.supp_exp_config,
+                exp_config=exp_config,
                 has_unique_id=False,
                 allow_optional=False,
             )

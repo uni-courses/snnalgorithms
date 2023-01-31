@@ -56,7 +56,7 @@ class MDSA:
     @typechecked
     def verify_m_vals(self, m_vals: List[int]) -> None:
         """Verifies the m_vals parameter setting of the algorithm."""
-        assert_parameter_is_list(m_vals)
+        assert_parameter_is_list(parameter=m_vals)
 
         # Verify values of parameters.
         for m_val in m_vals:
