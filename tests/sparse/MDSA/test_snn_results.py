@@ -78,14 +78,15 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # Get experiment runner for long test.
         full_exp_runner = Experiment_runner(
-            mdsa_settings,
+            exp_config=mdsa_settings,
             perform_run=False,
+            specific_run_config=None,
         )
         for run_config in full_exp_runner.run_configs:
             Experiment_runner(
-                mdsa_settings,
-                specific_run_config=run_config,
+                exp_config=mdsa_settings,
                 perform_run=True,
+                specific_run_config=run_config,
             )
 
             # Verify results are identical using the json results file.
@@ -107,7 +108,11 @@ def override_with_single_run_setting(
     mdsa_settings.algorithms = algorithms
     some_run_config_with_error = run_config_with_error()
     some_run_config_with_error.export_images = True
-    exp_runner = Experiment_runner(mdsa_settings, some_run_config_with_error)
+    exp_runner = Experiment_runner(
+        exp_config=mdsa_settings,
+        specific_run_config=some_run_config_with_error,
+        perform_run=True,
+    )
     return exp_runner
 
 
