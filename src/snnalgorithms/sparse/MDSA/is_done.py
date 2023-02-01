@@ -1,7 +1,7 @@
 """Determines whether the snn algorithm is done."""
 
 import networkx as nx
-from snncompare.exp_config.run_config.Run_config import Run_config
+from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 

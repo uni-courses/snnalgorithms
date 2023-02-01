@@ -13,8 +13,8 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
-from snncompare.exp_config.run_config.Run_config import Run_config
 from snncompare.helper import get_actual_duration
+from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.get_results import get_results

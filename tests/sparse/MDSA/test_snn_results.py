@@ -8,19 +8,19 @@ import unittest
 from pprint import pprint
 from typing import TYPE_CHECKING, Any, Dict
 
-from snncompare.exp_config.custom_setts.run_configs.algo_test import (
-    long_exp_config_for_mdsa_testing,
-    run_config_with_error,
-)
 from snncompare.exp_config.Exp_config import (
     Supported_experiment_settings,
     verify_exp_config,
 )
-from snncompare.exp_config.run_config.Run_config import Run_config
 from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_results.load_json_to_nx_graph import (
     load_json_to_nx_graph_from_file,
 )
+from snncompare.json_configurations.run_configs.algo_test import (
+    long_exp_config_for_mdsa_testing,
+    run_config_with_error,
+)
+from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs

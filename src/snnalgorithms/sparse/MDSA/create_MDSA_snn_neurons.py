@@ -6,7 +6,7 @@ from typing import Dict, List
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
-from snncompare.exp_config.run_config.Run_config import Run_config
+from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (

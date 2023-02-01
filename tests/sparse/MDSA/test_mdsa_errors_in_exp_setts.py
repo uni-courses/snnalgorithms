@@ -4,12 +4,12 @@ specifications."""
 import copy
 import unittest
 
-from snncompare.exp_config.default_setts.create_default_settings import (
-    default_exp_config,
-)
 from snncompare.exp_config.Exp_config import (
     Supported_experiment_settings,
     verify_exp_config,
+)
+from snncompare.json_configurations.create_default_settings import (
+    default_exp_config,
 )
 from typeguard import typechecked
 
