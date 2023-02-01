@@ -11,7 +11,7 @@ import numpy as np
 from networkx.classes.digraph import DiGraph
 from numpy import ndarray
 from snnbackends.networkx.LIF_neuron import LIF_neuron
-from snnbackends.plot_graphs import plot_circular_graph
+from snncompare.export_plots.plot_graphs import plot_circular_graph
 from typeguard import TYPE_CHECKING, typechecked
 
 if TYPE_CHECKING:
