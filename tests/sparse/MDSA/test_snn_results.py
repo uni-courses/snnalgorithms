@@ -51,7 +51,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # Do not output images.
         self.mdsa_settings.recreate_s2 = True
-        self.mdsa_settings.overwrite_images_only = False
+        self.mdsa_settings.recreate_s3 = False
         self.mdsa_settings.export_images = False
         self.mdsa_settings.export_types = ["png"]
 
