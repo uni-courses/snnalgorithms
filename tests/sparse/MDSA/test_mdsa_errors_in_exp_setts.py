@@ -51,8 +51,6 @@ class Test_mdsa(unittest.TestCase):
         verify_exp_config(
             supp_exp_config=self.supp_exp_config,
             exp_config=exp_config,
-            has_unique_id=False,
-            allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
@@ -62,8 +60,6 @@ class Test_mdsa(unittest.TestCase):
             verify_exp_config(
                 supp_exp_config=self.supp_exp_config,
                 exp_config=exp_config,
-                has_unique_id=False,
-                allow_optional=False,
             )
 
         self.assertEqual(
@@ -83,8 +79,6 @@ class Test_mdsa(unittest.TestCase):
         verify_exp_config(
             supp_exp_config=self.supp_exp_config,
             exp_config=exp_config,
-            has_unique_id=False,
-            allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
@@ -94,8 +88,6 @@ class Test_mdsa(unittest.TestCase):
             verify_exp_config(
                 supp_exp_config=self.supp_exp_config,
                 exp_config=exp_config,
-                has_unique_id=False,
-                allow_optional=False,
             )
 
         self.assertEqual(
@@ -115,8 +107,6 @@ class Test_mdsa(unittest.TestCase):
         verify_exp_config(
             supp_exp_config=self.supp_exp_config,
             exp_config=exp_config,
-            has_unique_id=False,
-            allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
@@ -127,8 +117,6 @@ class Test_mdsa(unittest.TestCase):
             verify_exp_config(
                 supp_exp_config=self.supp_exp_config,
                 exp_config=exp_config,
-                has_unique_id=False,
-                allow_optional=False,
             )
 
         self.assertEqual(
@@ -151,8 +139,6 @@ class Test_mdsa(unittest.TestCase):
         verify_exp_config(
             supp_exp_config=self.supp_exp_config,
             exp_config=exp_config,
-            has_unique_id=False,
-            allow_optional=False,
         )
 
         # Then remove one m_val parameter from a config and assert KeyError is
@@ -163,8 +149,6 @@ class Test_mdsa(unittest.TestCase):
             verify_exp_config(
                 supp_exp_config=self.supp_exp_config,
                 exp_config=exp_config,
-                has_unique_id=False,
-                allow_optional=False,
             )
 
         self.assertEqual(

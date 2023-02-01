@@ -71,8 +71,6 @@ class Test_mdsa_snn_results(unittest.TestCase):
         verify_exp_config(
             supp_exp_config=Supported_experiment_settings(),
             exp_config=mdsa_settings,
-            has_unique_id=False,
-            allow_optional=True,
         )
 
         # OVERRIDE: Run only on a single run config.
