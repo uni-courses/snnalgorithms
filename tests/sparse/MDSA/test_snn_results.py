@@ -20,6 +20,7 @@ from snncompare.json_configurations.run_configs.algo_test import (
     long_exp_config_for_mdsa_testing,
     run_config_with_error,
 )
+from snncompare.optional_config.Output_config import Output_config
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
@@ -60,6 +61,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
         """Tests whether the results of the snn implementation of the MDSA
         algorithm are the same as those of the default/Neumann implementation
         of that MDSA algorithm. ."""
+
+        # TODO: create output_config with valid content.
+        output_config = None
         pprint(mdsa_settings)
 
         # Remove results directory if it exists.
@@ -79,12 +83,14 @@ class Test_mdsa_snn_results(unittest.TestCase):
         # Get experiment runner for long test.
         full_exp_runner = Experiment_runner(
             exp_config=mdsa_settings,
+            output_config=output_config,
             perform_run=False,
             specific_run_config=None,
         )
         for run_config in full_exp_runner.run_configs:
             Experiment_runner(
                 exp_config=mdsa_settings,
+                output_config=output_config,
                 perform_run=True,
                 specific_run_config=run_config,
             )
@@ -99,6 +105,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
 def override_with_single_run_setting(
     *,
     mdsa_settings: Exp_config,
+    output_config: Output_config,
 ) -> Experiment_runner:
     """Overwrites a list of experiment settings to only run the experiment on a
     single run configuration."""
@@ -110,6 +117,7 @@ def override_with_single_run_setting(
     some_run_config_with_error.export_images = True
     exp_runner = Experiment_runner(
         exp_config=mdsa_settings,
+        output_config=output_config,
         specific_run_config=some_run_config_with_error,
         perform_run=True,
     )
