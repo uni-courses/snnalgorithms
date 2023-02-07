@@ -3,10 +3,8 @@
 TODO: instead of creating complicated relative positions, create a grid and
 pint the neurons on the grid intersections instead.
 """
-from typing import List, Optional
+from typing import List
 
-from snnbackends.networkx.LIF_neuron import Identifier
-from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 
@@ -179,96 +177,6 @@ class Node_layout:
         """Returns the maximum height of a redundant node."""
         node = Node_layout(node_name)
         return y0 + node.eff_height * circuit_redundancy
-
-
-# pylint: disable=R0911
-# pylint: disable=R0913
-@typechecked
-def get_node_position(
-    *,
-    graph_size: float,
-    node_name: str,
-    identifiers: List[Identifier],
-    node_redundancy: int,
-    run_config: Run_config,
-    m_val: Optional[int] = None,
-    degree_index: Optional[int] = None,
-) -> List[float]:
-    """Returns the node position."""
-    # 0 redundancy is default, 1 redundancy is 1 backup neuron etc.
-    redundancy: int
-    if run_config.adaptation is None:
-        redundancy = 0
-    else:
-        redundancy = run_config.adaptation["redundancy"]
-    circuit = MDSA_circuit_dimensions(graph_size, redundancy)
-
-    if node_name == "spike_once":
-        return spike_once_xy(
-            circuit=circuit,
-            node_index=identifiers[0].value,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "rand":
-        return rand_xy(
-            circuit=circuit,
-            node_index=identifiers[0].value,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "degree_receiver":
-        return degree_receiver_xy(
-            circuit=circuit,
-            node_index=identifiers[0].value,
-            degree_index_per_circuit=degree_index,
-            m_val=m_val,
-            node_redundancy=node_redundancy,
-        )
-    if node_name == "selector":
-        return selector_xy(
-            circuit=circuit,
-            circuit_redundancy=circuit.redundancy,
-            node_index=identifiers[0].value,
-            m_val=m_val,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "counter":
-        return counter_xy(
-            circuit=circuit,
-            circuit_redundancy=circuit.redundancy,
-            node_index=identifiers[0].value,
-            m_val=m_val,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "next_round":
-        return next_round_xy(
-            circuit=circuit,
-            circuit_redundancy=circuit.redundancy,
-            m_val=m_val,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "connecting":
-        return connecting_xy(
-            circuit=circuit,
-            circuit_redundancy=circuit.redundancy,
-            graph_size=graph_size,
-            node_redundancy=node_redundancy,
-        )
-
-    if node_name == "terminator":
-        return terminating_xy(
-            circuit=circuit,
-            circuit_redundancy=circuit.redundancy,
-            graph_size=graph_size,
-            m_val=m_val,
-            node_redundancy=node_redundancy,
-        )
-
-    raise Exception(f"Error, node:{node_name} not supported.")
 
 
 @typechecked

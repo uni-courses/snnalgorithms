@@ -6,6 +6,10 @@ from typing import Dict, List
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
+from snncompare.export_plots.Plot_config import (
+    Plot_config,
+    get_default_plot_config,
+)
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
@@ -15,7 +19,7 @@ from snnalgorithms.sparse.MDSA.create_MDSA_snn_recurrent_synapses import (
 from snnalgorithms.sparse.MDSA.create_MDSA_snn_synapses import (
     create_MDSA_synapses,
 )
-from snnalgorithms.sparse.MDSA.layout import get_node_position
+from snnalgorithms.sparse.MDSA.retry_layout import get_node_position
 
 
 @typechecked
@@ -32,8 +36,10 @@ def get_new_mdsa_graph(
     # TODO get recurrent weight form algo specification.
     recurrent_weight: int = -10
 
+    plot_config: Plot_config = get_default_plot_config()
+
     snn_graph = create_MDSA_neurons(
-        input_graph=input_graph, run_config=run_config
+        input_graph=input_graph, run_config=run_config, plot_config=plot_config
     )
 
     create_MDSA_recurrent_synapses(
@@ -58,6 +64,7 @@ def get_new_mdsa_graph(
 def create_MDSA_neurons(
     *,
     input_graph: nx.Graph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
@@ -65,17 +72,24 @@ def create_MDSA_neurons(
 
     # Create connecting node.
     create_connecting_node(
-        mdsa_snn=mdsa_snn, nr_of_nodes=len(input_graph), run_config=run_config
+        mdsa_snn=mdsa_snn,
+        nr_of_nodes=len(input_graph),
+        plot_config=plot_config,
+        run_config=run_config,
     )
 
     # Create spike_once nodes.
     create_spike_once_node(
-        input_graph=input_graph, mdsa_snn=mdsa_snn, run_config=run_config
+        input_graph=input_graph,
+        mdsa_snn=mdsa_snn,
+        plot_config=plot_config,
+        run_config=run_config,
     )
 
     create_degree_receiver_node(
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
+        plot_config=plot_config,
         run_config=run_config,
     )
 
@@ -83,6 +97,7 @@ def create_MDSA_neurons(
     create_rand_node(
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
+        plot_config=plot_config,
         run_config=run_config,
     )
 
@@ -90,27 +105,29 @@ def create_MDSA_neurons(
     create_selector_node(
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
+        plot_config=plot_config,
         run_config=run_config,
     )
 
     # Create selector nodes.
     create_counter_node(
         input_graph=input_graph,
-        m_val=run_config.algorithm["MDSA"]["m_val"],
         mdsa_snn=mdsa_snn,
+        plot_config=plot_config,
         run_config=run_config,
     )
 
     create_next_round_node(
         mdsa_snn=mdsa_snn,
         nr_of_nodes=len(input_graph.nodes),
+        plot_config=plot_config,
         run_config=run_config,
     )
 
     create_terminator_node(
         mdsa_snn=mdsa_snn,
-        m_val=run_config.algorithm["MDSA"]["m_val"],
         nr_of_nodes=len(input_graph.nodes),
+        plot_config=plot_config,
         run_config=run_config,
     )
 
@@ -122,6 +139,7 @@ def create_connecting_node(
     *,
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the connecting node in the MDSA
@@ -132,6 +150,7 @@ def create_connecting_node(
             node_name="connecting",
             identifiers=[],
             node_redundancy=0,
+            plot_config=plot_config,
             run_config=run_config,
         )
     )
@@ -152,6 +171,7 @@ def create_spike_once_node(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
@@ -168,6 +188,7 @@ def create_spike_once_node(
             get_node_position(
                 graph_size=len(input_graph.nodes),
                 node_name="spike_once",
+                plot_config=plot_config,
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
@@ -193,6 +214,7 @@ def create_degree_receiver_node(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
@@ -226,10 +248,11 @@ def create_degree_receiver_node(
                         get_node_position(
                             graph_size=len(input_graph),
                             node_name="degree_receiver",
+                            plot_config=plot_config,
                             identifiers=identifiers,
                             node_redundancy=0,
                             run_config=run_config,
-                            m_val=m_val,
+                            m_val_max=run_config.algorithm["MDSA"]["m_val"],
                             degree_index=degree_index,
                         )
                     )
@@ -256,6 +279,7 @@ def create_rand_node(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the rand node in the MDSA algorithm."""
@@ -271,6 +295,7 @@ def create_rand_node(
             get_node_position(
                 graph_size=len(input_graph),
                 node_name="rand",
+                plot_config=plot_config,
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
@@ -294,6 +319,7 @@ def create_selector_node(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the selector node in the MDSA
@@ -322,9 +348,10 @@ def create_selector_node(
                     graph_size=len(input_graph),
                     node_name="selector",
                     identifiers=identifiers,
+                    plot_config=plot_config,
                     node_redundancy=0,
                     run_config=run_config,
-                    m_val=m_val,
+                    m_val_max=run_config.algorithm["MDSA"]["m_val"],
                 )
             )
 
@@ -345,8 +372,8 @@ def create_selector_node(
 def create_counter_node(
     *,
     input_graph: nx.Graph,
-    m_val: int,
     mdsa_snn: nx.DiGraph,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the counter node in the MDSA
@@ -364,10 +391,11 @@ def create_counter_node(
             get_node_position(
                 graph_size=len(input_graph),
                 node_name="counter",
+                plot_config=plot_config,
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
-                m_val=m_val,
+                m_val_max=run_config.algorithm["MDSA"]["m_val"],
             )
         )
 
@@ -389,6 +417,7 @@ def create_next_round_node(
     *,
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """Creates the neuron settings for the counter node in the MDSA
@@ -404,6 +433,7 @@ def create_next_round_node(
             get_node_position(
                 graph_size=nr_of_nodes,
                 node_name="next_round",
+                plot_config=plot_config,
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
@@ -427,8 +457,8 @@ def create_next_round_node(
 def create_terminator_node(
     *,
     mdsa_snn: nx.DiGraph,
-    m_val: int,
     nr_of_nodes: int,
+    plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
     """T800 node that stops the spiking neural network from proceeding, once
@@ -440,10 +470,11 @@ def create_terminator_node(
         get_node_position(
             graph_size=nr_of_nodes,
             node_name="terminator",
+            plot_config=plot_config,
             identifiers=[],
             node_redundancy=0,
             run_config=run_config,
-            m_val=m_val,
+            m_val_max=run_config.algorithm["MDSA"]["m_val"],
         )
     )
 
