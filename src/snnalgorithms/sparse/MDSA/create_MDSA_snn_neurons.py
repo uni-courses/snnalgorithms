@@ -193,7 +193,6 @@ def create_spike_once_node(
         ]
         spike_once_xy = tuple(
             get_node_position(
-                graph_size=len(input_graph.nodes),
                 node_name="spike_once",
                 plot_config=plot_config,
                 identifiers=identifiers,
@@ -252,9 +251,9 @@ def create_degree_receiver_node(
                             value=m_val,
                         ),
                     ]
+                    print(f"identifiers={identifiers}")
                     degree_receiver_xy = tuple(
                         get_node_position(
-                            graph_size=len(input_graph),
                             node_name="degree_receiver",
                             plot_config=plot_config,
                             identifiers=identifiers,
@@ -319,7 +318,6 @@ def create_rand_node(
         ]
         rand_xy = tuple(
             get_node_position(
-                graph_size=len(input_graph),
                 node_name="rand",
                 plot_config=plot_config,
                 identifiers=identifiers,
@@ -373,7 +371,6 @@ def create_selector_node(
 
             selector_xy = tuple(
                 get_node_position(
-                    graph_size=len(input_graph),
                     node_name="selector",
                     identifiers=identifiers,
                     plot_config=plot_config,
@@ -419,7 +416,6 @@ def create_counter_node(
 
         counter_xy = tuple(
             get_node_position(
-                graph_size=len(input_graph),
                 node_name="counter",
                 plot_config=plot_config,
                 identifiers=identifiers,
@@ -462,7 +458,6 @@ def create_next_round_node(
 
         next_round_xy = tuple(
             get_node_position(
-                graph_size=nr_of_nodes,
                 node_name="next_round",
                 plot_config=plot_config,
                 identifiers=identifiers,

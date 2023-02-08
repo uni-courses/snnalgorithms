@@ -266,7 +266,6 @@ def get_node_position(
     if node_name == "terminator":
         return terminator_xy(
             dx_node=dx_node,
-            dy_node=dy_node,
             m_val_max=m_val_max,
             node_redundancy=node_redundancy,
             plot_config=plot_config,
