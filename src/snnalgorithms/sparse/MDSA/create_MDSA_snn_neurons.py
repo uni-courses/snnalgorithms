@@ -2,6 +2,7 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
+from pprint import pprint
 from typing import Dict, List
 
 import networkx as nx
@@ -69,17 +70,20 @@ def create_MDSA_neurons(
 ) -> nx.DiGraph:
     """Creates the neurons for the MDSA algorithm."""
     mdsa_snn = nx.DiGraph()
-
+    degree_indices = get_max_degree_index_per_node_index(
+        input_graph=input_graph
+    )
+    pprint(degree_indices)
     # Create connecting node.
-    create_connecting_node(
+    create_connector_node(
         mdsa_snn=mdsa_snn,
-        nr_of_nodes=len(input_graph),
         plot_config=plot_config,
         run_config=run_config,
     )
 
     # Create spike_once nodes.
     create_spike_once_node(
+        degree_indices=degree_indices,
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
         plot_config=plot_config,
@@ -87,6 +91,7 @@ def create_MDSA_neurons(
     )
 
     create_degree_receiver_node(
+        degree_indices=degree_indices,
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
         plot_config=plot_config,
@@ -95,6 +100,7 @@ def create_MDSA_neurons(
 
     # Create random spike nodes.
     create_rand_node(
+        degree_indices=degree_indices,
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
         plot_config=plot_config,
@@ -103,6 +109,7 @@ def create_MDSA_neurons(
 
     # Create selector nodes.
     create_selector_node(
+        degree_indices=degree_indices,
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
         plot_config=plot_config,
@@ -111,6 +118,7 @@ def create_MDSA_neurons(
 
     # Create selector nodes.
     create_counter_node(
+        degree_indices=degree_indices,
         input_graph=input_graph,
         mdsa_snn=mdsa_snn,
         plot_config=plot_config,
@@ -135,10 +143,9 @@ def create_MDSA_neurons(
 
 
 @typechecked
-def create_connecting_node(
+def create_connector_node(
     *,
     mdsa_snn: nx.DiGraph,
-    nr_of_nodes: int,
     plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
@@ -146,7 +153,6 @@ def create_connecting_node(
     algorithm."""
     connecting_xy = tuple(
         get_node_position(
-            graph_size=nr_of_nodes,
             node_name="connecting",
             identifiers=[],
             node_redundancy=0,
@@ -155,7 +161,7 @@ def create_connecting_node(
         )
     )
     lif_neuron = LIF_neuron(
-        name="connecting_node",
+        name="connector_node",
         bias=0.0,
         du=0.0,
         dv=0.0,
@@ -169,6 +175,7 @@ def create_connecting_node(
 @typechecked
 def create_spike_once_node(
     *,
+    degree_indices: Dict[int, int],
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     plot_config: Plot_config,
@@ -192,6 +199,7 @@ def create_spike_once_node(
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
+                degree_indices=degree_indices,
             )
         )
         lif_neuron = LIF_neuron(
@@ -212,6 +220,7 @@ def create_spike_once_node(
 @typechecked
 def create_degree_receiver_node(
     *,
+    degree_indices: Dict[int, int],
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     plot_config: Plot_config,
@@ -219,7 +228,6 @@ def create_degree_receiver_node(
 ) -> None:
     """Creates the neuron settings for the spike_once node in the MDSA
     algorithm."""
-
     # pylint: disable=R0801
     # Create degree_receiver nodes.
     for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
@@ -254,6 +262,7 @@ def create_degree_receiver_node(
                             run_config=run_config,
                             m_val_max=run_config.algorithm["MDSA"]["m_val"],
                             degree_index=degree_index,
+                            degree_indices=degree_indices,
                         )
                     )
 
@@ -275,8 +284,25 @@ def create_degree_receiver_node(
 
 
 @typechecked
+def get_max_degree_index_per_node_index(
+    *,
+    input_graph: nx.Graph,
+) -> Dict[int, int]:
+    """Returns how many degree_receiver nodes exist within a single node
+    circuit."""
+    degree_indices: Dict[int, int] = {}
+    for node_index in input_graph.nodes:
+        degree_indices[node_index] = 0
+        for node_neighbour in nx.all_neighbors(input_graph, node_index):
+            if node_index != node_neighbour:
+                degree_indices[node_index] = degree_indices[node_index] + 1
+    return degree_indices
+
+
+@typechecked
 def create_rand_node(
     *,
+    degree_indices: Dict[int, int],
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     plot_config: Plot_config,
@@ -299,6 +325,7 @@ def create_rand_node(
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
+                degree_indices=degree_indices,
             )
         )
         lif_neuron = LIF_neuron(
@@ -317,6 +344,7 @@ def create_rand_node(
 @typechecked
 def create_selector_node(
     *,
+    degree_indices: Dict[int, int],
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     plot_config: Plot_config,
@@ -352,6 +380,7 @@ def create_selector_node(
                     node_redundancy=0,
                     run_config=run_config,
                     m_val_max=run_config.algorithm["MDSA"]["m_val"],
+                    degree_indices=degree_indices,
                 )
             )
 
@@ -371,6 +400,7 @@ def create_selector_node(
 @typechecked
 def create_counter_node(
     *,
+    degree_indices: Dict[int, int],
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
     plot_config: Plot_config,
@@ -396,6 +426,7 @@ def create_counter_node(
                 node_redundancy=0,
                 run_config=run_config,
                 m_val_max=run_config.algorithm["MDSA"]["m_val"],
+                degree_indices=degree_indices,
             )
         )
 
@@ -437,7 +468,8 @@ def create_next_round_node(
                 identifiers=identifiers,
                 node_redundancy=0,
                 run_config=run_config,
-                m_val=m_val - 1,
+                # m_val=m_val - 1,
+                m_val_max=run_config.algorithm["MDSA"]["m_val"] + 1,
             )
         )
         lif_neuron = LIF_neuron(
@@ -468,7 +500,6 @@ def create_terminator_node(
     """
     terminator_xy = tuple(
         get_node_position(
-            graph_size=nr_of_nodes,
             node_name="terminator",
             plot_config=plot_config,
             identifiers=[],

@@ -96,7 +96,7 @@ def create_outgoing_connecting_synapses(
         mdsa_snn.add_edges_from(
             [
                 (
-                    "connecting_node",
+                    "connector_node",
                     f"spike_once_{node_index}",
                 )
             ],

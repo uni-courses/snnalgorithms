@@ -397,19 +397,19 @@ def connecting_xy(
         + circuit.dy_spike_once_rand
     )
 
-    connecting_node = Node_layout("connecting")
+    connector_node = Node_layout("connecting")
 
     redundancy_spacing = get_spacing(node_redundancy=node_redundancy)
     return [
-        start_width_in_circuit + connecting_node.eff_width * (node_redundancy),
+        start_width_in_circuit + connector_node.eff_width * (node_redundancy),
         start_height_in_circuit
-        + connecting_node.eff_height * (redundancy_spacing)
+        + connector_node.eff_height * (redundancy_spacing)
         + circuit.max_height * (graph_size - 1),
     ]
 
 
 @typechecked
-def terminating_xy(
+def terminator_xy(
     *,
     circuit: MDSA_circuit_dimensions,
     circuit_redundancy: int,
@@ -438,14 +438,14 @@ def terminating_xy(
         + circuit.dy_spike_once_rand
     )
 
-    terminating_node = Node_layout("terminating")
+    terminator_node = Node_layout("terminator")
     redundancy_spacing = get_spacing(node_redundancy=node_redundancy)
     return [
         start_width_in_circuit
-        + terminating_node.eff_width * (node_redundancy)
+        + terminator_node.eff_width * (node_redundancy)
         + circuit.max_width * (m_val - 1),  # Shift 1 m_val to left.
         start_height_in_circuit
-        + terminating_node.eff_height * (redundancy_spacing)
+        + terminator_node.eff_height * (redundancy_spacing)
         + circuit.max_height * (graph_size - 1),
     ]
 
