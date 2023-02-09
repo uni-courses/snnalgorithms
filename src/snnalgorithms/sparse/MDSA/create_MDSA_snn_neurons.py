@@ -2,7 +2,6 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
-from pprint import pprint
 from typing import Dict, List
 
 import networkx as nx
@@ -73,7 +72,6 @@ def create_MDSA_neurons(
     degree_indices = get_max_degree_index_per_node_index(
         input_graph=input_graph
     )
-    pprint(degree_indices)
     # Create connecting node.
     create_connector_node(
         mdsa_snn=mdsa_snn,
