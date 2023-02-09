@@ -251,7 +251,6 @@ def create_degree_receiver_node(
                             value=m_val,
                         ),
                     ]
-                    print(f"identifiers={identifiers}")
                     degree_receiver_xy = tuple(
                         get_node_position(
                             node_name="degree_receiver",
