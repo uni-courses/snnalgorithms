@@ -46,7 +46,6 @@ def spike_once_xy(
     """Returns the  x and y coordinates of a spike_once node."""
     x = dx_node * 1.0 + plot_config.dx_redundant * node_redundancy
     y = sum_height + plot_config.dy_redundant * node_redundancy
-    # print(f"node_index={node_index},y={y} node_redundancy={node_redundancy}")
     return x, y
 
 
@@ -194,7 +193,6 @@ def get_node_position(
                 plot_config=plot_config,
             )
         )
-        print(f"node_index={identifiers[0].value},    sum={sum_height}")
 
     dx_node = redundancy * plot_config.dx_redundant + plot_config.x_node_spacer
     dy_node = redundancy * plot_config.dx_redundant + plot_config.x_node_spacer
