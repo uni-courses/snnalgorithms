@@ -5,7 +5,6 @@ import copy
 import os
 import shutil
 import unittest
-from pprint import pprint
 from typing import TYPE_CHECKING, Any, Dict
 
 from snncompare.exp_config.Exp_config import (
@@ -64,7 +63,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
 
         # TODO: create output_config with valid content.
         output_config = None
-        pprint(mdsa_settings)
+        # pprint(mdsa_settings)
 
         # Remove results directory if it exists.
         if os.path.exists("results"):
