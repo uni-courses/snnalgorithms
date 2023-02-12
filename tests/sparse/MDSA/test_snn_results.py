@@ -15,7 +15,7 @@ from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_results.load_json_to_nx_graph import (
     load_json_to_nx_graph_from_file,
 )
-from snncompare.json_configurations.run_configs.algo_test import (
+from snncompare.json_configurations.algo_test import (
     long_exp_config_for_mdsa_testing,
     run_config_with_error,
 )
