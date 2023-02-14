@@ -435,7 +435,7 @@ def create_degree_receiver_inhibitory_synapses(
     # Create synapse to inhibitory neuron.
     # pylint: disable=R1702
     for node_index in input_graph.nodes:
-        for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
+        for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
             circuit_degree_receivers = []
             for node_name in mdsa_snn.nodes:
                 deg_lif = mdsa_snn.nodes[node_name]["nx_lif"][0]
@@ -461,7 +461,7 @@ def create_degree_receiver_inhibitory_synapses(
                         mdsa_snn.add_edges_from(
                             [(deg_lif.full_name, other_deg_lif.full_name)],
                             synapse=Synapse(
-                                weight=-1,
+                                weight=-100,
                                 delay=0,
                                 change_per_t=0,
                             ),
