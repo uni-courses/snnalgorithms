@@ -164,7 +164,7 @@ def create_degree_receiver_selector_synapses(
                             )
                         ],
                         synapse=Synapse(
-                            weight=-5,
+                            weight=-10,
                             delay=0,
                             change_per_t=0,
                         ),  # to disable bias
