@@ -30,7 +30,7 @@ def get_cumulative_starting_height(
         return 0.0
     sum_height: float = 0
     for i in range(0, node_index):
-        sum_height += 2 * dy_node + plot_config.dy_redundant * (
+        sum_height += 1 * dy_node + plot_config.dy_redundant * (
             node_redundancy + (degree_indices[i] - 1)
         )
     return sum_height
@@ -52,14 +52,13 @@ def spike_once_xy(
 @typechecked
 def rand_xy(
     dx_node: float,
-    dy_node: float,
     plot_config: "Plot_config",
     node_redundancy: float,
     sum_height: float,
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a spike_once node."""
-    x = dx_node * 1.0 + plot_config.dx_redundant * node_redundancy
-    y = sum_height + 1.0 * dy_node + plot_config.dy_redundant * node_redundancy
+    x = dx_node * 2.0 + plot_config.dx_redundant * node_redundancy
+    y = sum_height + plot_config.dy_redundant * node_redundancy
     return x, y
 
 
@@ -71,18 +70,16 @@ def degree_receiver_xy(
     degree_index_per_circuit: int,
     m_val: int,
     node_redundancy: float,
-    dy_node: float,
     sum_height: float,
 ) -> Tuple[float, float]:
     """Returns the x and y coordinates of a degree_receiver node The degree
     index indicates how much higher a ."""
-    x = dx_node * (2 + 2 * m_val) + plot_config.dx_redundant * node_redundancy
+    x = dx_node * (3 + 2 * m_val) + plot_config.dx_redundant * node_redundancy
     y = (
         sum_height
-        + degree_index_per_circuit * dy_node
+        + degree_index_per_circuit * plot_config.dy_redundant
         + plot_config.dy_redundant * (node_redundancy)
     )
-
     return x, y
 
 
@@ -90,18 +87,16 @@ def degree_receiver_xy(
 @typechecked
 def selector_xy(
     dx_node: float,
+    dy_node: float,
     m_val: int,
     node_redundancy: float,
     plot_config: "Plot_config",
     sum_height: float,
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a selector node."""
-    x = dx_node * (3 + 2 * m_val) + plot_config.dx_redundant * node_redundancy
-    # y = (
-    #    dy_node * (2 * node_index + 1)
-    #    + plot_config.dy_redundant * node_redundancy
-    # )
-    y = sum_height + plot_config.dy_redundant * node_redundancy
+    x = dx_node * (4 + 2 * m_val) + plot_config.dx_redundant * node_redundancy
+    # Move selector nodes up with 1*dy_node to allow next_round node at y=0.
+    y = sum_height + 1 * dy_node + plot_config.dy_redundant * node_redundancy
     return x, y
 
 
@@ -116,7 +111,7 @@ def counter_xy(
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a counter node."""
     x = (
-        dx_node * (4 + 2 * m_val_max)
+        dx_node * (5 + 2 * m_val_max)
         + plot_config.dx_redundant * node_redundancy
     )
     # y = dy_node * node_index + plot_config.dy_redundant * node_redundancy
@@ -133,7 +128,7 @@ def terminator_xy(
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a terminator node."""
     x = (
-        dx_node * (5 + 2 * m_val_max)
+        dx_node * (6 + 2 * m_val_max)
         + plot_config.dx_redundant * node_redundancy
     )
     y = 0
@@ -144,18 +139,16 @@ def terminator_xy(
 @typechecked
 def next_round_xy(
     dx_node: float,
-    dy_node: float,
     m_val: int,
-    m_val_max: int,
     node_redundancy: float,
     plot_config: "Plot_config",
 ) -> Tuple[float, float]:
-    """Returns the  x and y coordinates of a next_round node."""
-    x = (
-        dx_node * (4 + 2 * m_val_max)
-        + plot_config.dx_redundant * node_redundancy
-    )
-    y = dy_node * (1 * m_val) + plot_config.dy_redundant * node_redundancy
+    """Returns the  x and y coordinates of a next_round node.
+
+    Same x-coordinate as the selector node, except at y=0
+    """
+    x = dx_node * (4 + 2 * m_val) + plot_config.dx_redundant * node_redundancy
+    y = 0 + plot_config.dy_redundant * node_redundancy
     return (x, y)
 
 
@@ -214,7 +207,6 @@ def get_node_position(
     if node_name == "rand":
         return rand_xy(
             dx_node=dx_node,
-            dy_node=dy_node,
             node_redundancy=node_redundancy,
             plot_config=plot_config,
             sum_height=sum_height,
@@ -225,7 +217,6 @@ def get_node_position(
             dx_node=dx_node,
             degree_index_per_circuit=degree_index,
             m_val=identifiers[2].value,
-            dy_node=dy_node,
             node_redundancy=node_redundancy,
             plot_config=plot_config,
             sum_height=sum_height,
@@ -233,6 +224,7 @@ def get_node_position(
     if node_name == "selector":
         return selector_xy(
             dx_node=dx_node,
+            dy_node=dy_node,
             m_val=identifiers[1].value,
             node_redundancy=node_redundancy,
             plot_config=plot_config,
@@ -251,9 +243,7 @@ def get_node_position(
     if node_name == "next_round":
         return next_round_xy(
             dx_node=dx_node,
-            dy_node=dy_node,
             m_val=identifiers[0].value,
-            m_val_max=m_val_max,
             node_redundancy=node_redundancy,
             plot_config=plot_config,
         )
