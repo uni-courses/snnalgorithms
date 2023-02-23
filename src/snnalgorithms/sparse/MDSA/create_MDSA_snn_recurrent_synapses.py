@@ -2,7 +2,7 @@
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Synapse
-from snncompare.exp_config.run_config.Run_config import Run_config
+from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
 

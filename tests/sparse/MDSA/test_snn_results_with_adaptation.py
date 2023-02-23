@@ -27,7 +27,7 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
         for redundancy in range(2, 6, 2):
             # Modify configuration to include adaptation.
             self.mdsa_settings.adaptations = {"redundancy": [redundancy]}
-            self.mdsa_settings.overwrite_images_only = False
+            self.mdsa_settings.recreate_s3 = False
             self.mdsa_settings.export_images = False
 
             # Narrow down test scope by overriding experiment settings.
