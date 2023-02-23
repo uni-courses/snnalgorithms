@@ -479,7 +479,7 @@ def get_identifier_value(*, lif_neuron: LIF_neuron, position: int) -> int:
     for identifier in lif_neuron.identifiers:
         if identifier.position == position:
             return identifier.value
-    raise Exception(
-        "Identifier position:{position} not found in node:"
+    raise AttributeError(
+        f"Identifier position:{position} not found in node:"
         + f"{lif_neuron.full_name}."
     )

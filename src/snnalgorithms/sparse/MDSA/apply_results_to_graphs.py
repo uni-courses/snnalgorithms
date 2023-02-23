@@ -50,7 +50,7 @@ def set_mdsa_snn_results(
         # Verify the SNN graphs have completed simulation stage 2.
         if graph_name != "input_graph":
             if 2 not in stage_2_graphs[graph_name].graph["completed_stages"]:
-                raise Exception(
+                raise ValueError(
                     "Error, the stage 2 simulation is not yet"
                     + f" completed for: {graph_name}"
                 )
@@ -98,7 +98,7 @@ def set_mdsa_snn_results(
                     red_level=snn_graph.graph["red_level"],
                 )
             else:
-                raise Exception(f"Invalid graph name:{graph_name}")
+                raise ValueError(f"Invalid graph name:{graph_name}")
             # TODO: verify the results are set correctly.
 
 
@@ -137,7 +137,7 @@ def assert_valid_results(
                 f"Node:{key} has different counts."
             )
     if not actual_node_names["passed"]:
-        raise Exception(
+        raise ValueError(
             "Error, did not detect a difference between SNN "
             "and Neumann mark count in the nodes. Yet "
             "the results computation says there should be a difference."
@@ -249,7 +249,6 @@ def get_nx_LIF_count_with_redundancy(
 
     # TODO: verify nx simulator is used, throw error otherwise.
     for node_index in range(0, len(input_graph)):
-
         if not majority_vote:
             get_node_count(
                 adapted_nx_snn_graph=adapted_nx_snn_graph,
@@ -320,7 +319,6 @@ def get_redundant_node_counts(
 
     redundant_node_counts: List[float] = []
     for redundancy in list(range(1, red_level + 1, 2)):
-
         # Get redundant node counts:
         prefix = f"r_{redundancy}_"
         redundant_node_counts.append(
@@ -423,7 +421,7 @@ def graph_has_dead_neurons(*, snn_graph: nx.DiGraph) -> bool:
     if rad_death_found:
         for node_name in snn_graph.nodes:
             if "rad_death" not in snn_graph.nodes[node_name].keys():
-                raise Exception(
+                raise KeyError(
                     "Error, rad_death key not set in all nodes of"
                     + "graph, yet it was set for at least one node in graph:"
                     + f"{snn_graph}"

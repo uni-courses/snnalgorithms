@@ -45,7 +45,7 @@ def mdsa_is_done(
                 return True
             return False
         return False
-    raise Exception("Algorithm termination mode not yet found.")
+    raise KeyError("Algorithm termination mode not yet found.")
 
 
 def a_neuron_is_spiking(

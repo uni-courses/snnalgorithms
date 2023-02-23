@@ -35,7 +35,7 @@ def verify_list_with_numbers(
     """Verifies the some_vals parameter setting of the algorithm."""
     assert_parameter_is_list(parameter=some_vals)
     if not isinstance(elem_type, type):
-        raise Exception(
+        raise TypeError(
             "Error, the elem_type is not of type type. It is "
             + f"of type:{type(elem_type)}"
         )

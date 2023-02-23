@@ -35,7 +35,6 @@ def copy_region_of_img(
 
     # Open the image file
     with Image.open(src_path) as img:
-
         width, height = img.size
 
         # Copy the specified region from the source image

@@ -131,9 +131,7 @@ def add_random_recurrent_edges(
     )
 
     for node in G.nodes:
-
         if rand_bools[node]:
-
             # Add the recurrent edge.
             G.add_edge(node, node)
 
@@ -282,7 +280,7 @@ def get_list_with_rand_bools(
     # Generate the ordered true false list.
     rand_bools = [False] * amount_of_false_vals + [True] * amount_of_true_vals
     if len(rand_bools) != length:
-        raise Exception(
+        raise ValueError(
             f"The list of random booleans has length:{len(rand_bools)}"
             + f" whereas it should have length:{length}."
         )

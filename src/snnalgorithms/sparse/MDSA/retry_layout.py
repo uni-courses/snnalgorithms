@@ -259,4 +259,4 @@ def get_node_position(
             plot_config=plot_config,
         )
 
-    raise Exception(f"Error, node:{node_name} not supported.")
+    raise ValueError(f"Error, node:{node_name} not supported.")

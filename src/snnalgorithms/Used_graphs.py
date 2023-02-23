@@ -26,7 +26,7 @@ class Used_graphs:
             return self.four
         if size == 5:
             return self.five
-        raise Exception(f"Graph size of: {size} is currently not supported.")
+        raise ValueError(f"Graph size of: {size} is currently not supported.")
 
     @typechecked
     def get_graphs_with_3_neurons(self) -> List[nx.Graph]:

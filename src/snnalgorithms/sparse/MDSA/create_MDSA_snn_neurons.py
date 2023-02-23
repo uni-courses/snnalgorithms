@@ -31,7 +31,7 @@ def get_new_mdsa_graph(
     """Creates the networkx snn for a run configuration for the MDSA
     algorithm."""
     if not isinstance(input_graph.graph["alg_props"], Dict):
-        raise Exception("Error, algorithm properties not set.")
+        raise KeyError("Error, algorithm properties not set.")
     # exit()
     # TODO get recurrent weight form algo specification.
     recurrent_weight: int = -10
@@ -448,7 +448,6 @@ def create_next_round_node(
     algorithm."""
     # NOTE, for loop starts at index 1, instead of 0!
     for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
-
         identifiers = [
             Identifier(description="m_val", position=0, value=m_val),
         ]

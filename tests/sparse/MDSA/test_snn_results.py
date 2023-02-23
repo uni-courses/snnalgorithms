@@ -149,9 +149,7 @@ def assert_run_config_json_results(
     )
 
     for graph_name, snn_graph in nx_graphs.items():
-
         if graph_name in ["snn_algo_graph", "adapted_snn_graph"]:
-
             # Verify the SNN graphs have completed simulation stage 2.
             test_object.assertTrue(
                 # pylint: disable=R1733
