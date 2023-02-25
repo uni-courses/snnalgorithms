@@ -5,9 +5,10 @@ import copy
 import os
 import shutil
 import unittest
-from typing import TYPE_CHECKING, Any, Dict
+from typing import Any, Dict
 
 from snncompare.exp_config.Exp_config import (
+    Exp_config,
     Supported_experiment_settings,
     verify_exp_config,
 )
@@ -27,8 +28,8 @@ from snnalgorithms.get_alg_configs import get_algo_configs
 from snnalgorithms.sparse.MDSA.alg_params import MDSA
 from snnalgorithms.sparse.MDSA.get_results import get_results
 
-if TYPE_CHECKING:
-    from snncompare.exp_config.Exp_config import Exp_config
+# if TYPE_CHECKING:
+# from snncompare.exp_config.Exp_config import Exp_config
 
 
 class Test_mdsa_snn_results(unittest.TestCase):
@@ -83,6 +84,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
         full_exp_runner = Experiment_runner(
             exp_config=mdsa_settings,
             output_config=output_config,
+            reverse=False,
             perform_run=False,
             specific_run_config=None,
         )
@@ -90,6 +92,7 @@ class Test_mdsa_snn_results(unittest.TestCase):
             Experiment_runner(
                 exp_config=mdsa_settings,
                 output_config=output_config,
+                reverse=False,
                 perform_run=True,
                 specific_run_config=run_config,
             )
@@ -117,6 +120,7 @@ def override_with_single_run_setting(
     exp_runner = Experiment_runner(
         exp_config=mdsa_settings,
         output_config=output_config,
+        reverse=False,
         specific_run_config=some_run_config_with_error,
         perform_run=True,
     )

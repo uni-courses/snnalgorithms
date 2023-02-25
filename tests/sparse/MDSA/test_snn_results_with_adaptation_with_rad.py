@@ -14,7 +14,6 @@ class Test_mdsa_snn_results_with_adaptation(Test_mdsa_snn_results):
     its weights are identical."""
 
     # Initialize test object
-    #
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
         super(Test_mdsa_snn_results, self).__init__(*args, **kwargs)
         # Generate default experiment config.
