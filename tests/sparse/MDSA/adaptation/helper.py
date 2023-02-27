@@ -69,7 +69,7 @@ def get_redundant_neuron_names(
 ) -> List[str]:
     """Returns the names of the redundant neurons of a node."""
     redundant_neuron_names: List[str] = []
-    for redundancy in range(1, max_redundancy):
+    for redundancy in range(1, max_redundancy + 1):
         redundant_neuron_names.append(f"r_{redundancy}_{original_node_name}")
     return redundant_neuron_names
 

@@ -197,6 +197,7 @@ def get_dead_neuron_name_cominations(
 ) -> List[List[str]]:
     """Returns dead neuron lists."""
     combinations: List[List[str]] = []
+    # return [["selector_0_0"]]
     for node_name in snn_algo_graph.nodes():
         if "connector" not in node_name:
             combinations.append([node_name])
