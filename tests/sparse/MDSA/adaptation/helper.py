@@ -27,6 +27,7 @@ def assert_redundant_neuron_takes_over(
 ) -> None:
     """Verifies the dead neuron spikes are taken over by the redundant
     neurons."""
+    print(f"dead_neuron_names={dead_neuron_names}")
     for dead_neuron_name in dead_neuron_names:
         # Loop through adapted graph to find spike times of dead neurons.
         for original_node_name in graphs_dict["snn_algo_graph"].nodes():
@@ -98,10 +99,9 @@ def perform_verification_for_each_spike_time(
             red_neuron_names=red_neuron_names,
             t=t,
         ):
-            print(
-                f"Error, t={t}, red={range(1,max_redundancy)}: node:"
-                + f"{red_neuron_names} does not take over."
-            )
+            print(f"Error, t={t}, red={range(1,max_redundancy)}: nodes:")
+            print(red_neuron_names)
+            print(f"don't take over from:{dead_neuron_name}.")
             run_config_filename = run_config_to_filename(
                 run_config_dict=run_config.__dict__
             )
