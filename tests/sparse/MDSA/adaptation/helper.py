@@ -70,9 +70,6 @@ def perform_verification_for_each_spike_time(
     """Performs the adaptation verification per timestep on which an adapted
     neuron fires."""
 
-    print(
-        "rad adap nodes=" + f'{graphs_dict["rad_adapted_snn_graph"].nodes()}'
-    )
     # Verify the redundant neuron spikes <redundant> timesteps
     # after t.
     for t in spike_times:
@@ -81,7 +78,10 @@ def perform_verification_for_each_spike_time(
             .nodes[redundant_node_name]["nx_lif"][t + redundancy]
             .spikes
         ):
-            print(f"{t}, red={redundancy}:{redundant_node_name}")
+            print(
+                f"Error, t={t}, red={redundancy}: node:{redundant_node_name} "
+                + "does not take over."
+            )
             run_config_filename = run_config_to_filename(
                 run_config_dict=run_config.__dict__
             )
