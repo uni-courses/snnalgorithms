@@ -71,6 +71,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                 incoming_synapses=True,
                 neuron_models=self.mdsa_settings.neuron_models,
                 neuron_properties=[
+                    "spikes",
                     "a_in",
                     "bias",
                     "du",
