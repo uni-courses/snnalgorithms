@@ -151,7 +151,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                     dead_neuron_names=dead_neuron_names,
                     graphs_dict=results_nx_graphs["graphs_dict"],
                     output_config=output_config,
-                    redundancy=redundancy,
+                    max_redundancy=redundancy,
                     run_config=run_config,
                     test_object=self,
                 )
