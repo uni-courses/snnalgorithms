@@ -10,6 +10,7 @@ from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_plots.Plot_config import get_default_plot_config
 from snncompare.optional_config.Output_config import (
     Extra_storing_config,
+    Hover_info,
     Output_config,
     Zoom,
 )
@@ -61,11 +62,21 @@ class Test_mdsa(Test_mdsa_snn_results):
             # TODO: get a MDSA snn that has a redundancy of n =5
             # ...
 
-            # TODO: find random seed for MDSA snn for n = 2 that makes the
-            # spike_once neuron with redundancies [(0), (0,1)] die,
+            # TODO: Make the spike_once neuron with redundancies [(0), (0,1)]
+            # die.
 
             # Create duplicate Output_config that is used to generate the data
             # belonging to each run config, using the Experiment runner.
+            hover_info = Hover_info(
+                incoming_synapses=False,
+                neuron_models=self.mdsa_settings.neuron_models,
+                neuron_properties=["u", "v", "vth"],
+                node_names=True,
+                outgoing_synapses=True,
+                synaptic_models=self.mdsa_settings.synaptic_models,
+                synapse_properties=["weight"],
+            )
+
             output_config = Output_config(
                 recreate_stages=[1, 2, 4],
                 export_types=[],
@@ -75,6 +86,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                     bottom_top=None,
                 ),
                 output_json_stages=[1, 2, 4],
+                hover_info=hover_info,
                 extra_storing_config=Extra_storing_config(
                     count_spikes=False,
                     count_neurons=False,
