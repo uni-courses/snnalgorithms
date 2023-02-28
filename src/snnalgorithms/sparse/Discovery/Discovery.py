@@ -3,7 +3,11 @@ settings."""
 import sys
 
 import networkx as nx
-from snnbackends.networkx.LIF_neuron import LIF_neuron, Synapse
+from snnbackends.networkx.LIF_neuron import (
+    LIF_neuron,
+    Synapse,
+    print_neuron_properties_per_graph,
+)
 from snnbackends.networkx.run_on_networkx import (
     create_neuron_for_next_timestep,
     run_simulation_with_networkx_for_1_timestep,
@@ -33,9 +37,9 @@ class Discovery:
         self.u_len: int = 20
 
         # Specify supported values for du.
-        self.du_min: float = -2
-        self.du_max: float = 2
-        self.du_len: int = 20
+        self.du_min: float = -1
+        self.du_max: float = 1
+        self.du_len: int = 10
 
         # Specify svpported valves for v
         self.v_min: float = -10
@@ -43,9 +47,9 @@ class Discovery:
         self.v_len: int = 20
 
         # Specify svpported valves for dv.
-        self.dv_min: float = -2
-        self.dv_max: float = 2
-        self.dv_len: int = 20
+        self.dv_min: float = -1
+        self.dv_max: float = 1
+        self.dv_len: int = 10
 
         # Specify supported biasalbiases for bias
         self.bias_min: float = -10
@@ -58,8 +62,8 @@ class Discovery:
         self.vth_len: int = 20
 
         # Specify supported vthalvthes for vth
-        self.weight_min: int = -10
-        self.weight_max: int = 10
+        self.weight_min: int = -20
+        self.weight_max: int = 20
 
 
 # pylint: disable=R0903
@@ -70,6 +74,16 @@ class Discovery_algo:
     @typechecked
     def __init__(self, disco: Discovery) -> None:
         max_time: int = 10000
+        count = 0
+        total = (
+            disco.du_len
+            * disco.dv_len
+            * disco.vth_len
+            * disco.bias_len
+            * (disco.weight_max - disco.weight_min)
+        )
+
+        # pylint: disable=R1702
         for du in [
             disco.du_min + i * (disco.du_max - disco.du_min) / disco.du_len
             for i in range(disco.du_len)
@@ -101,15 +115,22 @@ class Discovery_algo:
                                 dv=dv,
                                 vth=vth,
                             )
+                            count = count + 1
+                            self.drawProgressBar(
+                                percent=count / total, barLen=100
+                            )
 
-                        if self.is_expected_neuron_I(
-                            lif_neuron=lif_neuron,
-                            max_time=max_time,
-                            weight=weight,
-                        ):
-                            print(f"du={du},dv={dv},vth={vth},bias={bias}")
-                            print("FOUND")
-                            sys.exit()
+                            if self.is_expected_neuron_I(
+                                lif_neuron=lif_neuron,
+                                max_time=max_time,
+                                weight=weight,
+                            ):
+                                print(
+                                    f"du={du},dv={dv},vth={vth},bias={bias},"
+                                    + f"weight={weight}"
+                                )
+                                print("FOUND")
+                                sys.exit()
 
     def is_expected_neuron_I(
         self, lif_neuron: LIF_neuron, max_time: int, weight: int
@@ -150,18 +171,49 @@ class Discovery_algo:
             run_simulation_with_networkx_for_1_timestep(
                 snn_graph=snn_graph, t=t + 1
             )
-            # print(f't={t}, spikes={snn_graph.nodes[0]["nx_lif"][t].spikes:}')
 
             # If neuron behaves, continue, otherwise move on to next neuron.
             if snn_graph.nodes[node_name]["nx_lif"][
                 t
             ].spikes != self.expected_spike_pattern_I(t):
                 return False
+            if not self.within_neuron_property_bounds(
+                lif_neuron=snn_graph.nodes[node_name]["nx_lif"][t]
+            ):
+                return False
+
+            if t > 100:
+                print_neuron_properties_per_graph(
+                    G=snn_graph, static=False, t=t, neuron_type="nx_lif"
+                )
 
         return True
 
+    @typechecked
     def expected_spike_pattern_I(self, t: int) -> bool:
         """Specifies the expected spike pattern for neuron type I."""
         if t < 3:
             return False
         return True
+
+    @typechecked
+    def within_neuron_property_bounds(self, lif_neuron: LIF_neuron) -> bool:
+        """If the voltage exceeds 100, return False.."""
+        if lif_neuron.v.get() > 100 or lif_neuron.v.get() < -100:
+            return False
+        if lif_neuron.u.get() > 100 or lif_neuron.u.get() < -100:
+            return False
+        return True
+
+    @typechecked
+    def drawProgressBar(self, percent: float, barLen: int = 20) -> None:
+        """Draws a completion bar."""
+        sys.stdout.write("\r")
+        progress = ""
+        for i in range(barLen):
+            if i < int(barLen * percent):
+                progress += "="
+            else:
+                progress += " "
+        sys.stdout.write(f"[ {progress} ] {percent * 100:.2f}%")
+        sys.stdout.flush()
