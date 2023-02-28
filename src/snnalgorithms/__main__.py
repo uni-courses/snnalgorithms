@@ -3,7 +3,11 @@ that invokes this script."""
 
 # Import code belonging to this project.
 
-from snnalgorithms.sparse.Discovery.Discovery import Discovery, Discovery_algo
+from snnalgorithms.sparse.Discovery.Discovery import (
+    Discovery,
+    Discovery_algo,
+    DiscoveryRanges,
+)
 
 # mdsa = MDSA(list(range(0, 4, 1)))
 # mdsa_configs = get_algo_configs(algo_spec=mdsa.__dict__)
@@ -12,4 +16,7 @@ from snnalgorithms.sparse.Discovery.Discovery import Discovery, Discovery_algo
 # Parse command line interface arguments to determine what this script does.
 # args = parse_cli_args()
 disco = Discovery()
-Discovery_algo(disco=disco)
+disco_ranges = DiscoveryRanges()
+
+# Discovery_algo(disco=disco)
+Discovery_algo(disco=disco_ranges)

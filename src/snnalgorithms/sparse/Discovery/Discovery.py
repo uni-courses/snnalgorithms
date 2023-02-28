@@ -1,6 +1,7 @@
 """Contains the specification of and maximum values of the algorithm
 settings."""
 import sys
+from typing import List, Optional, Union
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import (
@@ -31,39 +32,103 @@ class Discovery:
     ) -> None:
         self.name = "Discovery"
 
-        # Specify supported values for u
-        self.u_min: float = -10
-        self.u_max: float = 10
-        self.u_len: int = 20
-
         # Specify supported values for du.
-        self.du_min: float = -1
-        self.du_max: float = 1
-        self.du_len: int = 10
-
-        # Specify svpported valves for v
-        self.v_min: float = -10
-        self.v_max: float = 10
-        self.v_len: int = 20
+        du_min: float = -1
+        du_max: float = 1
+        du_len: int = 10
+        self.du_range = self.get_range(
+            min_val=du_min,
+            max_val=du_max,
+            length=du_len,
+        )
 
         # Specify svpported valves for dv.
-        self.dv_min: float = -1
-        self.dv_max: float = 1
-        self.dv_len: int = 10
+        dv_min: float = -1
+        dv_max: float = 1
+        dv_len: int = 10
+        self.dv_range = self.get_range(
+            min_val=dv_min,
+            max_val=dv_max,
+            length=dv_len,
+        )
 
         # Specify supported biasalbiases for bias
-        self.bias_min: float = -10
-        self.bias_max: float = 10
-        self.bias_len: int = 20
+        bias_min: float = -10
+        bias_max: float = 10
+        bias_len: int = 20
+        self.bias_range = self.get_range(
+            min_val=bias_min,
+            max_val=bias_max,
+            length=bias_len,
+        )
 
         # Specify supported vthalvthes for vth
-        self.vth_min: float = -10
-        self.vth_max: float = 10
-        self.vth_len: int = 20
+        vth_min: float = -10
+        vth_max: float = 10
+        vth_len: int = 20
+        self.vth_range = self.get_range(
+            min_val=vth_min,
+            max_val=vth_max,
+            length=vth_len,
+        )
 
         # Specify supported vthalvthes for vth
-        self.weight_min: int = -20
-        self.weight_max: int = 20
+        weight_min: int = -20
+        weight_max: int = 20
+        self.weight_range = self.get_range(
+            min_val=weight_min,
+            max_val=weight_max,
+        )
+
+    @typechecked
+    def get_range(
+        self,
+        min_val: Union[float, int],
+        max_val: Union[float, int],
+        length: Optional[int] = None,
+    ) -> List[Union[float, int]]:
+        """Returns a list with the values in a range."""
+        if length is not None:
+            return [
+                min_val + i * (max_val - min_val) / length
+                for i in range(length)
+            ]
+        if not isinstance(min_val, int) or not isinstance(min_val, int):
+            raise TypeError(
+                "Error, min or max value without length specification "
+                + f"requires integers. Found min:{min_val},max:{max_val}"
+            )
+        return list(range(int(min_val), int(max_val)))
+
+
+class DiscoveryRanges(Discovery):
+    """Specification of algorithm specification. Algorithm: Minimum Dominating
+    Set Approximation by Alipour.
+
+    Example usage: default_MDSA_alg=MDSA(some_vals=list(range(0, 4, 1)))
+    """
+
+    @typechecked
+    def __init__(
+        self,
+    ) -> None:
+        super().__init__()
+        self.name = "Discovery"
+
+        # Specify supported values for du.
+        self.du_range = [-1, -0.5, -0.1, 0, 0.1, 0.5, 1]
+
+        # Specify supported values for dv.
+        self.dv_range = [-1, -0.5, -0.1, 0, 0.1, 0.5, 1]
+
+        # Specify supported values for u
+        self.bias_range = list(range(-10, 10))
+
+        # Specify supported values for u
+        self.vth_range = list(range(-10, 10))
+
+        # Specify supported values for weight
+        self.weight_range = list(range(-10, 10))
 
 
 # pylint: disable=R0903
@@ -76,44 +141,31 @@ class Discovery_algo:
         max_time: int = 10000
         count = 0
         total = (
-            disco.du_len
-            * disco.dv_len
-            * disco.vth_len
-            * disco.bias_len
-            * (disco.weight_max - disco.weight_min)
+            len(disco.du_range)
+            * len(disco.dv_range)
+            * len(disco.vth_range)
+            * len(disco.bias_range)
+            * len(disco.weight_range)
         )
+        print(f"du:{disco.du_range}")
+        print(f"dv:{disco.dv_range}")
+        print(f"bias:{disco.bias_range}")
+        print(f"vth:{disco.vth_range}")
+        print(f"weight:{disco.weight_range}")
 
         # pylint: disable=R1702
-        for du in [
-            disco.du_min + i * (disco.du_max - disco.du_min) / disco.du_len
-            for i in range(disco.du_len)
-        ]:
-            for dv in [
-                disco.dv_min + i * (disco.dv_max - disco.dv_min) / disco.dv_len
-                for i in range(disco.dv_len)
-            ]:
-                for vth in [
-                    disco.vth_min
-                    + i * (disco.vth_max - disco.vth_min) / disco.vth_len
-                    for i in range(disco.vth_len)
-                ]:
-                    for bias in [
-                        disco.bias_min
-                        + i
-                        * (disco.bias_max - disco.bias_min)
-                        / disco.bias_len
-                        for i in range(disco.bias_len)
-                    ]:
-                        for weight in range(
-                            disco.weight_min, disco.weight_max
-                        ):
+        for du in disco.du_range:
+            for dv in disco.dv_range:
+                for bias in disco.bias_range:
+                    for vth in disco.vth_range:
+                        for weight in disco.weight_range:
                             # Create neuron.
                             lif_neuron = LIF_neuron(
                                 name="",
-                                bias=bias,
-                                du=du,
-                                dv=dv,
-                                vth=vth,
+                                bias=float(bias),
+                                du=float(du),
+                                dv=float(dv),
+                                vth=float(vth),
                             )
                             count = count + 1
                             self.drawProgressBar(
