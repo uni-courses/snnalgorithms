@@ -260,7 +260,7 @@ class Discovery_algo:
     @typechecked
     def drawProgressBar(self, percent: float, barLen: int = 20) -> None:
         """Draws a completion bar."""
-        sys.stdout.write("\r")
+        sys.stdout.write("'\r'")
         progress = ""
         for i in range(barLen):
             if i < int(barLen * percent):
