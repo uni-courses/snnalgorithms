@@ -7,6 +7,7 @@ from snnalgorithms.sparse.Discovery.Discovery import (
     Discovery,
     Discovery_algo,
     DiscoveryRanges,
+    Specific_range,
 )
 
 # mdsa = MDSA(list(range(0, 4, 1)))
@@ -17,6 +18,8 @@ from snnalgorithms.sparse.Discovery.Discovery import (
 # args = parse_cli_args()
 disco = Discovery()
 disco_ranges = DiscoveryRanges()
+specific_ranges = Specific_range()
 
 # Discovery_algo(disco=disco)
-Discovery_algo(disco=disco_ranges)
+# Discovery_algo(disco=disco_ranges)
+Discovery_algo(disco=specific_ranges)
