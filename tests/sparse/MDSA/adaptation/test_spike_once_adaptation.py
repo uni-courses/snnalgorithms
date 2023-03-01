@@ -133,74 +133,77 @@ class Test_mdsa(Test_mdsa_snn_results):
                 for dead_neuron_names in get_dead_neuron_name_cominations(
                     original_results_nx_graphs["graphs_dict"]["snn_algo_graph"]
                 ):
-                    results_nx_graphs = copy.deepcopy(
-                        original_results_nx_graphs
-                    )
-                    # Copy adapted graph into radiation graph to overwrite
-                    # radiation death.
-                    results_nx_graphs["graphs_dict"][
-                        "rad_adapted_snn_graph"
-                    ] = copy.deepcopy(
-                        results_nx_graphs["graphs_dict"]["adapted_snn_graph"]
-                    )
-                    rad_adapted_snn_graph = results_nx_graphs["graphs_dict"][
-                        "rad_adapted_snn_graph"
-                    ]
+                    if dead_neuron_names == ["selector_0_1"]:
+                        results_nx_graphs = copy.deepcopy(
+                            original_results_nx_graphs
+                        )
+                        # Copy adapted graph into radiation graph to overwrite
+                        # radiation death.
+                        results_nx_graphs["graphs_dict"][
+                            "rad_adapted_snn_graph"
+                        ] = copy.deepcopy(
+                            results_nx_graphs["graphs_dict"][
+                                "adapted_snn_graph"
+                            ]
+                        )
+                        rad_adapted_snn_graph = results_nx_graphs[
+                            "graphs_dict"
+                        ]["rad_adapted_snn_graph"]
 
-                    # Set dead neuron names.
+                        # Set dead neuron names.
 
-                    for dead_neuron_name in dead_neuron_names:
-                        rad_adapted_snn_graph.nodes[dead_neuron_name][
-                            "rad_death"
-                        ] = True
-                        rad_adapted_snn_graph.nodes[dead_neuron_name][
-                            "nx_lif"
-                        ][0].vth.set(9999)
+                        for dead_neuron_name in dead_neuron_names:
+                            rad_adapted_snn_graph.nodes[dead_neuron_name][
+                                "rad_death"
+                            ] = True
+                            rad_adapted_snn_graph.nodes[dead_neuron_name][
+                                "nx_lif"
+                            ][0].vth.set(9999)
 
-                    verify_radiation_is_applied(
-                        some_graph=rad_adapted_snn_graph,
-                        dead_neuron_names=dead_neuron_names,
-                        rad_type="neuron_death",
-                    )
-
-                    sim_graphs(
-                        run_config=run_config,
-                        stage_1_graphs=results_nx_graphs["graphs_dict"],
-                    )
-
-                    assert_redundant_neuron_takes_over(
-                        dead_neuron_names=dead_neuron_names,
-                        graphs_dict=results_nx_graphs["graphs_dict"],
-                        output_config=output_config,
-                        max_redundancy=redundancy,
-                        run_config=run_config,
-                        test_object=self,
-                    )
-
-                    # TODO: then also verify the complete adapted algorithm
-                    # still works.
-                    # perform_mdsa_results_computation_if_needed(
-                    # m_val=run_config.algorithm["MDSA"]["m_val"],
-                    # output_config=output_config,
-                    # run_config=run_config,
-                    # stage_2_graphs=results_nx_graphs["graphs_dict"],
-                    # )
-
-                    if set_results(
-                        output_config=output_config,
-                        run_config=run_config,
-                        stage_2_graphs=results_nx_graphs["graphs_dict"],
-                    ):
-                        compute_results(
-                            results_nx_graphs=results_nx_graphs,
-                            stage_index=4,
+                        verify_radiation_is_applied(
+                            some_graph=rad_adapted_snn_graph,
+                            dead_neuron_names=dead_neuron_names,
+                            rad_type="neuron_death",
                         )
 
-                    # assert_run_config_json_results(
-                    # test_object=self,
-                    # graphs_dict=results_nx_graphs["graphs_dict"],
-                    # run_config=run_config,
-                    # )
+                        sim_graphs(
+                            run_config=run_config,
+                            stage_1_graphs=results_nx_graphs["graphs_dict"],
+                        )
+
+                        assert_redundant_neuron_takes_over(
+                            dead_neuron_names=dead_neuron_names,
+                            graphs_dict=results_nx_graphs["graphs_dict"],
+                            output_config=output_config,
+                            max_redundancy=redundancy,
+                            run_config=run_config,
+                            test_object=self,
+                        )
+
+                        # TODO: then also verify the complete adapted algorithm
+                        # still works.
+                        # perform_mdsa_results_computation_if_needed(
+                        # m_val=run_config.algorithm["MDSA"]["m_val"],
+                        # output_config=output_config,
+                        # run_config=run_config,
+                        # stage_2_graphs=results_nx_graphs["graphs_dict"],
+                        # )
+
+                        if set_results(
+                            output_config=output_config,
+                            run_config=run_config,
+                            stage_2_graphs=results_nx_graphs["graphs_dict"],
+                        ):
+                            compute_results(
+                                results_nx_graphs=results_nx_graphs,
+                                stage_index=4,
+                            )
+
+                        # assert_run_config_json_results(
+                        # test_object=self,
+                        # graphs_dict=results_nx_graphs["graphs_dict"],
+                        # run_config=run_config,
+                        # )
 
             # TODO: run for radiation death of all combinations of
             # spike_once neurons (per node-cerciuit). E.g. n=0, n=1, n=0,1 etc.

@@ -108,7 +108,7 @@ def perform_verification_for_each_spike_time(
 
             create_svg_plot(
                 run_config_filename=run_config_filename,
-                graph_names=["rad_adapted_snn_graph"],
+                graph_names=["adapted_snn_graph", "rad_adapted_snn_graph"],
                 graphs=graphs_dict,
                 output_config=output_config,
             )
