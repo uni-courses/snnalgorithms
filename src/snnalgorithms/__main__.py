@@ -21,5 +21,5 @@ disco_ranges = DiscoveryRanges()
 specific_ranges = Specific_range()
 
 # Discovery_algo(disco=disco)
-# Discovery_algo(disco=disco_ranges)
-Discovery_algo(disco=specific_ranges)
+Discovery_algo(disco=disco_ranges)
+# Discovery_algo(disco=specific_ranges)

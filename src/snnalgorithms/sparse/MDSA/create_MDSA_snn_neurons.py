@@ -349,13 +349,17 @@ def create_selector_node(
     algorithm."""
     for node_index in input_graph.nodes:
         for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
-            # TODO: why. This is probably for the delay in activation for m>0.
+            # This is probably for the delay in activation for m>0.
+            vth: float = 4.0
             bias: float
             if m_val == 0:
-                bias = 5.0
+                # The selector should fire at the timestep if m=0.
+                bias = vth + 1
             else:
-                bias = 4.0  # read this wrong looked like it was 4
-                # in original code.
+                # for m>0, the selector should not fire until it has an input
+                # spike from the next_round neuron, hence the lower bias, equal
+                # to the threshold.
+                bias = vth
 
             identifiers = [
                 Identifier(
@@ -383,7 +387,7 @@ def create_selector_node(
                 bias=bias,
                 du=0.0,
                 dv=1.0,
-                vth=4.0,
+                vth=vth,
                 pos=selector_xy,
                 identifiers=identifiers,
             )

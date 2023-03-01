@@ -131,11 +131,11 @@ class DiscoveryRanges(Discovery):
         self.vth_range = list(range(0, 10))
 
         # Specify supported values for weight
-        self.weight_range = list(range(1, 2))
+        self.weight_range = list(range(-5, 5))
 
         # Specify supported values for weight
         self.a_in_range = list(range(5, 6))
-        self.a_in_time = 4
+        self.a_in_time = 0
 
 
 class Specific_range(Discovery):
@@ -259,7 +259,7 @@ class Discovery_algo:
         weight: int,
         a_in: float,
         a_in_time: Optional[int] = None,
-    ) -> Union[bool, Tuple[bool, nx.DiGraph]]:
+    ) -> Tuple[bool, nx.DiGraph]:
         """Determines whether a neuron is of type I.
 
         Type I is arbitrarily defined as: 'does not spike for 2
@@ -320,11 +320,11 @@ class Discovery_algo:
             ].spikes != self.expected_spike_pattern_I(
                 a_in_time=a_in_time, t=t
             ):
-                return False
+                return False, snn_graph
             if not self.within_neuron_property_bounds(
                 lif_neuron=snn_graph.nodes[node_name]["nx_lif"][t]
             ):
-                return False
+                return False, snn_graph
 
             if 100 < t < 150:
                 print_neuron_properties_per_graph(

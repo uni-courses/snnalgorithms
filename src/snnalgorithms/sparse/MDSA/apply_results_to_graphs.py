@@ -108,6 +108,7 @@ def assert_valid_results(
     actual_node_names: Dict,
     expected_node_names: Dict[str, int],
     graph_name: str,
+    verbose: Optional[bool] = False,
 ) -> None:
     """Assert results are equal to the Alipour default algorithm."""
 
@@ -143,12 +144,13 @@ def assert_valid_results(
             "the results computation says there should be a difference."
         )
 
-    print("")
-    for node_index, expected_count in expected_node_names.items():
-        print(
-            f"{graph_name}: node_index:{node_index}, ali-mark:"
-            + f"{expected_count}, snn:{copy_actual_node_names[node_index]}"
-        )
+    if verbose:
+        print("")
+        for node_index, expected_count in expected_node_names.items():
+            print(
+                f"{graph_name}: node_index:{node_index}, ali-mark:"
+                + f"{expected_count}, snn:{copy_actual_node_names[node_index]}"
+            )
 
 
 # pylint: disable=R0913
