@@ -14,6 +14,10 @@ from snncompare.optional_config.Output_config import (
     Output_config,
     Zoom,
 )
+from snncompare.process_results.process_results import (
+    compute_results,
+    set_results,
+)
 from snncompare.run_config import Run_config
 from snncompare.simulation.stage2_sim import sim_graphs
 from snnradiation.Radiation_damage import verify_radiation_is_applied
@@ -175,10 +179,22 @@ class Test_mdsa(Test_mdsa_snn_results):
 
                     # TODO: then also verify the complete adapted algorithm
                     # still works.
-                    # compute_results(
-                    # results_nx_graphs=results_nx_graphs,
-                    # stage_index=4,
+                    # perform_mdsa_results_computation_if_needed(
+                    # m_val=run_config.algorithm["MDSA"]["m_val"],
+                    # output_config=output_config,
+                    # run_config=run_config,
+                    # stage_2_graphs=results_nx_graphs["graphs_dict"],
                     # )
+
+                    if set_results(
+                        output_config=output_config,
+                        run_config=run_config,
+                        stage_2_graphs=results_nx_graphs["graphs_dict"],
+                    ):
+                        compute_results(
+                            results_nx_graphs=results_nx_graphs,
+                            stage_index=4,
+                        )
 
                     # assert_run_config_json_results(
                     # test_object=self,
