@@ -133,7 +133,10 @@ class Test_mdsa(Test_mdsa_snn_results):
                 for dead_neuron_names in get_dead_neuron_name_cominations(
                     original_results_nx_graphs["graphs_dict"]["snn_algo_graph"]
                 ):
-                    if dead_neuron_names == ["selector_0_1"]:
+                    if not any(
+                        x in dead_neuron_names[0]
+                        for x in ["counter", "terminator"]
+                    ):
                         results_nx_graphs = copy.deepcopy(
                             original_results_nx_graphs
                         )

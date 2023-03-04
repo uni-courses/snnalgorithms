@@ -119,7 +119,8 @@ class DiscoveryRanges(Discovery):
 
         # Specify supported values for du.
         # self.du_range = [-1, -0.5, -0.1, 0, 0.1, 0.5, 1]
-        self.du_range = [-1, -0.1, 0, 0.1, 1]
+        # self.du_range = [-1, -0.1, 0, 0.1, 1]
+        self.du_range = [1]
 
         # Specify supported values for dv.
         self.dv_range = [-1, -0.1, 0, 0.1, 1]
@@ -135,7 +136,7 @@ class DiscoveryRanges(Discovery):
 
         # Specify supported values for weight
         self.a_in_range = list(range(5, 6))
-        self.a_in_time = 0
+        self.a_in_time = 4
 
 
 class Specific_range(Discovery):
