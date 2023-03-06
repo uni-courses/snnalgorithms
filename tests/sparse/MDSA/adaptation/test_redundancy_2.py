@@ -1,4 +1,4 @@
-"""Tests whether the `nth` redundant neuron (with n=1) in the MDSA algorithm
+"""Tests whether the `nth` redundant neuron (with n=2) in the MDSA algorithm
 takes over from the died neurons (0 to n-1)."""
 # pylint: disable=R0801
 
