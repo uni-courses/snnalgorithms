@@ -17,7 +17,7 @@ from snncompare.export_results.load_json_to_nx_graph import (
     load_json_to_nx_graph_from_file,
 )
 from snncompare.json_configurations.algo_test import (
-    long_exp_config_for_mdsa_testing,
+    long_exp_config_for_mdsa_testing_without_adaptation,
     run_config_with_error,
 )
 from snncompare.optional_config.Output_config import Output_config
@@ -48,7 +48,9 @@ class Test_mdsa_snn_results(unittest.TestCase):
         implementations."""
         # Generate default experiment config.
         # pylint: disable=W0201
-        self.mdsa_settings: Exp_config = long_exp_config_for_mdsa_testing()
+        self.mdsa_settings: Exp_config = (
+            long_exp_config_for_mdsa_testing_without_adaptation()
+        )
 
         # Do not output images.
         self.mdsa_settings.recreate_s2 = True

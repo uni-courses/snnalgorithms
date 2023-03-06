@@ -2,18 +2,14 @@
 takes over from the died spike_once neurons (0 to n-1)."""
 # pylint: disable=R0801
 import copy
+from pprint import pprint
 from typing import Any, Dict, List, Union
 
 import networkx as nx
-from snncompare.create_configs import generate_run_configs
+from snncompare.exp_config import Exp_config
 from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_plots.Plot_config import get_default_plot_config
-from snncompare.optional_config.Output_config import (
-    Extra_storing_config,
-    Hover_info,
-    Output_config,
-    Zoom,
-)
+from snncompare.optional_config.Output_config import Output_config
 from snncompare.process_results.process_results import (
     compute_results,
     set_results,
@@ -26,6 +22,8 @@ from typeguard import typechecked
 from snnalgorithms.sparse.MDSA.get_results import get_results
 from tests.sparse.MDSA.adaptation.helper import (
     assert_redundant_neuron_takes_over,
+    create_default_output_config,
+    long_exp_config_for_mdsa_testing_with_adaptation,
 )
 from tests.sparse.MDSA.test_snn_results import Test_mdsa_snn_results
 
@@ -45,85 +43,39 @@ class Test_mdsa(Test_mdsa_snn_results):
     def test_something(self) -> None:
         """Tests whether the MDSA algorithm with adaptation yields the same
         results as without adaptation."""
-        # TODO: load all MDSA configs.
-        for redundancy in range(2, 6, 2):
-            # Modify configuration to include adaptation.
-            self.mdsa_settings.adaptations = {"redundancy": [redundancy]}
-            self.mdsa_settings.radiations = {"neuron_death": [0.25]}
 
-            # Narrow down test scope by overriding experiment settings.
-            # self.mdsa_settings.size_and_max_graphs = [(4, 1)]
-            self.mdsa_settings.algorithms = {
-                "MDSA": [
-                    {"m_val": 1},
-                ]
-            }
-            self.mdsa_settings.export_types = None
-            self.mdsa_settings.size_and_max_graphs = [(3, 1)]
-            # pprint(self.mdsa_settings.__dict__)
+        mdsa_settings: Exp_config = (
+            long_exp_config_for_mdsa_testing_with_adaptation()
+        )
+        print("mdsa_settings=")
+        pprint(mdsa_settings.__dict__)
 
-            # TODO: get a MDSA snn that has a redundancy of n =2
-            # TODO: get a MDSA snn that has a redundancy of n =5
-            # ...
+        mdsa_settings.export_types = None
+        output_config: Output_config = create_default_output_config(
+            exp_config=mdsa_settings
+        )
+        full_exp_runner = Experiment_runner(
+            exp_config=mdsa_settings,
+            output_config=output_config,
+            reverse=False,
+            perform_run=False,
+            specific_run_config=None,
+        )
 
-            # TODO: Make the spike_once neuron with redundancies [(0), (0,1)]
-            # die.
-
-            # Create duplicate Output_config that is used to generate the data
-            # belonging to each run config, using the Experiment runner.
-            hover_info = Hover_info(
-                incoming_synapses=True,
-                neuron_models=self.mdsa_settings.neuron_models,
-                neuron_properties=[
-                    "spikes",
-                    "a_in",
-                    "bias",
-                    "du",
-                    "u",
-                    "dv",
-                    "v",
-                    "vth",
-                ],
-                node_names=True,
-                outgoing_synapses=True,
-                synaptic_models=self.mdsa_settings.synaptic_models,
-                synapse_properties=["weight"],
-            )
-
-            output_config = Output_config(
-                recreate_stages=[1, 2, 4],
-                export_types=[],
-                zoom=Zoom(
-                    create_zoomed_image=False,
-                    left_right=None,
-                    bottom_top=None,
-                ),
-                output_json_stages=[1, 2, 4],
-                hover_info=hover_info,
-                extra_storing_config=Extra_storing_config(
-                    count_spikes=False,
-                    count_neurons=False,
-                    count_synapses=False,
-                    show_images=True,
-                    store_died_neurons=False,
-                ),
-            )
-
-            # Get experiment runner for long test.
-            for run_config in generate_run_configs(
-                exp_config=self.mdsa_settings, specific_run_config=None
-            ):
+        for run_config in full_exp_runner.run_configs:
+            print("run_config=")
+            pprint(run_config.__dict__)
+            if list(run_config.adaptation.keys()) == ["redundancy"]:
                 exp_runner = Experiment_runner(
-                    exp_config=self.mdsa_settings,
+                    exp_config=mdsa_settings,
                     output_config=output_config,
                     reverse=False,
                     perform_run=False,
                     specific_run_config=run_config,
                 )
-
                 original_results_nx_graphs: Dict = (
                     exp_runner.perform_run_stage_1(
-                        exp_config=self.mdsa_settings,
+                        exp_config=mdsa_settings,
                         output_config=output_config,
                         plot_config=get_default_plot_config(),
                         run_config=run_config,
@@ -178,7 +130,9 @@ class Test_mdsa(Test_mdsa_snn_results):
                             dead_neuron_names=dead_neuron_names,
                             graphs_dict=results_nx_graphs["graphs_dict"],
                             output_config=output_config,
-                            max_redundancy=redundancy,
+                            max_redundancy=list(
+                                run_config.adaptation.values()
+                            )[0],
                             run_config=run_config,
                             test_object=self,
                         )
