@@ -92,6 +92,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                         results_nx_graphs = copy.deepcopy(
                             original_results_nx_graphs
                         )
+
                         # Copy adapted graph into radiation graph to overwrite
                         # radiation death.
                         results_nx_graphs["graphs_dict"][
@@ -106,7 +107,6 @@ class Test_mdsa(Test_mdsa_snn_results):
                         ]["rad_adapted_snn_graph"]
 
                         # Set dead neuron names.
-
                         for dead_neuron_name in dead_neuron_names:
                             rad_adapted_snn_graph.nodes[dead_neuron_name][
                                 "rad_death"
@@ -137,15 +137,8 @@ class Test_mdsa(Test_mdsa_snn_results):
                             test_object=self,
                         )
 
-                        # TODO: then also verify the complete adapted algorithm
+                        # Then also verify the complete adapted algorithm
                         # still works.
-                        # perform_mdsa_results_computation_if_needed(
-                        # m_val=run_config.algorithm["MDSA"]["m_val"],
-                        # output_config=output_config,
-                        # run_config=run_config,
-                        # stage_2_graphs=results_nx_graphs["graphs_dict"],
-                        # )
-
                         if set_results(
                             output_config=output_config,
                             run_config=run_config,
@@ -155,17 +148,6 @@ class Test_mdsa(Test_mdsa_snn_results):
                                 results_nx_graphs=results_nx_graphs,
                                 stage_index=4,
                             )
-
-                        # assert_run_config_json_results(
-                        # test_object=self,
-                        # graphs_dict=results_nx_graphs["graphs_dict"],
-                        # run_config=run_config,
-                        # )
-
-            # TODO: run for radiation death of all combinations of
-            # spike_once neurons (per node-cerciuit). E.g. n=0, n=1, n=0,1 etc.
-            # self.assertTrue(True)
-            # self.assertTrue(False)
 
 
 @typechecked
