@@ -1,5 +1,5 @@
-"""Tests whether the `nth` redundant spike_once neuron in the MDSA algorithm
-takes over from the died spike_once neurons (0 to n-1)."""
+"""Tests whether the `nth` redundant neuron (with n=1) in the MDSA algorithm
+takes over from the died neurons (0 to n-1)."""
 # pylint: disable=R0801
 import copy
 from pprint import pprint
@@ -66,7 +66,12 @@ class Test_mdsa(Test_mdsa_snn_results):
         for run_config in full_exp_runner.run_configs:
             print("run_config=")
             pprint(run_config.__dict__)
-            if list(run_config.adaptation.keys()) == ["redundancy"]:
+            if list(run_config.adaptation.keys()) == [
+                "redundancy"
+            ]:  # and run_config.unique_id == (
+                # "13c76e42f0021bd305e6f20f80a1e0cecf844a770"
+                # + "423ccdd8e2d77b6681aafac"
+                # ):
                 original_results_nx_graphs: Dict = (
                     full_exp_runner.perform_run_stage_1(
                         exp_config=mdsa_settings,
@@ -79,9 +84,12 @@ class Test_mdsa(Test_mdsa_snn_results):
                 for dead_neuron_names in get_dead_neuron_name_cominations(
                     original_results_nx_graphs["graphs_dict"]["snn_algo_graph"]
                 ):
-                    if not any(
-                        x in dead_neuron_names[0]
-                        for x in ["counter", "terminator"]
+                    if (
+                        not any(
+                            x in dead_neuron_names[0]
+                            for x in ["counter", "terminator"]
+                        )
+                        # and "selector_2_0" in dead_neuron_names[0]
                     ):
                         results_nx_graphs = copy.deepcopy(
                             original_results_nx_graphs

@@ -144,6 +144,23 @@ def adapted_neuron_has_taken_over(
             )
 
         if (
+            len(
+                graphs_dict["rad_adapted_snn_graph"].nodes[
+                    redundant_node_name
+                ]["nx_lif"]
+            )
+            <= t + redundancy
+        ):
+            nr_of_timesteps = len(
+                graphs_dict["rad_adapted_snn_graph"].nodes[
+                    redundant_node_name
+                ]["nx_lif"]
+            )
+            print(f"len rad_adapted_snn_graph={nr_of_timesteps}")
+            print("Error, len rad_adapted_snn_graph was not enough.")
+            print(f"t={t}, redundancy={redundancy}")
+            return False
+        if (
             graphs_dict["rad_adapted_snn_graph"]
             .nodes[redundant_node_name]["nx_lif"][t + redundancy]
             .spikes
