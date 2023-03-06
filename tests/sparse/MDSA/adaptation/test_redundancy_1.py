@@ -51,10 +51,13 @@ class Test_mdsa(Test_mdsa_snn_results):
         print("mdsa_settings=")
         pprint(mdsa_settings.__dict__)
 
+        # Generate test scope.
         mdsa_settings.export_types = None
         output_config: Output_config = create_default_output_config(
             exp_config=mdsa_settings
         )
+
+        # Generate run_configs
         full_exp_runner = Experiment_runner(
             exp_config=mdsa_settings,
             output_config=output_config,
@@ -66,12 +69,10 @@ class Test_mdsa(Test_mdsa_snn_results):
         for run_config in full_exp_runner.run_configs:
             print("run_config=")
             pprint(run_config.__dict__)
-            if list(run_config.adaptation.keys()) == [
-                "redundancy"
-            ]:  # and run_config.unique_id == (
-                # "13c76e42f0021bd305e6f20f80a1e0cecf844a770"
-                # + "423ccdd8e2d77b6681aafac"
-                # ):
+
+            # Only test run_configs with adaptation for this test.
+            if list(run_config.adaptation.keys()) == ["redundancy"]:
+                # Get the original results dict to manually execute experiment.
                 original_results_nx_graphs: Dict = (
                     full_exp_runner.perform_run_stage_1(
                         exp_config=mdsa_settings,
@@ -81,22 +82,32 @@ class Test_mdsa(Test_mdsa_snn_results):
                     )
                 )
 
+                # Generate lists with dead neurons that are to be considered
+                # dead during a run. One list contains all the neurons that
+                # will be dead due to radiation in a single run_config.
                 for dead_neuron_names in get_dead_neuron_name_cominations(
                     original_results_nx_graphs["graphs_dict"]["snn_algo_graph"]
                 ):
-                    if (
-                        not any(
-                            x in dead_neuron_names[0]
-                            for x in ["counter", "terminator"]
-                        )
-                        # and "selector_2_0" in dead_neuron_names[0]
+                    # Do not test redundancy for counter neuron, because they
+                    # don't spike.
+                    # Do not test redundancy for terminator node because it
+                    # is ok if any of them fire simultaneously, so they are
+                    # "dumb" copies, not intelligent redundancy.
+                    if not any(
+                        x in dead_neuron_names[0]
+                        for x in ["counter", "terminator"]
                     ):
+                        # Create a deep copy from the results dict to prevent
+                        # the run_config from working with data changed by
+                        # the/a previous run_config.
                         results_nx_graphs = copy.deepcopy(
                             original_results_nx_graphs
                         )
 
                         # Copy adapted graph into radiation graph to overwrite
-                        # radiation death.
+                        # radiation death. This is because the run_config uses
+                        # the seed to set radiation death, whereas this test
+                        # requires a specific set (dead_neuron_names) to die.
                         results_nx_graphs["graphs_dict"][
                             "rad_adapted_snn_graph"
                         ] = copy.deepcopy(
@@ -108,7 +119,8 @@ class Test_mdsa(Test_mdsa_snn_results):
                             "graphs_dict"
                         ]["rad_adapted_snn_graph"]
 
-                        # Set dead neuron names.
+                        # Apply radiation based on the selected
+                        # dead_neuron_names for this run_config.
                         for dead_neuron_name in dead_neuron_names:
                             rad_adapted_snn_graph.nodes[dead_neuron_name][
                                 "rad_death"
@@ -116,18 +128,19 @@ class Test_mdsa(Test_mdsa_snn_results):
                             rad_adapted_snn_graph.nodes[dead_neuron_name][
                                 "nx_lif"
                             ][0].vth.set(9999)
-
                         verify_radiation_is_applied(
                             some_graph=rad_adapted_snn_graph,
                             dead_neuron_names=dead_neuron_names,
                             rad_type="neuron_death",
                         )
 
+                        # Now that the graphs have been created, simulate them.
                         sim_graphs(
                             run_config=run_config,
                             stage_1_graphs=results_nx_graphs["graphs_dict"],
                         )
 
+                        # Perform actual test.
                         assert_redundant_neuron_takes_over(
                             dead_neuron_names=dead_neuron_names,
                             graphs_dict=results_nx_graphs["graphs_dict"],
@@ -158,14 +171,10 @@ def get_dead_neuron_name_cominations(
 ) -> List[List[str]]:
     """Returns dead neuron lists."""
     combinations: List[List[str]] = []
-    # return [["selector_0_0"]]
+
     for node_name in snn_algo_graph.nodes():
         if "connector" not in node_name:
             combinations.append([node_name])
-
-    # Also run a test where all original neurons have died.
-    # combinations.append(list(snn_algo_graph.nodes()))
-
     return combinations
 
 
