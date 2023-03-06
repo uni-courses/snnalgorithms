@@ -47,6 +47,7 @@ class Test_mdsa(Test_mdsa_snn_results):
         mdsa_settings: Exp_config = (
             long_exp_config_for_mdsa_testing_with_adaptation()
         )
+        print("")
         print("mdsa_settings=")
         pprint(mdsa_settings.__dict__)
 
@@ -57,7 +58,7 @@ class Test_mdsa(Test_mdsa_snn_results):
         full_exp_runner = Experiment_runner(
             exp_config=mdsa_settings,
             output_config=output_config,
-            reverse=False,
+            reverse=True,
             perform_run=False,
             specific_run_config=None,
         )
@@ -66,15 +67,8 @@ class Test_mdsa(Test_mdsa_snn_results):
             print("run_config=")
             pprint(run_config.__dict__)
             if list(run_config.adaptation.keys()) == ["redundancy"]:
-                exp_runner = Experiment_runner(
-                    exp_config=mdsa_settings,
-                    output_config=output_config,
-                    reverse=False,
-                    perform_run=False,
-                    specific_run_config=run_config,
-                )
                 original_results_nx_graphs: Dict = (
-                    exp_runner.perform_run_stage_1(
+                    full_exp_runner.perform_run_stage_1(
                         exp_config=mdsa_settings,
                         output_config=output_config,
                         plot_config=get_default_plot_config(),
