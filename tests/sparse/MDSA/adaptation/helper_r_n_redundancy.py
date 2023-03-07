@@ -108,6 +108,16 @@ def redundant_neuron_takes_over_without_duplicates(
         original_node_name=node_name,
     )
 
+    # TODO: change into dict, and if selector neuron, check only if
+    # two different redundant neurons spike, not whether more than one spike
+    # has been registered within the time_window.
+    #
+    # This should not be necessary, because the r_2_selector_0_0 should not
+    # spike at t=3, if the selector_0_0 spikes at t=2. It should spike for the
+    # first time at t=4. To inspect this, see manually whether the
+    # r_2_selector_0_0 spikes at t=3 (simultaneously with r_1_selector_0_0) if
+    # only selector_0 dies of radiation.
+    # 962d5dee640f590fa7d1b85c2e220567f2c1851a981ebc1bd6463d0fe79d3a50
     nr_of_redundant_neuron_spikes: int = 0
     for redundant_node_name in redundant_node_names:
         for timestep in timestep_window:

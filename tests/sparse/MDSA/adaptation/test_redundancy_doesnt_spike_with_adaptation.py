@@ -41,6 +41,9 @@ class Test_mdsa(unittest.TestCase):
             with_adaptation_only=True
         )
 
+        if not run_config_results:
+            raise SystemError("Error, no run_configs are tested.")
+
         for i, (
             run_config,
             original_results_nx_graphs,

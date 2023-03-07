@@ -46,16 +46,15 @@ class Test_mdsa(unittest.TestCase):
             min_red_level=max_red_death_level + 1,
         )
 
-        # TODO: copy
         if not run_config_results:
             raise SystemError("Error, no run_configs are tested.")
 
-        for (
+        for i, (
             run_config,
             original_results_nx_graphs,
-        ) in run_config_results.items():
+        ) in enumerate(run_config_results.items()):
             # TODO: replace
-            print("run_config=")
+            print(f"run_config ({i}/{len(run_config_results.keys())})=")
             pprint(run_config.__dict__)
 
             # Generate lists with dead neurons that are to be considered

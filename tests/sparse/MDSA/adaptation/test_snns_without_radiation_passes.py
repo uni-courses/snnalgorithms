@@ -52,11 +52,14 @@ class Test_mdsa(unittest.TestCase):
             with_adaptation_only=True
         )
 
-        for (
+        if not run_config_results:
+            raise SystemError("Error, no run_configs are tested.")
+
+        for i, (
             run_config,
             original_results_nx_graphs,
-        ) in run_config_results.items():
-            print("run_config=")
+        ) in enumerate(run_config_results.items()):
+            print(f"run_config ({i}/{len(run_config_results.keys())})=")
             pprint(run_config.__dict__)
 
             results_nx_graphs = overwrite_radiation_with_custom(
