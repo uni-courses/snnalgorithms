@@ -120,7 +120,7 @@ repos:
     - id: name-tests-test
       # Override default to check if `.py` files in `/test/` START with `test_`.
       args: ['--django']
-      exclude: "(^tests/sparse/MDSA/adaptation/redundancy_helper.py)"
+      exclude: ^tests/sparse/MDSA/adaptation/redundancy_helper.py|^tests/sparse/MDSA/adaptation/adap_has_dupe_spikes.py|^tests/collisions/|^tests/sparse/MDSA/adaptation/helper_r_n_redundancy.py|^tests/sparse/MDSA/helper_results_check.py
     # Ensures JSON files are properly formatted.
     - id: pretty-format-json
       args: ['--autofix']

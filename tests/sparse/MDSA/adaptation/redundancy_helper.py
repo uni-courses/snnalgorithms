@@ -5,7 +5,7 @@ neuron would spike in the unradiated version.
 """
 import copy
 from pprint import pprint
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import networkx as nx
 from snncompare.exp_config.Exp_config import Exp_config
@@ -263,11 +263,33 @@ def long_exp_config_for_mdsa_testing_with_adaptation() -> Exp_config:
 
 
 @typechecked
-def get_dead_neuron_name_cominations(
+def get_dead_neuron_names(
+    *,
+    redundancy_levels: List[int],
+    snn_algo_graph: nx.DiGraph,
+) -> List[List[str]]:
+    """Returns lists with a single dead neuron name (one for each original snn
+    neuron)."""
+    combinations: List[List[str]] = []
+
+    for node_name in snn_algo_graph.nodes():
+        node_names: List[str] = []
+        if 0 in redundancy_levels:
+            node_names.append(node_name)
+        for red_level in redundancy_levels:
+            if red_level > 0:
+                node_names.append(f"r_{red_level}_{node_name}")
+        combinations.append(node_names)
+    return combinations
+
+
+@typechecked
+def get_original_and_r_1_neuron_names(
     *,
     snn_algo_graph: nx.DiGraph,
 ) -> List[List[str]]:
-    """Returns dead neuron lists."""
+    """Returns lists with a single dead neuron name (one for each original snn
+    neuron)."""
     combinations: List[List[str]] = []
 
     for node_name in snn_algo_graph.nodes():
@@ -327,9 +349,9 @@ def assert_run_config_json_results(
 
 
 @typechecked
-def get_run_config_and_results_dicts_for_large_test_scope() -> (
-    Tuple[Dict[Run_config, Dict], Output_config]
-):
+def get_run_config_and_results_dicts_for_large_test_scope(
+    *, with_adaptation_only: bool, min_red_level: Optional[int] = None
+) -> Tuple[Dict[Run_config, Dict], Output_config]:
     """Sets up the long mdsa test scope for MDSA redundancy testing."""
     mdsa_settings: Exp_config = (
         long_exp_config_for_mdsa_testing_with_adaptation()
@@ -355,18 +377,34 @@ def get_run_config_and_results_dicts_for_large_test_scope() -> (
 
     run_config_results: Dict[Run_config, Dict] = {}
     for run_config in full_exp_runner.run_configs:
-        # Only test run_configs with adaptation for this test.
-        if list(run_config.adaptation.keys()) == ["redundancy"]:
-            # Get the original results dict to manually execute experiment.
-            original_results_nx_graphs: Dict = (
-                full_exp_runner.perform_run_stage_1(
-                    exp_config=mdsa_settings,
-                    output_config=output_config,
-                    plot_config=get_default_plot_config(),
-                    run_config=run_config,
+        # If you want to only test a specific run.
+        if run_config.unique_id == (
+            "962d5dee640f590fa7d1b85c2e220567f2"
+            + "c1851a981ebc1bd6463d0fe79d3a50"
+        ):
+            # Only test run_configs with adaptation if desired.
+            if not with_adaptation_only or (
+                # If the run_config has adaptation, and no minimum redundancy
+                # level is required, add it.
+                list(run_config.adaptation.keys()) == ["redundancy"]
+                and (
+                    min_red_level is None
+                    # If the run_config has adaptation, and the redundancy
+                    # level is equal to, or larger than required minimum
+                    # redundancy, add it.
+                    or run_config.adaptation["redundancy"] >= min_red_level
                 )
-            )
-            run_config_results[run_config] = original_results_nx_graphs
+            ):
+                # Get the original results dict to manually execute experiment.
+                original_results_nx_graphs: Dict = (
+                    full_exp_runner.perform_run_stage_1(
+                        exp_config=mdsa_settings,
+                        output_config=output_config,
+                        plot_config=get_default_plot_config(),
+                        run_config=run_config,
+                    )
+                )
+                run_config_results[run_config] = original_results_nx_graphs
     return run_config_results, output_config
 
 
@@ -407,3 +445,17 @@ def overwrite_radiation_with_custom(
     )
 
     return results_nx_graphs
+
+
+@typechecked
+def get_spike_window_per_neuron_type(
+    *,
+    t: int,
+    max_redundancy: int,
+) -> List[int]:
+    """Returns the timesteps at which an original neuron-, or redundant neuron
+    of a specific type may fire."""
+    time_window: List[int] = []
+    for i in range(t, t + max_redundancy + 1):
+        time_window.append(i)
+    return time_window

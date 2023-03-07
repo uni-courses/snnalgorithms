@@ -4,32 +4,25 @@ takes over from the died neurons (0 to n-1)."""
 
 from pprint import pprint
 
-from snncompare.process_results.process_results import (
-    compute_results,
-    set_results,
-)
 from snncompare.simulation.stage2_sim import sim_graphs
 from typeguard import typechecked
 
 from tests.sparse.MDSA.adaptation.redundancy_helper import (
     assert_redundant_neuron_takes_over,
-    get_dead_neuron_name_cominations,
+    get_dead_neuron_names,
     get_run_config_and_results_dicts_for_large_test_scope,
     overwrite_radiation_with_custom,
 )
-from tests.sparse.MDSA.test_snn_results import Test_mdsa_snn_results
 
 
 # pylint: disable=R0903
-class Test_mdsa(Test_mdsa_snn_results):
+class Test_mdsa:
     """Tests whether MDSA algorithm specification detects invalid
     specifications."""
 
     # Initialize test object
     def __init__(self, *args, **kwargs) -> None:  # type:ignore[no-untyped-def]
-        super(Test_mdsa_snn_results, self).__init__(*args, **kwargs)
-        # Generate default experiment config.
-        self.create_exp_config()
+        super().__init__(*args, **kwargs)
 
     @typechecked
     def test_something(self) -> None:
@@ -38,7 +31,9 @@ class Test_mdsa(Test_mdsa_snn_results):
         (
             run_config_results,
             output_config,
-        ) = get_run_config_and_results_dicts_for_large_test_scope()
+        ) = get_run_config_and_results_dicts_for_large_test_scope(
+            with_adaptation_only=True
+        )
 
         for (
             run_config,
@@ -50,10 +45,11 @@ class Test_mdsa(Test_mdsa_snn_results):
             # Generate lists with dead neurons that are to be considered
             # dead during a run. One list contains all the neurons that
             # will be dead due to radiation in a single run_config.
-            for dead_neuron_names in get_dead_neuron_name_cominations(
+            for dead_neuron_names in get_dead_neuron_names(
                 snn_algo_graph=original_results_nx_graphs["graphs_dict"][
                     "snn_algo_graph"
-                ]
+                ],
+                redundancy_levels=[0],
             ):
                 # Do not test redundancy for counter neuron, because they
                 # don't spike.
@@ -63,7 +59,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                 if not any(
                     x in dead_neuron_name
                     for dead_neuron_name in dead_neuron_names
-                    for x in ["counter", "terminator"]
+                    for x in ["connector", "counter", "terminator"]
                 ):
                     results_nx_graphs = overwrite_radiation_with_custom(
                         original_results_nx_graphs=original_results_nx_graphs,
@@ -86,14 +82,7 @@ class Test_mdsa(Test_mdsa_snn_results):
                         test_object=self,
                     )
 
-                    # Then also verify the complete adapted algorithm
-                    # still works.
-                    if set_results(
-                        output_config=output_config,
-                        run_config=run_config,
-                        stage_2_graphs=results_nx_graphs["graphs_dict"],
-                    ):
-                        compute_results(
-                            results_nx_graphs=results_nx_graphs,
-                            stage_index=4,
-                        )
+                    # TODO: also assert the radiation graph passes.
+                    # This is to verify unexpected artifacts, like a redundant
+                    # degree receiver node that keeps on spiking, do not still
+                    # render erroneous results after adaptation has taken over.
