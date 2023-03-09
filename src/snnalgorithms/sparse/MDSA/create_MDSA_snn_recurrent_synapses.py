@@ -1,5 +1,7 @@
 """Creates the MDSA snn synapses."""
 
+from typing import Union
+
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Synapse
 from snncompare.run_config.Run_config import Run_config
@@ -11,7 +13,7 @@ def create_MDSA_recurrent_synapses(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    recurrent_weight: int,
+    recurrent_weight: Union[float, int],
     run_config: Run_config,
 ) -> nx.DiGraph:
     """Creates the synapses between the neurons for the MDSA algorithm."""
@@ -51,7 +53,7 @@ def create_recurrent_spike_once_synapse(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    recurrent_weight: int,
+    recurrent_weight: Union[float, int],
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
     algorithm."""
@@ -78,7 +80,7 @@ def create_recurrent_degree_receiver_synapse(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    recurrent_weight: int,
+    recurrent_weight: Union[float, int],
     run_config: Run_config,
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
@@ -113,7 +115,7 @@ def create_recurrent_rand_synapse(
     *,
     input_graph: nx.Graph,
     mdsa_snn: nx.DiGraph,
-    recurrent_weight: int,
+    recurrent_weight: Union[float, int],
 ) -> None:
     """Creates the outgoing synapses for the connecting node in the MDSA
     algorithm."""

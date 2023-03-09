@@ -2,6 +2,7 @@
 takes over from the died neurons (0 to n-1)."""
 # pylint: disable=R0801
 
+import unittest
 from pprint import pprint
 
 from snncompare.simulation.stage2_sim import sim_graphs
@@ -16,7 +17,7 @@ from tests.sparse.MDSA.adaptation.redundancy_helper import (
 
 
 # pylint: disable=R0903
-class Test_mdsa:
+class Test_mdsa(unittest.TestCase):
     """Tests whether MDSA algorithm specification detects invalid
     specifications."""
 

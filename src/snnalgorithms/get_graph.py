@@ -143,7 +143,11 @@ def add_random_recurrent_edges(
 
 @typechecked
 def set_random_edge_weights(
-    *, G: DiGraph, min_weight: int, max_weight: int, seed: int
+    *,
+    G: DiGraph,
+    min_weight: float | int,
+    max_weight: float | int,
+    seed: int,
 ) -> None:
     """Creates random edge weights and assigns them to the edge objects in the
     graph.

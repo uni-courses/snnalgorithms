@@ -257,7 +257,7 @@ class Discovery_algo:
         self,
         lif_neuron: LIF_neuron,
         max_time: int,
-        weight: int,
+        weight: Union[float, int],
         a_in: float,
         a_in_time: Optional[int] = None,
     ) -> Tuple[bool, nx.DiGraph]:

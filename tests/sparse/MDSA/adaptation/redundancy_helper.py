@@ -378,33 +378,33 @@ def get_run_config_and_results_dicts_for_large_test_scope(
     run_config_results: Dict[Run_config, Dict] = {}
     for run_config in full_exp_runner.run_configs:
         # If you want to only test a specific run.
-        if run_config.unique_id == (
-            "962d5dee640f590fa7d1b85c2e220567f2"
-            + "c1851a981ebc1bd6463d0fe79d3a50"
+        # if run_config.unique_id == (
+        #     "962d5dee640f590fa7d1b85c2e220567f2"
+        #     + "c1851a981ebc1bd6463d0fe79d3a50"
+        # ):
+        # Only test run_configs with adaptation if desired.
+        if not with_adaptation_only or (
+            # If the run_config has adaptation, and no minimum redundancy
+            # level is required, add it.
+            list(run_config.adaptation.keys()) == ["redundancy"]
+            and (
+                min_red_level is None
+                # If the run_config has adaptation, and the redundancy
+                # level is equal to, or larger than required minimum
+                # redundancy, add it.
+                or run_config.adaptation["redundancy"] >= min_red_level
+            )
         ):
-            # Only test run_configs with adaptation if desired.
-            if not with_adaptation_only or (
-                # If the run_config has adaptation, and no minimum redundancy
-                # level is required, add it.
-                list(run_config.adaptation.keys()) == ["redundancy"]
-                and (
-                    min_red_level is None
-                    # If the run_config has adaptation, and the redundancy
-                    # level is equal to, or larger than required minimum
-                    # redundancy, add it.
-                    or run_config.adaptation["redundancy"] >= min_red_level
+            # Get the original results dict to manually execute experiment.
+            original_results_nx_graphs: Dict = (
+                full_exp_runner.perform_run_stage_1(
+                    exp_config=mdsa_settings,
+                    output_config=output_config,
+                    plot_config=get_default_plot_config(),
+                    run_config=run_config,
                 )
-            ):
-                # Get the original results dict to manually execute experiment.
-                original_results_nx_graphs: Dict = (
-                    full_exp_runner.perform_run_stage_1(
-                        exp_config=mdsa_settings,
-                        output_config=output_config,
-                        plot_config=get_default_plot_config(),
-                        run_config=run_config,
-                    )
-                )
-                run_config_results[run_config] = original_results_nx_graphs
+            )
+            run_config_results[run_config] = original_results_nx_graphs
     return run_config_results, output_config
 
 

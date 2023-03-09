@@ -108,17 +108,48 @@ def redundant_neuron_takes_over_without_duplicates(
         original_node_name=node_name,
     )
 
-    # TODO: change into dict, and if selector neuron, check only if
-    # two different redundant neurons spike, not whether more than one spike
-    # has been registered within the time_window.
-    #
-    # This should not be necessary, because the r_2_selector_0_0 should not
-    # spike at t=3, if the selector_0_0 spikes at t=2. It should spike for the
-    # first time at t=4. To inspect this, see manually whether the
-    # r_2_selector_0_0 spikes at t=3 (simultaneously with r_1_selector_0_0) if
-    # only selector_0 dies of radiation.
-    # 962d5dee640f590fa7d1b85c2e220567f2c1851a981ebc1bd6463d0fe79d3a50
+    nr_of_redundant_neuron_spikes = get_nr_of_redundant_neurons_spiking(
+        rad_adapted_graph=rad_adapted_graph,
+        redundant_node_names=redundant_node_names,
+        timestep_window=timestep_window,
+    )
+
+    if nr_of_redundant_neuron_spikes != 1:
+        print(f"timestep_window={timestep_window}")
+        print(f"redundant_node_names={redundant_node_names}")
+        print(f"nr_of_redundant_neuron_spikes={nr_of_redundant_neuron_spikes}")
+        return False
+    return True
+
+
+@typechecked
+def get_nr_of_redundant_neurons_spiking(
+    redundant_node_names: List[str],
+    timestep_window: List[int],
+    rad_adapted_graph: nx.DiGraph,
+) -> int:
+    """"Counts the nr of simultaneous redundant spikes within a timestep
+    window, with the purpose of finding duplicate spikes. Since some neuron
+    types continue firing, they may lead to multiple spikes within the same
+    time window. For example the selector neuron. To prevent the, expected,
+    continuous firing of such neurons to say two, different redundant neurons
+    spiked within the same window, a dictionary with nr of spikes per redundant
+    neuron is created. For continuously spiking neurons, the dictionary is
+    checked for the nr of neurons that have spiked, instead of the nr of
+    spikes.
+
+    Returns the number of redundant neurons that spiked in the time
+    window.
+    """
+    # Create dictionary with redundant spikes, one per redundant neuron.
+    redundant_spikes: Dict[str, int] = {}
+    for redundant_node_name in redundant_node_names:
+        redundant_spikes[redundant_node_name] = 0
+
+    # Create absolute neuron spike count.
     nr_of_redundant_neuron_spikes: int = 0
+
+    # Count the nr of redundant spikes and store them.
     for redundant_node_name in redundant_node_names:
         for timestep in timestep_window:
             if (
@@ -128,14 +159,17 @@ def redundant_neuron_takes_over_without_duplicates(
                 if rad_adapted_graph.nodes[redundant_node_name]["nx_lif"][
                     timestep
                 ].spikes:
+                    redundant_spikes[redundant_node_name] += 1
                     nr_of_redundant_neuron_spikes += 1
             else:
                 # The network is already done, so the redundant neurons cannot
                 # spike anymore within the remaining timestep_window.
                 break
-    if nr_of_redundant_neuron_spikes != 1:
-        print(f"timestep_window={timestep_window}")
-        print(f"redundant_node_names={redundant_node_names}")
-        print(f"nr_of_redundant_neuron_spikes={nr_of_redundant_neuron_spikes}")
-        return False
-    return True
+    for redundant_node_name in redundant_node_names:
+        if "selector" in redundant_node_name:
+            # Return nr of spikes as the nr of different redundant neurons that
+            # have spiked.
+            return sum(
+                spike_count > 0 for spike_count in redundant_spikes.values()
+            )
+    return nr_of_redundant_neuron_spikes

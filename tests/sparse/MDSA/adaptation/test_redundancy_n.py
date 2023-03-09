@@ -1,5 +1,9 @@
 """Tests whether the `nth` redundant neuron (with n=2) in the MDSA algorithm
-takes over from the died neurons (0 to n-1)."""
+takes over from the died neurons (0 to n-1).
+
+Also verifies only one redundant neuron spikes within a spike window of
+a redundant neuron.
+"""
 # pylint: disable=R0801
 
 import unittest
@@ -53,7 +57,6 @@ class Test_mdsa(unittest.TestCase):
             run_config,
             original_results_nx_graphs,
         ) in enumerate(run_config_results.items()):
-            # TODO: replace
             print(f"run_config ({i}/{len(run_config_results.keys())})=")
             pprint(run_config.__dict__)
 

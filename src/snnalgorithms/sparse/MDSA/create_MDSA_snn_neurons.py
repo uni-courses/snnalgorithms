@@ -2,7 +2,7 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import networkx as nx
 from snnbackends.networkx.LIF_neuron import Identifier, LIF_neuron
@@ -34,7 +34,7 @@ def get_new_mdsa_graph(
         raise KeyError("Error, algorithm properties not set.")
     # exit()
     # TODO get recurrent weight form algo specification.
-    recurrent_weight: int = -10
+    recurrent_weight: Union[float, int] = -10
 
     plot_config: Plot_config = get_default_plot_config()
 
@@ -125,7 +125,6 @@ def create_MDSA_neurons(
 
     create_next_round_node(
         mdsa_snn=mdsa_snn,
-        nr_of_nodes=len(input_graph.nodes),
         plot_config=plot_config,
         run_config=run_config,
     )
@@ -444,18 +443,20 @@ def create_counter_node(
 def create_next_round_node(
     *,
     mdsa_snn: nx.DiGraph,
-    nr_of_nodes: int,
     plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
-    """Creates the neuron settings for the counter node in the MDSA
-    algorithm."""
+    """Creates the neuron settings for the counter node in the MDSA algorithm.
+
+    TODO: Change properties to accept a_in of size n, to make it spike,
+    and then still allow it to spike at t+1 for redundancy.
+    """
     # NOTE, for loop starts at index 1, instead of 0!
     for m_val in range(1, run_config.algorithm["MDSA"]["m_val"] + 1):
         identifiers = [
             Identifier(description="m_val", position=0, value=m_val),
         ]
-
+        vth: float = 4.0
         next_round_xy = tuple(
             get_node_position(
                 node_name="next_round",
@@ -469,10 +470,14 @@ def create_next_round_node(
         )
         lif_neuron = LIF_neuron(
             name="next_round",
-            bias=0.0,
+            # bias=0.0,
+            # du=0.0,
+            # dv=1.0,
+            # vth=float(nr_of_nodes) - 1,
+            bias=vth,
             du=0.0,
             dv=1.0,
-            vth=float(nr_of_nodes) - 1,
+            vth=vth,
             pos=next_round_xy,
             identifiers=identifiers,
         )
