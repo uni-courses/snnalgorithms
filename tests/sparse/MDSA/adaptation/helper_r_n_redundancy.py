@@ -128,10 +128,10 @@ def get_nr_of_redundant_neurons_spiking(
     timestep_window: List[int],
     rad_adapted_graph: nx.DiGraph,
 ) -> int:
-    """"Counts the nr of simultaneous redundant spikes within a timestep
-    window, with the purpose of finding duplicate spikes. Since some neuron
-    types continue firing, they may lead to multiple spikes within the same
-    time window. For example the selector neuron. To prevent the, expected,
+    """Counts the nr of simultaneous redundant spikes within a timestep window,
+    with the purpose of finding duplicate spikes. Since some neuron types
+    continue firing, they may lead to multiple spikes within the same time
+    window. For example the selector neuron. To prevent the, expected,
     continuous firing of such neurons to say two, different redundant neurons
     spiked within the same window, a dictionary with nr of spikes per redundant
     neuron is created. For continuously spiking neurons, the dictionary is
