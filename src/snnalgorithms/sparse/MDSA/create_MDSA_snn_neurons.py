@@ -480,7 +480,9 @@ def create_next_round_node(
             bias=vth,
             du=0.0,
             dv=1.0,
-            vth=vth,
+            vth=vth + 1 - 0.0000001,  # Spikes once all degree receivers have
+            # fired, and a total of 1 has come in through a_in (limits
+            # functional redundant network size to (1/(0.0000001)).
             pos=next_round_xy,
             identifiers=identifiers,
         )

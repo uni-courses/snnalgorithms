@@ -78,7 +78,7 @@ class Test_mdsa(unittest.TestCase):
                     x in dead_neuron_name
                     for dead_neuron_name in dead_neuron_names
                     for x in ["connector", "counter", "terminator"]
-                ):
+                ):  # and "next_round" in dead_neuron_names[0]:
                     print(dead_neuron_names)
                     results_nx_graphs = overwrite_radiation_with_custom(
                         original_results_nx_graphs=original_results_nx_graphs,

@@ -13,7 +13,10 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
+from snncompare.export_plots.create_dash_plot import create_svg_plot
+from snncompare.export_results.helper import run_config_to_filename
 from snncompare.helper import get_actual_duration
+from snncompare.optional_config import Output_config
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
@@ -24,6 +27,7 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 def set_mdsa_snn_results(
     *,
     m_val: int,
+    output_config: Output_config,
     run_config: Run_config,
     stage_2_graphs: Dict,
 ) -> None:
@@ -65,6 +69,9 @@ def set_mdsa_snn_results(
                 assert_valid_results(
                     actual_node_names=snn_graph.graph["results"],
                     expected_node_names=alipour_counter_marks,
+                    graphs_dict=stage_2_graphs,
+                    output_config=output_config,
+                    run_config=run_config,
                     graph_name=graph_name,
                 )
 
@@ -79,6 +86,9 @@ def set_mdsa_snn_results(
                 assert_valid_results(
                     actual_node_names=snn_graph.graph["results"],
                     expected_node_names=alipour_counter_marks,
+                    graphs_dict=stage_2_graphs,
+                    output_config=output_config,
+                    run_config=run_config,
                     graph_name=graph_name,
                 )
 
@@ -108,6 +118,9 @@ def assert_valid_results(
     actual_node_names: Dict,
     expected_node_names: Dict[str, int],
     graph_name: str,
+    graphs_dict: Dict,
+    output_config: Output_config,
+    run_config: Run_config,
     verbose: Optional[bool] = False,
 ) -> None:
     """Assert results are equal to the Alipour default algorithm."""
@@ -129,6 +142,19 @@ def assert_valid_results(
     # Verify the expected nodes are the same as the actual nodes.
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
+            # Visualise the snn behaviour
+            run_config_filename = run_config_to_filename(
+                run_config_dict=run_config.__dict__
+            )
+            print(f"visualising:{graph_name}")
+            print(f"output_config:{output_config.__dict__}")
+
+            create_svg_plot(
+                run_config_filename=run_config_filename,
+                graph_names=[graph_name],
+                graphs=graphs_dict,
+                output_config=output_config,
+            )
             raise ValueError(
                 f"SNN count per node for: {graph_name}, are not equal to "
                 " the default/Neumann node counts:\n"
