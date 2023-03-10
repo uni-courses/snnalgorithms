@@ -38,6 +38,7 @@ def assert_n_redundant_neuron_takes_over(
     rad_adapted_graph: nx.DiGraph = graphs_dict["rad_adapted_snn_graph"]
     snn_graph: nx.DiGraph = graphs_dict["snn_algo_graph"]
 
+    count_deg: int = 0
     # Per original node, check when it spikes in the adapted graph.
     # pylint: disable=R1702
     for node_name in snn_graph:
@@ -58,25 +59,28 @@ def assert_n_redundant_neuron_takes_over(
                             t=t,
                         ):
                             print(
-                                "Error, redundant neuron did not take over "
+                                f"Error ({count_deg}), redundant neuron "
+                                + "did not take over "
                                 + f"correctly for:{dead_neuron_names} at {t}."
                             )
 
-                            # Visualise the snn behaviour
-                            run_config_filename = run_config_to_filename(
-                                run_config_dict=run_config.__dict__
-                            )
+                            if "degree_receiver" not in node_name:
+                                # Visualise the snn behaviour
+                                run_config_filename = run_config_to_filename(
+                                    run_config_dict=run_config.__dict__
+                                )
 
-                            create_svg_plot(
-                                run_config_filename=run_config_filename,
-                                graph_names=[
-                                    "adapted_snn_graph",
-                                    "rad_adapted_snn_graph",
-                                ],
-                                graphs=graphs_dict,
-                                output_config=output_config,
-                            )
-                            raise ValueError()
+                                create_svg_plot(
+                                    run_config_filename=run_config_filename,
+                                    graph_names=[
+                                        "adapted_snn_graph",
+                                        "rad_adapted_snn_graph",
+                                    ],
+                                    graphs=graphs_dict,
+                                    output_config=output_config,
+                                )
+                                raise ValueError()
+                            count_deg += 1
 
 
 @typechecked

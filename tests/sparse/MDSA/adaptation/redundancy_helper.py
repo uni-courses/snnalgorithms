@@ -379,8 +379,7 @@ def get_run_config_and_results_dicts_for_large_test_scope(
     for run_config in full_exp_runner.run_configs:
         # If you want to only test a specific run.
         # if run_config.unique_id == (
-        #     "962d5dee640f590fa7d1b85c2e220567f2"
-        #     + "c1851a981ebc1bd6463d0fe79d3a50"
+        # "97bbfa84fc0179b360ad36c8e72eb5ea8865be5478f7694bab11715872819470"
         # ):
         # Only test run_configs with adaptation if desired.
         if not with_adaptation_only or (
@@ -436,7 +435,7 @@ def overwrite_radiation_with_custom(
     for dead_neuron_name in dead_neuron_names:
         rad_adapted_snn_graph.nodes[dead_neuron_name]["rad_death"] = True
         rad_adapted_snn_graph.nodes[dead_neuron_name]["nx_lif"][0].vth.set(
-            9999
+            9999999999
         )
     verify_radiation_is_applied(
         some_graph=rad_adapted_snn_graph,

@@ -34,13 +34,16 @@ def get_new_mdsa_graph(
         raise KeyError("Error, algorithm properties not set.")
     # exit()
     # TODO get recurrent weight form algo specification.
-    recurrent_weight: Union[float, int] = -10
+    recurrent_weight: Union[float, int] = -100
 
     plot_config: Plot_config = get_default_plot_config()
 
     snn_graph = create_MDSA_neurons(
         input_graph=input_graph, run_config=run_config, plot_config=plot_config
     )
+
+    for node_name in snn_graph.nodes:
+        snn_graph.nodes[node_name]["recur"] = recurrent_weight
 
     create_MDSA_recurrent_synapses(
         input_graph=input_graph,
