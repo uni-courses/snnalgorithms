@@ -146,8 +146,19 @@ def assert_valid_results(
             run_config_filename = run_config_to_filename(
                 run_config_dict=run_config.__dict__
             )
-            print(f"visualising:{graph_name}")
-            print(f"output_config:{output_config.__dict__}")
+
+            # Override output config from exp_config.
+            output_config.extra_storing_config.show_images = True
+            output_config.hover_info.neuron_properties = [
+                "spikes",
+                "a_in",
+                "bias",
+                "du",
+                "u",
+                "dv",
+                "v",
+                "vth",
+            ]
 
             create_svg_plot(
                 run_config_filename=run_config_filename,

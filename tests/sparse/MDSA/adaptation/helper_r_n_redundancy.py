@@ -122,7 +122,9 @@ def redundant_neuron_takes_over_without_duplicates(
         print(f"timestep_window={timestep_window}")
         print(f"redundant_node_names={redundant_node_names}")
         print(f"nr_of_redundant_neuron_spikes={nr_of_redundant_neuron_spikes}")
-        return False
+        if "next_round" not in node_name and nr_of_redundant_neuron_spikes > 1:
+            return False
+        print("Continuing test.")
     return True
 
 

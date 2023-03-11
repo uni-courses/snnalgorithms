@@ -229,10 +229,7 @@ def create_degree_receiver_next_round_synapses(
                                 )
                             ],
                             synapse=Synapse(
-                                weight=1.0
-                                / len(
-                                    input_graph.nodes
-                                ),  # TODO: restore to 1.
+                                weight=1,
                                 delay=0,
                                 change_per_t=0,
                             ),
