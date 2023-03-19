@@ -1,5 +1,4 @@
 """Determines whether the snn algorithm is done."""
-
 import networkx as nx
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
@@ -11,6 +10,9 @@ def mdsa_is_done(
     run_config: Run_config,
     snn_graph: nx.DiGraph,
     t: int,
+    # terminator_node_spike:bool,
+    # selector_node_spike:bool,
+    # next_round_node_spike:bool,
 ) -> bool:
     """Checks whether the network is done or not.
 
@@ -25,11 +27,11 @@ def mdsa_is_done(
             # caused the neuron to not spike. This algorithm requires that
             # at least 1 selector neuron is firing within if t>1.
             for node_name in snn_graph.nodes:
-                if a_neuron_is_spiking(
+                if a_nx_neuron_is_spiking(
                     identifier="selector",
                     snn_graph=snn_graph,
                     t=t,
-                ) or a_neuron_is_spiking(
+                ) or a_nx_neuron_is_spiking(
                     identifier="next_round",
                     snn_graph=snn_graph,
                     t=t,
@@ -48,7 +50,7 @@ def mdsa_is_done(
     raise KeyError("Algorithm termination mode not yet found.")
 
 
-def a_neuron_is_spiking(
+def a_nx_neuron_is_spiking(
     *, t: int, snn_graph: nx.DiGraph, identifier: str
 ) -> bool:
     """Returns True if a nextround neuron is spiking at timestep t."""
