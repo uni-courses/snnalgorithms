@@ -13,6 +13,7 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple
 
 import networkx as nx
+from simsnn.core.simulators import Simulator
 from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_results.helper import run_config_to_filename
 from snncompare.helper import get_actual_duration
@@ -50,24 +51,29 @@ def set_mdsa_snn_results(
     )
 
     # Compute SNN results
-    for graph_name, snn_graph in stage_2_graphs.items():
+    for graph_name, snn in stage_2_graphs.items():
+        if isinstance(snn, Simulator):
+            graph = snn.network.graph
+        else:
+            graph = snn
+
         # Verify the SNN graphs have completed simulation stage 2.
         if graph_name != "input_graph":
-            if 2 not in stage_2_graphs[graph_name].graph["completed_stages"]:
+            if 2 not in graph.graph["completed_stages"]:
                 raise ValueError(
                     "Error, the stage 2 simulation is not yet"
                     + f" completed for: {graph_name}"
                 )
 
             if graph_name == "snn_algo_graph":
-                snn_graph.graph["results"] = get_snn_results(
+                graph.graph["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
-                    snn_graph=snn_graph,
+                    snn_graph=graph,
                 )
                 assert_valid_results(
-                    actual_node_names=snn_graph.graph["results"],
+                    actual_node_names=graph.graph["results"],
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -76,15 +82,15 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "adapted_snn_graph":
-                snn_graph.graph["results"] = get_snn_results(
+                graph.graph["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
-                    snn_graph=snn_graph,
-                    red_level=snn_graph.graph["red_level"],
+                    snn_graph=graph,
+                    red_level=graph.graph["red_level"],
                 )
                 assert_valid_results(
-                    actual_node_names=snn_graph.graph["results"],
+                    actual_node_names=graph.graph["results"],
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -93,19 +99,19 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "rad_snn_algo_graph":
-                snn_graph.graph["results"] = get_snn_results(
+                graph.graph["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
-                    snn_graph=snn_graph,
+                    snn_graph=graph,
                 )
             elif graph_name == "rad_adapted_snn_graph":
-                snn_graph.graph["results"] = get_snn_results(
+                graph.graph["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
-                    snn_graph=snn_graph,
-                    red_level=snn_graph.graph["red_level"],
+                    snn_graph=graph,
+                    red_level=graph.graph["red_level"],
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
