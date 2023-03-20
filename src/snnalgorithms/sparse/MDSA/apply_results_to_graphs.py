@@ -39,7 +39,7 @@ def set_mdsa_snn_results(
     """
 
     # TODO: Verify stage 2 graphs.
-
+    print(f'stage_2_graphs["input_graph"]={stage_2_graphs["input_graph"]}')
     # Get Alipour count.
     # Compute the count for each node according to Alipour et al.'s algorithm.
     alipour_counter_marks = get_results(
@@ -390,6 +390,8 @@ def get_majority_node_count(
 
     # Get original node count:
     prefix = ""
+
+    print(f"adapted_nx_snn_graph.nodes={adapted_nx_snn_graph.nodes}")
     node_counts.append(
         adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"]["nx_lif"][
             t
