@@ -1,8 +1,4 @@
-"""Checks when a dead neurons spikes in the non-radiated adapted SNN.
-
-Then asserts the redundant `n` neuron spikes `n` timesteps after the
-neuron would spike in the unradiated version.
-"""
+"""Helps at n redundancy tests."""
 
 from typing import Dict, List, Union
 
@@ -41,6 +37,7 @@ def assert_n_redundant_neuron_takes_over(
     count_deg: int = 0
     # Per original node, check when it spikes in the adapted graph.
     # pylint: disable=R1702
+    # pylint: disable=R0801
     for node_name in snn_graph:
         if node_name in dead_neuron_names:
             if not any(
@@ -78,6 +75,7 @@ def assert_n_redundant_neuron_takes_over(
                                     ],
                                     graphs=graphs_dict,
                                     output_config=output_config,
+                                    run_config=run_config,
                                 )
                                 raise ValueError()
                             count_deg += 1
@@ -102,6 +100,7 @@ def redundant_neuron_takes_over_without_duplicates(
     """
 
     # For each spike in the adapted network, assert no redundant neuron spikes.
+    # pylint: disable=R0801
     timestep_window: List[int] = get_spike_window_per_neuron_type(
         t=t,
         max_redundancy=max_redundancy,

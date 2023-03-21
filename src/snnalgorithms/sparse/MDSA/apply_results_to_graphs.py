@@ -19,9 +19,13 @@ from simsnn.core.simulators import Simulator
 from snnbackends.simsnn.run_on_simsnn import (
     get_mdsa_neuron_indices_for_spike_raster,
 )
+from snncompare.exp_config.Exp_config import Exp_config
 from snncompare.export_plots.create_dash_plot import create_svg_plot
+from snncompare.export_plots.temp_default_output_creation import (
+    create_default_output_config,
+)
 from snncompare.export_results.helper import run_config_to_filename
-from snncompare.helper import get_actual_duration
+from snncompare.helper import get_some_duration
 from snncompare.optional_config import Output_config
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
@@ -32,6 +36,7 @@ from snnalgorithms.sparse.MDSA.get_results import get_results
 @typechecked
 def set_mdsa_snn_results(
     *,
+    exp_config: Exp_config,
     m_val: int,
     output_config: Output_config,
     run_config: Run_config,
@@ -83,6 +88,7 @@ def set_mdsa_snn_results(
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
+                    exp_config=exp_config,
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -101,6 +107,7 @@ def set_mdsa_snn_results(
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
+                    exp_config=exp_config,
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -134,6 +141,7 @@ def set_mdsa_snn_results(
 def assert_valid_results(
     *,
     actual_node_names: Dict,
+    exp_config: Exp_config,
     expected_node_names: Dict[str, int],
     graph_name: str,
     graphs_dict: Dict,
@@ -165,6 +173,10 @@ def assert_valid_results(
                 run_config_dict=run_config.__dict__
             )
 
+            if "hover_info" not in output_config.__dict__.keys():
+                output_config = create_default_output_config(
+                    exp_config=exp_config,
+                )
             # Override output config from exp_config.
             output_config.extra_storing_config.show_images = True
             output_config.hover_info.neuron_properties = [
@@ -183,6 +195,7 @@ def assert_valid_results(
                 graph_names=[graph_name],
                 graphs=graphs_dict,
                 output_config=output_config,
+                run_config=run_config,
             )
             raise ValueError(
                 f"SNN count per node for: {graph_name}, are not equal to "
@@ -226,8 +239,10 @@ def get_snn_results(
     count in the list.
     """
     # Determine why the duration is used here to get a time step.
-    sim_duration = get_actual_duration(
-        simulator=run_config.simulator, snn_graph=snn_graph
+    sim_duration = get_some_duration(
+        simulator=run_config.simulator,
+        snn_graph=snn_graph,
+        duration_name="actual_duration",
     )
     final_timestep = sim_duration - 1  # Because all indices start at 0.
 

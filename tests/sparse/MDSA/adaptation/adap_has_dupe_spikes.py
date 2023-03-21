@@ -1,7 +1,8 @@
-"""Checks when a dead neurons spikes in the non-radiated adapted SNN.
+"""Checks whether an adaptated snn has duplicate spikes per neuron type in the
+MDSA snn.
 
-Then asserts the redundant `n` neuron spikes `n` timesteps after the
-neuron would spike in the unradiated version.
+So whether multiple redundant neurons spike simultaneously per original
+neuron.
 """
 from typing import Dict, List, Union
 
@@ -63,6 +64,7 @@ def assert_no_duplicate_spikes_in_adapted_network(
                             graph_names=["adapted_snn_graph"],
                             graphs=graphs_dict,
                             output_config=output_config,
+                            run_config=run_config,
                         )
                         raise ValueError()
 

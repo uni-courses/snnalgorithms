@@ -1,8 +1,4 @@
-"""Checks when a dead neurons spikes in the non-radiated adapted SNN.
-
-Then asserts the redundant `n` neuron spikes `n` timesteps after the
-neuron would spike in the unradiated version.
-"""
+"""Helps with the redundancy tests."""
 import copy
 from pprint import pprint
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -124,6 +120,7 @@ def perform_verification_for_each_spike_time(
                 graph_names=["adapted_snn_graph", "rad_adapted_snn_graph"],
                 graphs=graphs_dict,
                 output_config=output_config,
+                run_config=run_config,
             )
             test_object.assertTrue(False)
 
@@ -182,6 +179,7 @@ def create_default_hover_info(*, exp_config: Exp_config) -> Hover_info:
     hover_info = Hover_info(
         incoming_synapses=True,
         neuron_models=exp_config.neuron_models,
+        # pylint: disable=R0801
         neuron_properties=[
             "spikes",
             "a_in",
