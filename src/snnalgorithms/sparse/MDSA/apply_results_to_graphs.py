@@ -10,10 +10,14 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
+from simsnn.core.nodes import LIF
 from simsnn.core.simulators import Simulator
+from snnbackends.simsnn.run_on_simsnn import (
+    get_mdsa_neuron_indices_for_spike_raster,
+)
 from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_results.helper import run_config_to_filename
 from snncompare.helper import get_actual_duration
@@ -39,7 +43,6 @@ def set_mdsa_snn_results(
     """
 
     # TODO: Verify stage 2 graphs.
-    print(f'stage_2_graphs["input_graph"]={stage_2_graphs["input_graph"]}')
     # Get Alipour count.
     # Compute the count for each node according to Alipour et al.'s algorithm.
     alipour_counter_marks = get_results(
@@ -53,27 +56,32 @@ def set_mdsa_snn_results(
     # Compute SNN results
     for graph_name, snn in stage_2_graphs.items():
         if isinstance(snn, Simulator):
-            graph = snn.network.graph
+            # graph =
+            graph_attributes = snn.network.graph.graph
+
         else:
-            graph = snn
+            # graph = snn
+            graph_attributes = snn.graph
+        graph = snn
 
         # Verify the SNN graphs have completed simulation stage 2.
         if graph_name != "input_graph":
-            if 2 not in graph.graph["completed_stages"]:
+            if 2 not in graph_attributes["completed_stages"]:
                 raise ValueError(
                     "Error, the stage 2 simulation is not yet"
                     + f" completed for: {graph_name}"
                 )
 
             if graph_name == "snn_algo_graph":
-                graph.graph["results"] = get_snn_results(
+                graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
+                    run_config=run_config,
                     snn_graph=graph,
                 )
                 assert_valid_results(
-                    actual_node_names=graph.graph["results"],
+                    actual_node_names=graph_attributes["results"],
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -82,15 +90,16 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "adapted_snn_graph":
-                graph.graph["results"] = get_snn_results(
+                graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
+                    run_config=run_config,
                     snn_graph=graph,
                     red_level=graph.graph["red_level"],
                 )
                 assert_valid_results(
-                    actual_node_names=graph.graph["results"],
+                    actual_node_names=graph_attributes["results"],
                     expected_node_names=alipour_counter_marks,
                     graphs_dict=stage_2_graphs,
                     output_config=output_config,
@@ -99,17 +108,19 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "rad_snn_algo_graph":
-                graph.graph["results"] = get_snn_results(
+                graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
+                    run_config=run_config,
                     snn_graph=graph,
                 )
             elif graph_name == "rad_adapted_snn_graph":
-                graph.graph["results"] = get_snn_results(
+                graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
+                    run_config=run_config,
                     snn_graph=graph,
                     red_level=graph.graph["red_level"],
                 )
@@ -203,7 +214,8 @@ def get_snn_results(
     alipour_counter_marks: Dict[str, int],
     input_graph: nx.Graph,
     redundant: bool,
-    snn_graph: nx.DiGraph,
+    run_config: Run_config,
+    snn_graph: Union[nx.DiGraph, Simulator],
     red_level: Optional[int] = None,
 ) -> Dict:
     """Returns the marks per node that are selected by the snn simulation.
@@ -213,13 +225,18 @@ def get_snn_results(
     count in the list.
     """
     # Determine why the duration is used here to get a time step.
-    sim_duration = get_actual_duration(snn_graph=snn_graph)
+    sim_duration = get_actual_duration(
+        simulator=run_config.simulator, snn_graph=snn_graph
+    )
     final_timestep = sim_duration - 1  # Because all indices start at 0.
 
     snn_counter_marks = {}
     if not redundant:
         snn_counter_marks = get_nx_LIF_count_without_redundancy(
-            input_graph=input_graph, nx_SNN_G=snn_graph, t=final_timestep
+            input_graph=input_graph,
+            snn=snn_graph,
+            simulator=run_config.simulator,
+            t=final_timestep,
         )
     else:
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
@@ -239,7 +256,11 @@ def get_snn_results(
 
 @typechecked
 def get_nx_LIF_count_without_redundancy(
-    *, input_graph: nx.Graph, nx_SNN_G: nx.DiGraph, t: int
+    *,
+    input_graph: nx.Graph,
+    snn: Union[nx.DiGraph, Simulator],
+    simulator: str,
+    t: int,
 ) -> Dict:
     """Creates a dictionary with the node name and the the current as node
     count.
@@ -247,7 +268,7 @@ def get_nx_LIF_count_without_redundancy(
     # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param nx_SNN_G:
+    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
     approximation.
     """
@@ -255,10 +276,20 @@ def get_nx_LIF_count_without_redundancy(
     node_counts = {}
 
     # TODO: verify nx simulator is used, throw error otherwise.
-    for node_index in range(0, len(input_graph)):
-        node_counts[f"counter_{node_index}"] = int(
-            nx_SNN_G.nodes[f"counter_{node_index}"]["nx_lif"][t].u.get()
+
+    if simulator == "simsnn":
+        counter_indices = get_mdsa_neuron_indices_for_spike_raster(
+            node_name_identifier="counter",
+            snn=snn,
         )
+        for counter_index in counter_indices:
+            simsnn_node: LIF = snn.network.nodes[counter_index]
+            node_counts[simsnn_node.name] = simsnn_node.I
+    elif simulator == "nx":
+        for node_index in range(0, len(input_graph)):
+            node_counts[f"counter_{node_index}"] = int(
+                snn.nodes[f"counter_{node_index}"]["nx_lif"][t].u.get()
+            )
     return node_counts
 
 
@@ -278,7 +309,7 @@ def get_nx_LIF_count_with_redundancy(
     # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param nx_SNN_G:
+    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
     approximation.
     """
@@ -392,6 +423,8 @@ def get_majority_node_count(
     prefix = ""
 
     print(f"adapted_nx_snn_graph.nodes={adapted_nx_snn_graph.nodes}")
+    print(f"the={adapted_nx_snn_graph}")
+    print(f"node_index={node_index}")
     node_counts.append(
         adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"]["nx_lif"][
             t
