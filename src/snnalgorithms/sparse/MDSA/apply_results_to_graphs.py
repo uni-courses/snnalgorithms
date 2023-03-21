@@ -168,6 +168,12 @@ def assert_valid_results(
     # Verify the expected nodes are the same as the actual nodes.
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
+            print(
+                f"\nfor:{graph_name},\n"
+                + f"expected_node_names={expected_node_names}"
+            )
+            print(f"copy_actual_node_names={copy_actual_node_names}")
+            print("So printing the behaviour.\n\n")
             # Visualise the snn behaviour
             run_config_filename = run_config_to_filename(
                 run_config_dict=run_config.__dict__
