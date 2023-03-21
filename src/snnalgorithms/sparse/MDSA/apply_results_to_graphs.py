@@ -10,6 +10,7 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
+from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -96,7 +97,7 @@ def set_mdsa_snn_results(
                     redundant=True,
                     run_config=run_config,
                     snn_graph=graph,
-                    red_level=graph.graph["red_level"],
+                    red_level=graph_attributes["red_level"],
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
@@ -122,7 +123,7 @@ def set_mdsa_snn_results(
                     redundant=True,
                     run_config=run_config,
                     snn_graph=graph,
-                    red_level=graph.graph["red_level"],
+                    red_level=graph_attributes["red_level"],
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
@@ -243,6 +244,7 @@ def get_snn_results(
             input_graph=input_graph,
             adapted_nx_snn_graph=snn_graph,
             red_level=red_level,
+            simulator=run_config.simulator,
             t=final_timestep,
         )
 
@@ -297,8 +299,9 @@ def get_nx_LIF_count_without_redundancy(
 def get_nx_LIF_count_with_redundancy(
     *,
     input_graph: nx.Graph,
-    adapted_nx_snn_graph: nx.DiGraph,
+    adapted_nx_snn_graph: Union[nx.DiGraph, Simulator],
     red_level: int,
+    simulator: str,
     t: int,
     majority_vote: Optional[bool] = True,
 ) -> Dict:
@@ -335,9 +338,11 @@ def get_nx_LIF_count_with_redundancy(
             )
         else:
             node_counts[f"counter_{node_index}"] = get_majority_node_count(
-                adapted_nx_snn_graph=adapted_nx_snn_graph,
+                input_graph=input_graph,
+                adapted_snn=adapted_nx_snn_graph,
                 node_index=node_index,
                 red_level=red_level,
+                simulator=simulator,
                 t=t,
             )
     return node_counts
@@ -368,91 +373,103 @@ def get_node_count(
     else:
         prefix = ""
 
-    redundant_node_counts = get_redundant_node_counts(
+    snn_counter_marks: Dict[str, float] = {}
+    add_redundant_counter_node_counts(
         adapted_nx_snn_graph=adapted_nx_snn_graph,
         node_index=node_index,
         red_level=red_level,
+        snn_counter_marks=snn_counter_marks,
         t=t,
     )
-    for node_count in redundant_node_counts:
+
+    for node_count in snn_counter_marks.values():
         if node_count >= 0:
             node_counts[f"counter_{node_index}"] = node_count
 
     node_counts[f"counter_{node_index}"] = adapted_nx_snn_graph.nodes[
         f"{prefix}counter_{node_index}"
     ]["nx_lif"][t].u.get()
+    raise SystemError("TODO: verify and document this procedure.")
 
 
 @typechecked
-def get_redundant_node_counts(
+def add_redundant_counter_node_counts(
     *,
     adapted_nx_snn_graph: nx.DiGraph,
     node_index: int,
     red_level: int,
+    snn_counter_marks: Dict[str, float],
     t: int,
-) -> List[float]:
+) -> Dict[str, float]:
     """Returns the count stored in the redundant counter neurons."""
-
-    redundant_node_counts: List[float] = []
-    for redundancy in list(range(1, red_level + 1, 2)):
+    for redundancy in list(range(1, red_level + 1)):
         # Get redundant node counts:
         prefix = f"r_{redundancy}_"
-        redundant_node_counts.append(
-            adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"][
-                "nx_lif"
-            ][t].u.get()
-        )
-    return redundant_node_counts
+        red_node_name = f"{prefix}counter_{node_index}"
+        snn_counter_marks[red_node_name] = adapted_nx_snn_graph.nodes[
+            red_node_name
+        ]["nx_lif"][t].u.get()
+    return snn_counter_marks
 
 
 @typechecked
 def get_majority_node_count(
     *,
-    adapted_nx_snn_graph: nx.DiGraph,
+    input_graph: nx.Graph,
+    adapted_snn: Union[nx.DiGraph, Simulator],
     node_index: int,
     red_level: int,
+    simulator: str,
     t: int,
     remove_negatives: Optional[bool] = True,
 ) -> float:
     """Returns the node count according to a majority vote between the original
     and redundant nodes of a count node in the MDSA neuron."""
 
-    node_counts = []
-
-    # Get original node count:
-    prefix = ""
-
-    print(f"adapted_nx_snn_graph.nodes={adapted_nx_snn_graph.nodes}")
-    print(f"the={adapted_nx_snn_graph}")
-    print(f"node_index={node_index}")
-    node_counts.append(
-        adapted_nx_snn_graph.nodes[f"{prefix}counter_{node_index}"]["nx_lif"][
-            t
-        ].u.get()
+    snn_counter_marks: Dict[str, int] = get_nx_LIF_count_without_redundancy(
+        input_graph=input_graph,
+        snn=adapted_snn,
+        simulator=simulator,
+        t=t,
     )
 
-    node_counts.extend(
-        get_redundant_node_counts(
-            adapted_nx_snn_graph=adapted_nx_snn_graph,
+    # Filter only counter_<node_index> neurons.
+    remove_node_names: List[str] = []
+    # pylint:disable=C0201
+    for node_name in snn_counter_marks.keys():
+        if f"counter_{node_index}" not in node_name:
+            remove_node_names.append(node_name)
+    for node_name in remove_node_names:
+        snn_counter_marks.pop(node_name)
+
+    if simulator == "nx":
+        add_redundant_counter_node_counts(
+            adapted_nx_snn_graph=adapted_snn,
             node_index=node_index,
             red_level=red_level,
+            snn_counter_marks=snn_counter_marks,
             t=t,
         )
-    )
+    pprint(snn_counter_marks)
 
     if remove_negatives:
-        node_counts = [item for item in node_counts if item >= 0]
+        remove_node_names = []
+        for node_name, node_count in snn_counter_marks.items():
+            if node_count < 0:
+                remove_node_names.append(node_name)
+        for node_name in remove_node_names:
+            snn_counter_marks.pop(node_name)
 
     # Verify there are at most 2 different values, one for died neurons,
     # and one for functional count neurons.
-    if len(set(node_counts)) > 2:
+    if len(set(list(snn_counter_marks.values()))) > 2:
         raise ValueError(
             "Error, the node count contains more than 2 different values."
             "Only a valid, and an invalid value for died neurons may exist."
-            f"However, we found:{node_counts}."
+            f"However, we found:{list(snn_counter_marks.values())}."
         )
 
-    return find_majority(votes=node_counts, position=1)[
+    return find_majority(votes=list(snn_counter_marks.values()), position=1)[
         0
     ]  # Return value that occurred most.
 
