@@ -76,6 +76,7 @@ class Test_mdsa(unittest.TestCase):
             # Then also verify the complete adapted algorithm
             # still works.
             if set_results(
+                exp_config=exp_config,
                 output_config=output_config,
                 run_config=run_config,
                 stage_2_graphs=results_nx_graphs["graphs_dict"],
