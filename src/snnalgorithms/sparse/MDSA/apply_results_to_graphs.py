@@ -96,13 +96,14 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "adapted_snn_graph":
+                print(f"run_config={run_config.__dict__}")
+                print(graph_attributes)
                 graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
                     run_config=run_config,
                     snn_graph=graph,
-                    red_level=graph_attributes["red_level"],
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
@@ -129,7 +130,6 @@ def set_mdsa_snn_results(
                     redundant=True,
                     run_config=run_config,
                     snn_graph=graph,
-                    red_level=graph_attributes["red_level"],
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
@@ -235,7 +235,6 @@ def get_snn_results(
     redundant: bool,
     run_config: Run_config,
     snn_graph: Union[nx.DiGraph, Simulator],
-    red_level: Optional[int] = None,
 ) -> Dict:
     """Returns the marks per node that are selected by the snn simulation.
 
@@ -244,11 +243,19 @@ def get_snn_results(
     count in the list.
     """
     # Determine why the duration is used here to get a time step.
-    sim_duration = get_some_duration(
-        simulator=run_config.simulator,
-        snn_graph=snn_graph,
-        duration_name="actual_duration",
-    )
+    if run_config.simulator == "nx":
+        sim_duration = get_some_duration(
+            simulator=run_config.simulator,
+            snn_graph=snn_graph,
+            duration_name="actual_duration",
+        )
+    elif run_config.simulator == "simsnn":
+        sim_duration = len(snn_graph.multimeter.targets)
+    else:
+        raise NotImplementedError(
+            f"Error:{run_config.simulator} not implemented"
+        )
+
     final_timestep = sim_duration - 1  # Because all indices start at 0.
 
     snn_counter_marks = {}
@@ -263,7 +270,7 @@ def get_snn_results(
         snn_counter_marks = get_nx_LIF_count_with_redundancy(
             input_graph=input_graph,
             adapted_nx_snn_graph=snn_graph,
-            red_level=red_level,
+            red_level=run_config.adaptation["redundancy"],
             simulator=run_config.simulator,
             t=final_timestep,
         )
