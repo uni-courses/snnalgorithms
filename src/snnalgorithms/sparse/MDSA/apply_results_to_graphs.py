@@ -187,7 +187,7 @@ def assert_valid_results(
             output_config.extra_storing_config.show_images = True
             output_config.hover_info.neuron_properties = [
                 "spikes",
-                "a_in",
+                "a_in_next",
                 "bias",
                 "du",
                 "u",
