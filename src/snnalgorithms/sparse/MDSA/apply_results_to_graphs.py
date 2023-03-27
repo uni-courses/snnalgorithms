@@ -10,7 +10,6 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
-from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -471,7 +470,6 @@ def get_majority_node_count(
             snn_counter_marks=snn_counter_marks,
             t=t,
         )
-    pprint(snn_counter_marks)
 
     if remove_negatives:
         remove_node_names = []
