@@ -171,6 +171,7 @@ def assert_valid_results(
             )
             print(f"copy_actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
+
             # Visualise the snn behaviour
             run_config_filename = run_config_to_filename(
                 run_config_dict=run_config.__dict__
@@ -352,6 +353,7 @@ def get_nx_LIF_count_with_redundancy(
         )
 
     # TODO: verify nx simulator is used, throw error otherwise.
+    print(f"majority_vote={majority_vote}")
     for node_index in range(0, len(input_graph)):
         if not majority_vote:
             get_node_count(
@@ -476,6 +478,16 @@ def get_majority_node_count(
             red_level=red_level,
             snn_counter_marks=snn_counter_marks,
             t=t,
+        )
+    elif simulator == "simsnn":
+        for node in adapted_snn.network.nodes:
+            print(node.name)
+        raise NotImplementedError(
+            "Error, did not yet get redundant node counts."
+        )
+    else:
+        raise NotImplementedError(
+            "Error, did not yet get redundant node counts."
         )
 
     if remove_negatives:
