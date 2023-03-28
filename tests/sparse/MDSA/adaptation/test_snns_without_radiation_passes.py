@@ -5,7 +5,7 @@ TODO: determine whether it asserts the results are the same as the original
 snn, or as the Neumann algo results.
 TODO: this is a duplicate test remove the original.
 TODO: verify if `set_results(` performs assert of result validity.
-TODO: include the actual assert, the compute_results( does not
+TODO: include the actual assert, the verify_stage_completion( does not
 assert valid results.
 """
 # pylint: disable=R0801
@@ -13,14 +13,15 @@ import unittest
 from pprint import pprint
 
 from snncompare.process_results.process_results import (
-    compute_results,
     set_results,
+    verify_stage_completion,
 )
 from snncompare.simulation.stage2_sim import sim_graphs
 from typeguard import typechecked
 
 from tests.sparse.MDSA.adaptation.redundancy_helper import (
     get_run_config_and_results_dicts_for_large_test_scope,
+    long_exp_config_for_mdsa_testing_with_adaptation,
     overwrite_radiation_with_custom,
 )
 from tests.sparse.MDSA.helper_results_check import (
@@ -76,13 +77,14 @@ class Test_mdsa(unittest.TestCase):
             # Then also verify the complete adapted algorithm
             # still works.
             if set_results(
-                exp_config=exp_config,
+                exp_config=long_exp_config_for_mdsa_testing_with_adaptation(),
                 output_config=output_config,
                 run_config=run_config,
                 stage_2_graphs=results_nx_graphs["graphs_dict"],
             ):
-                compute_results(
+                verify_stage_completion(
                     results_nx_graphs=results_nx_graphs,
+                    simulator="simsnn",
                     stage_index=4,
                 )
 

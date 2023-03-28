@@ -96,8 +96,6 @@ def set_mdsa_snn_results(
                 )
 
             elif graph_name == "adapted_snn_graph":
-                print(f"run_config={run_config.__dict__}")
-                print(graph_attributes)
                 graph_attributes["results"] = get_snn_results(
                     alipour_counter_marks=alipour_counter_marks,
                     input_graph=stage_2_graphs["input_graph"],
