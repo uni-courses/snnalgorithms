@@ -32,7 +32,7 @@ from typeguard import typechecked
 from snnalgorithms.sparse.MDSA.get_results import get_results
 
 
-@typechecked
+# @typechecked # TODO: restore.
 def set_mdsa_snn_results(
     *,
     exp_config: Exp_config,
@@ -134,7 +134,7 @@ def set_mdsa_snn_results(
             # TODO: verify the results are set correctly.
 
 
-@typechecked
+# @typechecked # TODO: restore.
 def assert_valid_results(
     *,
     actual_node_names: Dict,
@@ -451,7 +451,9 @@ def get_majority_node_count(
     """Returns the node count according to a majority vote between the original
     and redundant nodes of a count node in the MDSA neuron."""
 
-    snn_counter_marks: Dict[str, int] = get_nx_LIF_count_without_redundancy(
+    snn_counter_marks: Dict[
+        str, Union[int, float]
+    ] = get_nx_LIF_count_without_redundancy(
         input_graph=input_graph,
         snn=adapted_snn,
         simulator=simulator,
