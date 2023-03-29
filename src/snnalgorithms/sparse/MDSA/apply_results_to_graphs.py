@@ -13,11 +13,7 @@ from collections import Counter
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
-from simsnn.core.nodes import LIF
 from simsnn.core.simulators import Simulator
-from snnbackends.simsnn.run_on_simsnn import (
-    get_mdsa_neuron_indices_for_spike_raster,
-)
 from snncompare.exp_config.Exp_config import Exp_config
 from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_plots.temp_default_output_creation import (
@@ -249,7 +245,7 @@ def get_snn_results(
             duration_name="actual_duration",
         )
     elif run_config.simulator == "simsnn":
-        sim_duration = len(snn_graph.multimeter.targets)
+        sim_duration = len(snn_graph.multimeter.I)
     else:
         raise NotImplementedError(
             f"Error:{run_config.simulator} not implemented"
@@ -303,21 +299,17 @@ def get_nx_LIF_count_without_redundancy(
     # Initialise the node counts
     node_counts = {}
 
-    # TODO: verify nx simulator is used, throw error otherwise.
-
     if simulator == "simsnn":
-        counter_indices = get_mdsa_neuron_indices_for_spike_raster(
-            node_name_identifier="counter",
-            snn=snn,
-        )
-        for counter_index in counter_indices:
-            simsnn_node: LIF = snn.network.nodes[counter_index]
-            node_counts[simsnn_node.name] = simsnn_node.I
+        for node_index, simsnn_node in enumerate(snn.network.nodes):
+            if simsnn_node.name[:8] == "counter_":
+                node_counts[simsnn_node.name] = snn.multimeter.I[t][node_index]
     elif simulator == "nx":
         for node_index in range(0, len(input_graph)):
             node_counts[f"counter_{node_index}"] = int(
                 snn.nodes[f"counter_{node_index}"]["nx_lif"][t].u.get()
             )
+    else:
+        raise NotImplementedError(f"Error, {simulator} not supported.")
     return node_counts
 
 
@@ -353,7 +345,6 @@ def get_nx_LIF_count_with_redundancy(
         )
 
     # TODO: verify nx simulator is used, throw error otherwise.
-    print(f"majority_vote={majority_vote}")
     for node_index in range(0, len(input_graph)):
         if not majority_vote:
             get_node_count(
@@ -361,6 +352,7 @@ def get_nx_LIF_count_with_redundancy(
                 node_counts=node_counts,
                 node_index=node_index,
                 red_level=red_level,
+                simulator=simulator,
                 t=t,
             )
         else:
@@ -382,6 +374,7 @@ def get_node_count(
     node_counts: Dict,
     node_index: int,
     red_level: int,
+    simulator: str,
     t: int,
 ) -> None:
     """If a counter neuron fires, which it always does when it gets an input
@@ -405,6 +398,7 @@ def get_node_count(
         adapted_nx_snn_graph=adapted_nx_snn_graph,
         node_index=node_index,
         red_level=red_level,
+        simulator=simulator,
         snn_counter_marks=snn_counter_marks,
         t=t,
     )
@@ -422,9 +416,10 @@ def get_node_count(
 @typechecked
 def add_redundant_counter_node_counts(
     *,
-    adapted_nx_snn_graph: nx.DiGraph,
+    adapted_nx_snn_graph: Union[nx.DiGraph, Simulator],
     node_index: int,
     red_level: int,
+    simulator: str,
     snn_counter_marks: Dict[str, float],
     t: int,
 ) -> Dict[str, float]:
@@ -433,9 +428,16 @@ def add_redundant_counter_node_counts(
         # Get redundant node counts:
         prefix = f"r_{redundancy}_"
         red_node_name = f"{prefix}counter_{node_index}"
-        snn_counter_marks[red_node_name] = adapted_nx_snn_graph.nodes[
-            red_node_name
-        ]["nx_lif"][t].u.get()
+        if simulator == "nx":
+            snn_counter_marks[red_node_name] = adapted_nx_snn_graph.nodes[
+                red_node_name
+            ]["nx_lif"][t].u.get()
+        elif simulator == "simsnn":
+            for node in adapted_nx_snn_graph.network.nodes:
+                if red_node_name == node.name:
+                    snn_counter_marks[red_node_name] = node.I
+        else:
+            raise NotImplementedError(f"Error, {simulator} not implemented.")
     return snn_counter_marks
 
 
@@ -471,24 +473,14 @@ def get_majority_node_count(
     for node_name in remove_node_names:
         snn_counter_marks.pop(node_name)
 
-    if simulator == "nx":
-        add_redundant_counter_node_counts(
-            adapted_nx_snn_graph=adapted_snn,
-            node_index=node_index,
-            red_level=red_level,
-            snn_counter_marks=snn_counter_marks,
-            t=t,
-        )
-    elif simulator == "simsnn":
-        for node in adapted_snn.network.nodes:
-            print(node.name)
-        raise NotImplementedError(
-            "Error, did not yet get redundant node counts."
-        )
-    else:
-        raise NotImplementedError(
-            "Error, did not yet get redundant node counts."
-        )
+    add_redundant_counter_node_counts(
+        adapted_nx_snn_graph=adapted_snn,
+        node_index=node_index,
+        red_level=red_level,
+        simulator=simulator,
+        snn_counter_marks=snn_counter_marks,
+        t=t,
+    )
 
     if remove_negatives:
         remove_node_names = []
