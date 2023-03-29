@@ -10,6 +10,7 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
+from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -161,10 +162,9 @@ def assert_valid_results(
     # Verify the expected nodes are the same as the actual nodes.
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
-            print(
-                f"\nfor:{graph_name},\n"
-                + f"expected_node_names={expected_node_names}"
-            )
+            print(f"\nfor:{graph_name}, in:\n")
+            pprint(run_config.__dict__)
+            print(f"expected_node_names={expected_node_names}")
             print(f"copy_actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
 
@@ -422,7 +422,7 @@ def add_redundant_counter_node_counts(
     simulator: str,
     snn_counter_marks: Dict[str, float],
     t: int,
-) -> Dict[str, float]:
+) -> None:
     """Returns the count stored in the redundant counter neurons."""
     for redundancy in list(range(1, red_level + 1)):
         # Get redundant node counts:
@@ -433,12 +433,15 @@ def add_redundant_counter_node_counts(
                 red_node_name
             ]["nx_lif"][t].u.get()
         elif simulator == "simsnn":
-            for node in adapted_nx_snn_graph.network.nodes:
-                if red_node_name == node.name:
-                    snn_counter_marks[red_node_name] = node.I
+            for simsnn_index, simsnn_node in enumerate(
+                adapted_nx_snn_graph.network.nodes
+            ):
+                if simsnn_node.name == red_node_name:
+                    snn_counter_marks[
+                        red_node_name
+                    ] = adapted_nx_snn_graph.multimeter.I[t][simsnn_index]
         else:
             raise NotImplementedError(f"Error, {simulator} not implemented.")
-    return snn_counter_marks
 
 
 @typechecked
