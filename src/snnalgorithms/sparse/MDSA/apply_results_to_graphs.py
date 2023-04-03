@@ -165,7 +165,7 @@ def assert_valid_results(
             print(f"\nfor:{graph_name}, in:\n")
             pprint(run_config.__dict__)
             print(f"expected_node_names={expected_node_names}")
-            print(f"copy_actual_node_names={copy_actual_node_names}")
+            print(f"  actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
 
             # Visualise the snn behaviour
@@ -189,7 +189,6 @@ def assert_valid_results(
                 "v",
                 "vth",
             ]
-
             create_svg_plot(
                 run_config_filename=run_config_filename,
                 graph_names=[graph_name],
@@ -471,7 +470,8 @@ def get_majority_node_count(
     remove_node_names: List[str] = []
     # pylint:disable=C0201
     for node_name in snn_counter_marks.keys():
-        if f"counter_{node_index}" not in node_name:
+        expected_len: int = -len(f"counter_{node_index}")
+        if f"counter_{node_index}" not in node_name[expected_len:]:
             remove_node_names.append(node_name)
     for node_name in remove_node_names:
         snn_counter_marks.pop(node_name)
