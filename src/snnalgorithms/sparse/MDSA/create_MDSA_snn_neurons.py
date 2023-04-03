@@ -2,6 +2,7 @@
 
 TODO: replace len(input_graph) with nr_of_nodes arg, or vice versa.
 """
+from pprint import pprint
 from typing import Dict, List, Union
 
 import networkx as nx
@@ -295,6 +296,7 @@ def get_max_degree_index_per_node_index(
         for node_neighbour in nx.all_neighbors(input_graph, node_index):
             if node_index != node_neighbour:
                 degree_indices[node_index] = degree_indices[node_index] + 1
+    pprint(degree_indices)
     return degree_indices
 
 
