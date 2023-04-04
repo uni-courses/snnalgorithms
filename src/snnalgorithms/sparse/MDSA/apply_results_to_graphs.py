@@ -26,7 +26,7 @@ from snncompare.optional_config import Output_config
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
-from snnalgorithms.sparse.MDSA.get_results import get_results
+from snnalgorithms.sparse.MDSA.get_results import get_neumann_results
 
 
 # @typechecked # TODO: restore.
@@ -47,7 +47,7 @@ def set_mdsa_snn_results(
     # TODO: Verify stage 2 graphs.
     # Get Alipour count.
     # Compute the count for each node according to Alipour et al.'s algorithm.
-    alipour_counter_marks = get_results(
+    alipour_counter_marks = get_neumann_results(
         input_graph=stage_2_graphs["input_graph"],
         m_val=m_val,
         rand_props=stage_2_graphs["input_graph"].graph["alg_props"],
@@ -160,6 +160,7 @@ def assert_valid_results(
         )
 
     # Verify the expected nodes are the same as the actual nodes.
+
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
             print(f"\nfor:{graph_name}, in:\n")

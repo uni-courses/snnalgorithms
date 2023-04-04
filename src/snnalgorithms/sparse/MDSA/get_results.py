@@ -3,8 +3,7 @@ et al."""
 from typing import Dict
 
 import networkx as nx
-from snncompare.helper import (
-    compute_mark,
+from snncompare.results_helper import (
     compute_marks_for_m_larger_than_one,
     set_node_default_values,
 )
@@ -13,7 +12,7 @@ from typeguard import typechecked
 
 # pylint: disable=R0913
 @typechecked
-def get_results(
+def get_neumann_results(
     *,
     input_graph: nx.Graph,
     m_val: int,
@@ -31,6 +30,7 @@ def get_results(
     """
 
     rand_ceil = rand_props["rand_ceil"]
+    print(f"rand_ceil={rand_ceil}")
     # Reverse list cause the random numbers are subtracted in the edge weights.
     # That causes the highest to "fire first" and lowest to fire last, so the
     # mark order is swapped. Hence the [::-1]
@@ -43,9 +43,6 @@ def get_results(
             rand_ceil=rand_ceil,
             uninhibited_spread_rand_nrs=rand_nrs,
         )
-
-    # pylint: disable=R0801
-    compute_mark(input_graph=input_graph, rand_ceil=rand_ceil)
 
     compute_marks_for_m_larger_than_one(
         input_graph=input_graph,

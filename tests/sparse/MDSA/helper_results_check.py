@@ -9,7 +9,7 @@ from snncompare.export_results.load_json_to_nx_graph import (
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
 
-from snnalgorithms.sparse.MDSA.get_results import get_results
+from snnalgorithms.sparse.MDSA.get_results import get_neumann_results
 
 
 @typechecked
@@ -36,7 +36,7 @@ def assert_run_config_results_without_rad(
     assert nx_graphs is not None  # nosec
 
     # Verify results are as expected.
-    expected_node_names: Dict[str, int] = get_results(
+    expected_node_names: Dict[str, int] = get_neumann_results(
         input_graph=nx_graphs["input_graph"],
         m_val=run_config.algorithm["MDSA"]["m_val"],
         rand_props=nx_graphs["input_graph"].graph["alg_props"],

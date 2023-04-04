@@ -35,6 +35,7 @@ class SNN_initialisation_properties:
         :param G: The original graph on which the MDSA algorithm is ran.
         """
         rand_ceil = len(G) - 1
+        # rand_ceil = len(G)
         return rand_ceil
 
     @typechecked
@@ -46,7 +47,7 @@ class SNN_initialisation_properties:
 
         The a_in of the degree_receiver_x_y neuron can be described as:
             + a spike from at most n-1 spike_once neurons, with weight=n-1.
-            + a random nr in range/of weight: [0, n-1] (or [0, rand_ceil-1]).
+            + a random nr in range/of weight: [0, n-1].
             + selector_excitation of weight +1
             - this offset.
         So at most the degree_receivers get: (n-1)*(n-1)+(n-1) as positive
