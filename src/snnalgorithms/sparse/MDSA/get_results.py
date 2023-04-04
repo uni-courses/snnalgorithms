@@ -30,7 +30,6 @@ def get_neumann_results(
     """
 
     rand_ceil = rand_props["rand_ceil"]
-    print(f"rand_ceil={rand_ceil}")
     # Reverse list cause the random numbers are subtracted in the edge weights.
     # That causes the highest to "fire first" and lowest to fire last, so the
     # mark order is swapped. Hence the [::-1]

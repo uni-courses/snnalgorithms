@@ -293,9 +293,11 @@ def get_rand_planar_triangle_free_graph(
                 # Only store unique graphs (overwrite the duplicate) with
                 # identical ismorphic hash at the key.
                 input_graphs[isomorphic_hash] = input_graph
-    print(
-        f"Found:{len(input_graphs.items())} unique input graphs with density:"
-    )
-    for input_graph in input_graphs.values():
-        print(nx.density(input_graph))
-    return list(input_graphs.values())
+    print(f"Found:{len(input_graphs.items())} unique input graphs.")
+
+    # Sort the graphs to ensure it always returns the same order of input
+    # graphs.
+    sorted_input_graphs: List[nx.Graph] = []
+    for some_hash in sorted(list(input_graphs.keys())):
+        sorted_input_graphs.append(input_graphs[some_hash])
+    return sorted_input_graphs
