@@ -1,9 +1,14 @@
 """Contains the list of graphs that are used for radiation testing."""
+import json
 import random
 from itertools import combinations
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import networkx as nx
+from snncompare.export_results.output_stage1_configs_and_input_graph import (
+    get_input_graph_output_filepath,
+)
 from snncompare.import_results.helper import get_isomorphic_graph_hash
 from typeguard import typechecked
 
@@ -20,17 +25,17 @@ class Used_graphs:
     @typechecked
     def get_graphs(
         self, max_nr_of_graphs: int, seed: int, size: int
-    ) -> List[nx.Graph]:
+    ) -> Dict[str, nx.Graph]:
         """Returns the graphs that are used for testing, per selected size.
 
         :param size: Nr of nodes in the original graph on which test is ran.
         """
-        if size == 3:
-            return self.three
-        if size == 4:
-            return self.four
-        if size == 5:
-            return self.five
+        # if size == 3:
+        # return self.three
+        # if size == 4:
+        # return self.four
+        # if size == 5:
+        # return self.five
         return get_rand_planar_triangle_free_graph(
             density_cutoff=0.01,
             max_nr_of_graphs=max_nr_of_graphs,
@@ -266,7 +271,7 @@ def get_rand_planar_triangle_free_graph(
     seed: int,
     size: int,
     max_iterations: Optional[int] = 10000,
-) -> List[nx.Graph]:
+) -> Dict[str, nx.Graph]:
     """Generates unique, random, undirected, connected, planar, triangle-free
     graphs, and returns them in a list."""
     input_graphs: Dict[str, nx.Graph] = {}
@@ -290,6 +295,23 @@ def get_rand_planar_triangle_free_graph(
                     some_graph=input_graph
                 )
 
+                # If input graph exists, load it from file.
+                output_filepath: str = get_input_graph_output_filepath(
+                    input_graph=input_graph
+                )
+                if Path(output_filepath).is_file():
+                    # Load graph from file and verify it results in the same
+                    # graph.
+                    with open(output_filepath, encoding="utf-8") as json_file:
+                        some_json_graph = json.load(json_file)
+                        json_file.close()
+                        if (
+                            "completed_stages"
+                            in some_json_graph["graph"].keys()
+                        ):
+                            some_json_graph["graph"].pop("completed_stages")
+                    input_graph = nx.node_link_graph(some_json_graph)
+
                 # Only store unique graphs (overwrite the duplicate) with
                 # identical ismorphic hash at the key.
                 input_graphs[isomorphic_hash] = input_graph
@@ -297,7 +319,7 @@ def get_rand_planar_triangle_free_graph(
 
     # Sort the graphs to ensure it always returns the same order of input
     # graphs.
-    sorted_input_graphs: List[nx.Graph] = []
-    for some_hash in sorted(list(input_graphs.keys())):
-        sorted_input_graphs.append(input_graphs[some_hash])
-    return sorted_input_graphs
+    # sorted_input_graphs: List[nx.Graph] = []
+    # for some_hash in sorted(list(input_graphs.keys())):
+    # sorted_input_graphs.append(input_graphs[some_hash])
+    return input_graphs
