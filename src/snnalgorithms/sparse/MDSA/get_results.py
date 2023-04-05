@@ -34,6 +34,7 @@ def get_neumann_results(
     # That causes the highest to "fire first" and lowest to fire last, so the
     # mark order is swapped. Hence the [::-1]
     rand_nrs = rand_props["rand_nrs"][::-1]
+    print(f"rand_nrs={rand_nrs}")
 
     for node in input_graph.nodes:
         set_node_default_values(
