@@ -116,7 +116,7 @@ def create_outgoing_spike_once_synapses(
 ) -> None:
     """Creates the outgoing synapses for the spike_once node in the MDSA
     algorithm."""
-    rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
+    rand_ceil = input_graph.graph["alg_props"]["rand_ceil"] + 1
     for node_index in input_graph.nodes:
         for neighbour_index in nx.all_neighbors(input_graph, node_index):
             if node_index != neighbour_index:
@@ -164,7 +164,7 @@ def create_degree_receiver_selector_synapses(
                             )
                         ],
                         synapse=Synapse(
-                            weight=-10,
+                            weight=-100,
                             delay=0,
                             change_per_t=0,
                         ),  # to disable bias
@@ -229,10 +229,7 @@ def create_degree_receiver_next_round_synapses(
                                 )
                             ],
                             synapse=Synapse(
-                                weight=1.0
-                                / len(
-                                    input_graph.nodes
-                                ),  # TODO: restore to 1.
+                                weight=1,
                                 delay=0,
                                 change_per_t=0,
                             ),
@@ -325,7 +322,7 @@ def create_degree_to_degree_synapses(
     """
     # pylint: disable=R0913
     # Currently no method is found to reduce the 6/5 nested blocks.
-    rand_ceil = input_graph.graph["alg_props"]["rand_ceil"]
+    rand_ceil = input_graph.graph["alg_props"]["rand_ceil"] + 1
     for m_val in range(0, run_config.algorithm["MDSA"]["m_val"] + 1):
         for node_index_left in input_graph.nodes:
             for y in input_graph.nodes:

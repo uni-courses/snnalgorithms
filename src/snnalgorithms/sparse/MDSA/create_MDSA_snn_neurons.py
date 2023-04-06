@@ -128,6 +128,7 @@ def create_MDSA_neurons(
 
     create_next_round_node(
         mdsa_snn=mdsa_snn,
+        nr_of_nodes=len(input_graph.nodes),
         plot_config=plot_config,
         run_config=run_config,
     )
@@ -446,6 +447,7 @@ def create_counter_node(
 def create_next_round_node(
     *,
     mdsa_snn: nx.DiGraph,
+    nr_of_nodes: int,
     plot_config: Plot_config,
     run_config: Run_config,
 ) -> None:
@@ -459,7 +461,6 @@ def create_next_round_node(
         identifiers = [
             Identifier(description="m_val", position=0, value=m_val),
         ]
-        vth: float = 4.0
         next_round_xy = tuple(
             get_node_position(
                 node_name="next_round",
@@ -473,16 +474,10 @@ def create_next_round_node(
         )
         lif_neuron = LIF_neuron(
             name="next_round",
-            # bias=0.0,
-            # du=0.0,
-            # dv=1.0,
-            # vth=float(nr_of_nodes) - 1,
-            bias=vth,
+            bias=0.0,
             du=0.0,
             dv=1.0,
-            vth=vth + 1 - 0.0000001,  # Spikes once all degree receivers have
-            # fired, and a total of 1 has come in through a_in (limits
-            # functional redundant network size to (1/(0.0000001)).
+            vth=float(nr_of_nodes) - 1,
             pos=next_round_xy,
             identifiers=identifiers,
         )
