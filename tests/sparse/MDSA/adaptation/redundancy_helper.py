@@ -216,6 +216,7 @@ def create_default_output_config(*, exp_config: Exp_config) -> Output_config:
             count_spikes=False,
             count_neurons=False,
             count_synapses=False,
+            skip_stage_2_output=True,
             show_images=True,
             store_died_neurons=False,
         ),
@@ -278,21 +279,6 @@ def get_dead_neuron_names(
             if red_level > 0:
                 node_names.append(f"r_{red_level}_{node_name}")
         combinations.append(node_names)
-    return combinations
-
-
-@typechecked
-def get_original_and_r_1_neuron_names(
-    *,
-    snn_algo_graph: nx.DiGraph,
-) -> List[List[str]]:
-    """Returns lists with a single dead neuron name (one for each original snn
-    neuron)."""
-    combinations: List[List[str]] = []
-
-    for node_name in snn_algo_graph.nodes():
-        if "connector" not in node_name:
-            combinations.append([node_name])
     return combinations
 
 
