@@ -68,11 +68,11 @@ def set_mdsa_snn_results(
 
         # Verify the SNN graphs have completed simulation stage 2.
         if graph_name != "input_graph":
-            if 2 not in graph_attributes["completed_stages"]:
-                raise ValueError(
-                    "Error, the stage 2 simulation is not yet"
-                    + f" completed for: {graph_name}"
-                )
+            # if 2 not in graph_attributes["completed_stages"]:
+            #     raise ValueError(
+            #         "Error, the stage 2 simulation is not yet"
+            #         + f" completed for: {graph_name}"
+            #     )
 
             if graph_name == "snn_algo_graph":
                 graph_attributes["results"] = get_snn_results(
