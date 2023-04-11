@@ -21,9 +21,15 @@ from snncompare.export_plots.temp_default_output_creation import (
     create_default_output_config,
 )
 from snncompare.export_results.helper import run_config_to_filename
-from snncompare.helper import get_some_duration
+from snncompare.helper import (
+    get_some_duration,
+    get_with_adaptation_bool,
+    get_with_radiation_bool,
+)
+from snncompare.import_results.load_stage_1_and_2 import load_simsnn_graphs
 from snncompare.optional_config import Output_config
 from snncompare.run_config.Run_config import Run_config
+from snncompare.simulation.stage2_sim import stage_2_or_4_graph_exists_already
 from typeguard import typechecked
 
 from snnalgorithms.sparse.MDSA.get_results import get_neumann_results
@@ -68,11 +74,12 @@ def set_mdsa_snn_results(
 
         # Verify the SNN graphs have completed simulation stage 2.
         if graph_name != "input_graph":
-            # if 2 not in graph_attributes["completed_stages"]:
-            #     raise ValueError(
-            #         "Error, the stage 2 simulation is not yet"
-            #         + f" completed for: {graph_name}"
-            #     )
+            with_adaptation: bool = get_with_adaptation_bool(
+                graph_name=graph_name
+            )
+            with_radiation: bool = get_with_radiation_bool(
+                graph_name=graph_name
+            )
 
             if graph_name == "snn_algo_graph":
                 graph_attributes["results"] = get_snn_results(
@@ -81,6 +88,9 @@ def set_mdsa_snn_results(
                     redundant=False,
                     run_config=run_config,
                     snn_graph=graph,
+                    stage_2_graphs=stage_2_graphs,
+                    with_adaptation=with_adaptation,
+                    with_radiation=with_radiation,
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
@@ -98,7 +108,10 @@ def set_mdsa_snn_results(
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
                     run_config=run_config,
+                    stage_2_graphs=stage_2_graphs,
                     snn_graph=graph,
+                    with_adaptation=with_adaptation,
+                    with_radiation=with_radiation,
                 )
                 assert_valid_results(
                     actual_node_names=graph_attributes["results"],
@@ -116,7 +129,10 @@ def set_mdsa_snn_results(
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=False,
                     run_config=run_config,
+                    stage_2_graphs=stage_2_graphs,
                     snn_graph=graph,
+                    with_adaptation=with_adaptation,
+                    with_radiation=with_radiation,
                 )
             elif graph_name == "rad_adapted_snn_graph":
                 graph_attributes["results"] = get_snn_results(
@@ -124,7 +140,10 @@ def set_mdsa_snn_results(
                     input_graph=stage_2_graphs["input_graph"],
                     redundant=True,
                     run_config=run_config,
+                    stage_2_graphs=stage_2_graphs,
                     snn_graph=graph,
+                    with_adaptation=with_adaptation,
+                    with_radiation=with_radiation,
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
@@ -231,7 +250,10 @@ def get_snn_results(
     input_graph: nx.Graph,
     redundant: bool,
     run_config: Run_config,
+    stage_2_graphs: Dict,
     snn_graph: Union[nx.DiGraph, Simulator],
+    with_adaptation: bool,
+    with_radiation: bool,
 ) -> Dict:
     """Returns the marks per node that are selected by the snn simulation.
 
@@ -239,6 +261,24 @@ def get_snn_results(
     the code automatically selects the working node, and returns its
     count in the list.
     """
+    if stage_2_or_4_graph_exists_already(
+        input_graph=input_graph,
+        stage_1_graphs=stage_2_graphs,
+        run_config=run_config,
+        with_adaptation=with_adaptation,
+        with_radiation=with_radiation,
+        stage_index=4,
+    ):
+        # Load stage 4 results from file.
+        stage_4_graph = load_simsnn_graphs(
+            run_config=run_config,
+            input_graph=input_graph,
+            with_adaptation=with_adaptation,
+            with_radiation=with_radiation,
+            stage_index=4,
+        )
+        return stage_4_graph.network.graph.graph["results"]
+
     # Determine why the duration is used here to get a time step.
     if run_config.simulator == "nx":
         sim_duration = get_some_duration(
