@@ -16,7 +16,6 @@ from snncompare.optional_config.Output_config import (
     Zoom,
 )
 from snncompare.run_config.Run_config import Run_config
-from snnradiation.Radiation_damage import verify_radiation_is_applied
 from typeguard import typechecked
 
 from snnalgorithms.get_alg_configs import get_algo_configs
@@ -389,45 +388,6 @@ def get_run_config_and_results_dicts_for_large_test_scope(
             )
             run_config_results[run_config] = original_results_nx_graphs
     return run_config_results, output_config
-
-
-@typechecked
-def overwrite_radiation_with_custom(
-    *, original_results_nx_graphs: Dict, dead_neuron_names: List[str]
-) -> Dict:
-    """Copies the existing adapted graph without radiation, into the
-    rad_adapted_snn_graph, and then applies custom radiation to it."""
-
-    # Create a deep copy from the results dict to prevent
-    # the run_config from working with data changed by
-    # the/a previous run_config.
-    results_nx_graphs = copy.deepcopy(original_results_nx_graphs)
-
-    # Copy adapted graph into radiation graph to overwrite
-    # radiation death. This is because the run_config uses
-    # the seed to set radiation death, whereas this test
-    # requires a specific set (dead_neuron_names) to die.
-    results_nx_graphs["graphs_dict"]["rad_adapted_snn_graph"] = copy.deepcopy(
-        results_nx_graphs["graphs_dict"]["adapted_snn_graph"]
-    )
-    rad_adapted_snn_graph = results_nx_graphs["graphs_dict"][
-        "rad_adapted_snn_graph"
-    ]
-
-    # Apply radiation based on the selected
-    # dead_neuron_names for this run_config.
-    for dead_neuron_name in dead_neuron_names:
-        rad_adapted_snn_graph.nodes[dead_neuron_name]["rad_death"] = True
-        rad_adapted_snn_graph.nodes[dead_neuron_name]["nx_lif"][0].vth.set(
-            9999999999
-        )
-    verify_radiation_is_applied(
-        some_graph=rad_adapted_snn_graph,
-        dead_neuron_names=dead_neuron_names,
-        rad_type="neuron_death",
-    )
-
-    return results_nx_graphs
 
 
 @typechecked
