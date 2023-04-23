@@ -14,6 +14,7 @@ from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
+from simsnn.core.nodes import LIF
 from simsnn.core.simulators import Simulator
 from snncompare.exp_config.Exp_config import Exp_config
 from snncompare.export_plots.create_dash_plot import create_svg_plot
@@ -338,8 +339,11 @@ def get_nx_LIF_count_without_redundancy(
 
     if simulator == "simsnn":
         for node_index, simsnn_node in enumerate(snn.network.nodes):
-            if simsnn_node.name[:8] == "counter_":
-                node_counts[simsnn_node.name] = snn.multimeter.I[t][node_index]
+            if isinstance(simsnn_node, LIF):
+                if simsnn_node.name[:8] == "counter_":
+                    node_counts[simsnn_node.name] = snn.multimeter.I[t][
+                        node_index
+                    ]
     elif simulator == "nx":
         for node_index in range(0, len(input_graph)):
             node_counts[f"counter_{node_index}"] = int(
@@ -473,10 +477,11 @@ def add_redundant_counter_node_counts(
             for simsnn_index, simsnn_node in enumerate(
                 adapted_nx_snn_graph.network.nodes
             ):
-                if simsnn_node.name == red_node_name:
-                    snn_counter_marks[
-                        red_node_name
-                    ] = adapted_nx_snn_graph.multimeter.I[t][simsnn_index]
+                if isinstance(simsnn_node, LIF):
+                    if simsnn_node.name == red_node_name:
+                        snn_counter_marks[
+                            red_node_name
+                        ] = adapted_nx_snn_graph.multimeter.I[t][simsnn_index]
         else:
             raise NotImplementedError(f"Error, {simulator} not implemented.")
 
