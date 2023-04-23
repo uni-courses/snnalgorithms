@@ -8,7 +8,6 @@ from typing import Dict, List, Union
 
 import networkx as nx
 from snncompare.export_plots.create_dash_plot import create_svg_plot
-from snncompare.export_results.helper import run_config_to_filename
 from snncompare.optional_config.Output_config import Output_config
 from snncompare.run_config.Run_config import Run_config
 from typeguard import typechecked
@@ -55,12 +54,8 @@ def assert_no_duplicate_spikes_in_adapted_network(
                         )
 
                         # Visualise the snn behaviour
-                        run_config_filename = run_config_to_filename(
-                            run_config_dict=run_config.__dict__
-                        )
 
                         create_svg_plot(
-                            run_config_filename=run_config_filename,
                             graph_names=["adapted_snn_graph"],
                             graphs=graphs_dict,
                             output_config=output_config,

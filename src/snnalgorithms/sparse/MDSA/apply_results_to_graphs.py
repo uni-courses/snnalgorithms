@@ -20,7 +20,6 @@ from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_plots.temp_default_output_creation import (
     create_default_output_config,
 )
-from snncompare.export_results.helper import run_config_to_filename
 from snncompare.helper import (
     get_some_duration,
     get_with_adaptation_bool,
@@ -191,9 +190,6 @@ def assert_valid_results(
             print("So printing the behaviour.\n\n")
 
             # Visualise the snn behaviour
-            run_config_filename = run_config_to_filename(
-                run_config_dict=run_config.__dict__
-            )
 
             if "hover_info" not in output_config.__dict__.keys():
                 output_config = create_default_output_config(
@@ -212,7 +208,6 @@ def assert_valid_results(
                 "vth",
             ]
             create_svg_plot(
-                run_config_filename=run_config_filename,
                 graph_names=[graph_name],
                 graphs=graphs_dict,
                 output_config=output_config,

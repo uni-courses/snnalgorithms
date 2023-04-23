@@ -8,7 +8,6 @@ from snncompare.exp_config.Exp_config import Exp_config
 from snncompare.Experiment_runner import Experiment_runner
 from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_plots.Plot_config import get_default_plot_config
-from snncompare.export_results.helper import run_config_to_filename
 from snncompare.optional_config.Output_config import (
     Extra_storing_config,
     Hover_info,
@@ -110,12 +109,8 @@ def perform_verification_for_each_spike_time(
             print(f"Error, t={t}, red={range(1,max_redundancy)}: nodes:")
             print(red_neuron_names)
             print(f"don't take over from:{dead_neuron_name}.")
-            run_config_filename = run_config_to_filename(
-                run_config_dict=run_config.__dict__
-            )
 
             create_svg_plot(
-                run_config_filename=run_config_filename,
                 graph_names=["adapted_snn_graph", "rad_adapted_snn_graph"],
                 graphs=graphs_dict,
                 output_config=output_config,
