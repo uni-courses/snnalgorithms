@@ -7,7 +7,7 @@ import sys
 import setuptools
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
-sys.path.insert(1, os.path.join(os.path.dirname(__file__), "tests"))
+# sys.path.insert(1, os.path.join(os.path.dirname(__file__), "tests"))
 
 install_requires = [
     "lava @ https://github.com/a-t-0/lava/archive/refs/tags/v0.5.1.tar.gz",
