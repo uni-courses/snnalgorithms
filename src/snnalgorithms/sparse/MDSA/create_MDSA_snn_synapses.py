@@ -21,10 +21,12 @@ def create_MDSA_synapses(
     )
 
     # Create spike_once nodes.
-    for _ in input_graph.nodes:
-        create_outgoing_spike_once_synapses(
-            input_graph=input_graph, mdsa_snn=mdsa_snn
-        )
+    # TODO: verify this should be repeated for each node index.
+    # for node_index in input_graph.nodes:
+    #    print(f'node_index={node_index}')
+    create_outgoing_spike_once_synapses(
+        input_graph=input_graph, mdsa_snn=mdsa_snn
+    )
 
     create_degree_receiver_selector_synapses(
         input_graph=input_graph,
