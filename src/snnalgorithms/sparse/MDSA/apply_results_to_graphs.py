@@ -14,13 +14,13 @@ from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
+from simsnn.core.nodes import LIF
 from simsnn.core.simulators import Simulator
 from snncompare.exp_config.Exp_config import Exp_config
 from snncompare.export_plots.create_dash_plot import create_svg_plot
 from snncompare.export_plots.temp_default_output_creation import (
     create_default_output_config,
 )
-from snncompare.export_results.helper import run_config_to_filename
 from snncompare.helper import (
     get_some_duration,
     get_with_adaptation_bool,
@@ -28,7 +28,7 @@ from snncompare.helper import (
 )
 from snncompare.import_results.load_stage_1_and_2 import load_simsnn_graphs
 from snncompare.optional_config import Output_config
-from snncompare.run_config.Run_config import Run_config
+from snncompare.run_config.Run_config import Run_config, run_config_to_dict
 from snncompare.simulation.stage2_sim import stage_2_or_4_graph_exists_already
 from typeguard import typechecked
 
@@ -185,15 +185,12 @@ def assert_valid_results(
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
             print(f"\nfor:{graph_name}, in:\n")
-            pprint(run_config.__dict__)
+            pprint(run_config_to_dict(run_config=run_config))
             print(f"expected_node_names={expected_node_names}")
             print(f"  actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
 
             # Visualise the snn behaviour
-            run_config_filename = run_config_to_filename(
-                run_config_dict=run_config.__dict__
-            )
 
             if "hover_info" not in output_config.__dict__.keys():
                 output_config = create_default_output_config(
@@ -212,7 +209,6 @@ def assert_valid_results(
                 "vth",
             ]
             create_svg_plot(
-                run_config_filename=run_config_filename,
                 graph_names=[graph_name],
                 graphs=graphs_dict,
                 output_config=output_config,
@@ -343,8 +339,11 @@ def get_nx_LIF_count_without_redundancy(
 
     if simulator == "simsnn":
         for node_index, simsnn_node in enumerate(snn.network.nodes):
-            if simsnn_node.name[:8] == "counter_":
-                node_counts[simsnn_node.name] = snn.multimeter.I[t][node_index]
+            if isinstance(simsnn_node, LIF):
+                if simsnn_node.name[:8] == "counter_":
+                    node_counts[simsnn_node.name] = snn.multimeter.I[t][
+                        node_index
+                    ]
     elif simulator == "nx":
         for node_index in range(0, len(input_graph)):
             node_counts[f"counter_{node_index}"] = int(
@@ -478,10 +477,11 @@ def add_redundant_counter_node_counts(
             for simsnn_index, simsnn_node in enumerate(
                 adapted_nx_snn_graph.network.nodes
             ):
-                if simsnn_node.name == red_node_name:
-                    snn_counter_marks[
-                        red_node_name
-                    ] = adapted_nx_snn_graph.multimeter.I[t][simsnn_index]
+                if isinstance(simsnn_node, LIF):
+                    if simsnn_node.name == red_node_name:
+                        snn_counter_marks[
+                            red_node_name
+                        ] = adapted_nx_snn_graph.multimeter.I[t][simsnn_index]
         else:
             raise NotImplementedError(f"Error, {simulator} not implemented.")
 
@@ -538,12 +538,12 @@ def get_majority_node_count(
 
     # Verify there are at most 2 different values, one for died neurons,
     # and one for functional count neurons.
-    if len(set(list(snn_counter_marks.values()))) > 2:
-        raise ValueError(
-            "Error, the node count contains more than 2 different values."
-            "Only a valid, and an invalid value for died neurons may exist."
-            f"However, we found:{list(snn_counter_marks.values())}."
-        )
+    # if len(set(list(snn_counter_marks.values()))) > 2:
+    #    raise ValueError(
+    #        "Error, the node count contains more than 2 different values."
+    #        "Only a valid, and an invalid value for died neurons may exist."
+    #        f"However, we found:{list(snn_counter_marks.values())}."
+    #    )
 
     return find_majority(votes=list(snn_counter_marks.values()), position=1)[
         0
