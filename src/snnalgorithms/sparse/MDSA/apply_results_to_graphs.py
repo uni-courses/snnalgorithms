@@ -300,13 +300,20 @@ def get_snn_results(
             t=final_timestep,
         )
     else:
-        snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph=input_graph,
-            adapted_nx_snn_graph=snn_graph,
-            red_level=run_config.adaptation["redundancy"],
-            simulator=run_config.simulator,
-            t=final_timestep,
-        )
+        # TODO: support different adaptation types.
+        if run_config.adaptation.adaptation_type == "redundancy":
+            snn_counter_marks = get_nx_LIF_count_with_redundancy(
+                input_graph=input_graph,
+                adapted_nx_snn_graph=snn_graph,
+                red_level=run_config.adaptation.redundancy,
+                simulator=run_config.simulator,
+                t=final_timestep,
+            )
+        else:
+            raise NotImplementedError(
+                "Error, did not yet implement: "
+                + f"{run_config.adaptation.adaptation_type}."
+            )
 
     # Compare the two performances.
     if alipour_counter_marks == snn_counter_marks:

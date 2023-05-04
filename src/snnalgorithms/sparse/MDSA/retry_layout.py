@@ -172,7 +172,7 @@ def get_node_position(
     if run_config.adaptation is None:
         redundancy = 0
     else:
-        redundancy = run_config.adaptation["redundancy"]
+        redundancy = run_config.adaptation.redundancy
 
     if degree_indices is not None:
         if identifiers[0].description != "node_index":
