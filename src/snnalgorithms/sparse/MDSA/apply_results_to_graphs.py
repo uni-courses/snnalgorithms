@@ -317,6 +317,12 @@ def get_snn_results(
                 simulator=run_config.simulator,
                 t=final_timestep,
             )
+            pprint(snn_counter_marks)
+            # Normalise the scores by dividing by the population size.
+            for neuron_name, count in snn_counter_marks.items():
+                snn_counter_marks[neuron_name] = count / (
+                    run_config.adaptation.redundancy + 1
+                )
         else:
             raise NotImplementedError(
                 "Error, did not yet implement: "
