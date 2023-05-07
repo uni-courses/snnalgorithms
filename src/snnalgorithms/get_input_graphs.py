@@ -3,13 +3,112 @@ import json
 import random
 from itertools import combinations
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
+import customshowme
 import networkx as nx
-from snncompare.export_results.output_stage1_configs_and_input_graph import (
+from snncompare.exp_config import Exp_config
+from snncompare.graph_generation.export_input_graphs import (
     get_input_graph_output_filepath,
+    output_input_graph_if_not_exist,
 )
 from snncompare.import_results.helper import get_isomorphic_graph_hash
+from typeguard import typechecked
+
+from snnalgorithms.sparse.MDSA.SNN_initialisation_properties import (
+    SNN_initialisation_properties,
+)
+
+
+@customshowme.time
+def create_mdsa_input_graphs_from_exp_config(
+    exp_config: Exp_config,
+) -> Dict[str, nx.Graph]:
+    """Finds the maximum number of graphs per input size, for the MDSA
+    algorithm and creates that many unique input graphs.
+
+    Then outputs these.
+    """
+
+    if "MDSA" in exp_config.algorithms.keys():
+        for graph_size, nr_of_graphs in exp_config.size_and_max_graphs:
+            input_graphs: Dict[str, nx.Graph] = generate_mdsa_input_graphs(
+                graph_size=graph_size,
+                max_nr_of_graphs=nr_of_graphs,
+                seeds=exp_config.seeds,
+            )
+            for input_graph in input_graphs.values():
+                output_input_graph_if_not_exist(input_graph=input_graph)
+        return input_graphs
+    raise NotImplementedError("Error, algorithm not (yet) supported.")
+
+
+@typechecked
+def generate_mdsa_input_graphs(
+    *,
+    graph_size: int,
+    max_nr_of_graphs: int,
+    seeds: List[int],
+) -> Dict[str, nx.Graph]:
+    """Removes graphs that are not used, because of a maximum nr of graphs that
+    is to be evaluated.
+
+    TODO: export the input graphs to a pickle.
+    Use the experiment config to generate the minimum number of required input
+     graphs per graph size.
+    """
+    # Generate the input graphs.
+    cum_input_graphs: Dict[str, nx.Graph] = {}
+    for seed in seeds:
+        # TODO: duplicate seeds are explored this way in
+        # get_rand_planar_triangle_free_graph, if the seeds are consequitive.
+        # This is because a new psuedo-random seed is created with
+        # seed+graph_nr.
+        # TODO: rewrite to only pass unique seeds.
+        input_graphs: Dict[
+            str, nx.Graph
+        ] = get_rand_planar_triangle_free_graph(
+            density_cutoff=0.01,
+            max_nr_of_graphs=max_nr_of_graphs + 1,
+            seed=seed,
+            size=graph_size,
+        )
+        for input_graph_hash, input_graph in input_graphs.items():
+            # pylint: disable=C0201
+            if input_graph_hash not in cum_input_graphs.keys():
+                cum_input_graphs[input_graph_hash] = input_graph
+
+        if len(cum_input_graphs.values()) >= max_nr_of_graphs:
+            break
+
+    if len(cum_input_graphs.values()) < max_nr_of_graphs:
+        raise ValueError(
+            f"For input_graph of size:{graph_size}, I found:"
+            + f"{len(cum_input_graphs)} graphs, yet expected graph_nr:"
+            + f"{max_nr_of_graphs}. Please lower the max_graphs setting in:"
+            + "size_and_max_graphs in the experiment configuration."
+        )
+    return input_graphs
+
+
+def add_mdsa_initialisation_properties_to_input_graph(
+    input_graph: nx.Graph, seed: int
+) -> None:
+    """Adds the initialisation properties into an input graph."""
+
+    # Add the algorithm properties for the MDSA algorithm into the
+    # input graphs as a dictionary. These properties are: the random
+    # numbers that are used for the graph initialisation.
+    if "alg_props" not in input_graph.graph.keys():
+        input_graph.graph["alg_props"] = SNN_initialisation_properties(
+            input_graph, seed
+        ).__dict__
+
+    if not isinstance(input_graph, nx.Graph):
+        raise TypeError(
+            "Error, the input graph is not a networkx graph:"
+            + f"{type(input_graph)}"
+        )
 
 
 def triangle_free_graph(size: int, seed: int) -> nx.Graph:
