@@ -10,6 +10,7 @@ import networkx as nx
 from snncompare.exp_config import Exp_config
 from snncompare.graph_generation.export_input_graphs import (
     get_input_graph_output_filepath,
+    has_outputted_input_graph_for_graph_size_and_nr,
     output_input_graph_if_not_exist,
 )
 from snncompare.import_results.helper import get_isomorphic_graph_hash
@@ -23,7 +24,7 @@ from snnalgorithms.sparse.MDSA.SNN_initialisation_properties import (
 @customshowme.time
 def create_mdsa_input_graphs_from_exp_config(
     exp_config: Exp_config,
-) -> Dict[str, nx.Graph]:
+) -> None:
     """Finds the maximum number of graphs per input size, for the MDSA
     algorithm and creates that many unique input graphs.
 
@@ -32,15 +33,18 @@ def create_mdsa_input_graphs_from_exp_config(
 
     if "MDSA" in exp_config.algorithms.keys():
         for graph_size, nr_of_graphs in exp_config.size_and_max_graphs:
-            input_graphs: Dict[str, nx.Graph] = generate_mdsa_input_graphs(
-                graph_size=graph_size,
-                max_nr_of_graphs=nr_of_graphs,
-                seeds=exp_config.seeds,
-            )
-            for input_graph in input_graphs.values():
-                output_input_graph_if_not_exist(input_graph=input_graph)
-        return input_graphs
-    raise NotImplementedError("Error, algorithm not (yet) supported.")
+            if not has_outputted_input_graph_for_graph_size_and_nr(
+                graph_size=graph_size, graph_nr=nr_of_graphs - 1
+            ):
+                input_graphs: Dict[str, nx.Graph] = generate_mdsa_input_graphs(
+                    graph_size=graph_size,
+                    max_nr_of_graphs=nr_of_graphs,
+                    seeds=exp_config.seeds,
+                )
+                for input_graph in input_graphs.values():
+                    output_input_graph_if_not_exist(input_graph=input_graph)
+    else:
+        raise NotImplementedError("Error, algorithm not (yet) supported.")
 
 
 @typechecked
