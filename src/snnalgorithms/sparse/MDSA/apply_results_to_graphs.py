@@ -148,8 +148,10 @@ def set_mdsa_snn_results(
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
             # TODO: verify the results are set correctly.
-            print(f"graph_name={graph_name}")
-            pprint(graph_attributes["results"])
+
+            # TODO: print side by side.
+            # print(f"graph_name={graph_name}")
+            # pprint(graph_attributes["results"])
 
 
 # @typechecked # TODO: restore.
@@ -317,7 +319,6 @@ def get_snn_results(
                 simulator=run_config.simulator,
                 t=final_timestep,
             )
-            pprint(snn_counter_marks)
             # Normalise the scores by dividing by the population size.
             for neuron_name, count in snn_counter_marks.items():
                 snn_counter_marks[neuron_name] = count / (
