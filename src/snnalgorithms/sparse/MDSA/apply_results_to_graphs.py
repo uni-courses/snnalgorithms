@@ -150,8 +150,8 @@ def set_mdsa_snn_results(
             # TODO: verify the results are set correctly.
 
             # TODO: print side by side.
-            # print(f"graph_name={graph_name}")
-            # pprint(graph_attributes["results"])
+            print(f"graph_name={graph_name}")
+            pprint(graph_attributes["results"])
 
 
 # @typechecked # TODO: restore.
@@ -558,15 +558,8 @@ def get_majority_node_count(
         for node_name in remove_node_names:
             snn_counter_marks.pop(node_name)
 
-    # Verify there are at most 2 different values, one for died neurons,
-    # and one for functional count neurons.
-    # if len(set(list(snn_counter_marks.values()))) > 2:
-    #    raise ValueError(
-    #        "Error, the node count contains more than 2 different values."
-    #        "Only a valid, and an invalid value for died neurons may exist."
-    #        f"However, we found:{list(snn_counter_marks.values())}."
-    #    )
-
+    if not snn_counter_marks:
+        return 0  # If no votes are found, return 0 as default count.
     return find_majority(votes=list(snn_counter_marks.values()), position=1)[
         0
     ]  # Return value that occurred most.
