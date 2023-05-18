@@ -149,10 +149,6 @@ def set_mdsa_snn_results(
                 raise ValueError(f"Invalid graph name:{graph_name}")
             # TODO: verify the results are set correctly.
 
-            # TODO: print side by side.
-            print(f"graph_name={graph_name}")
-            pprint(graph_attributes["results"])
-
 
 # @typechecked # TODO: restore.
 def assert_valid_results(
