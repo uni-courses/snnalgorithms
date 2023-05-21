@@ -167,7 +167,7 @@ def get_node_position(
         sum_height: float = (
             get_cumulative_starting_height(  # type:ignore[arg-type]
                 degree_indices=degree_indices,
-                dy_node=plot_config.y_node_spacer,
+                dy_node=plot_config.y_degree_receiver_spacing,
                 node_index=identifiers[0].value,
                 node_redundancy=redundancy,
                 plot_config=plot_config,
