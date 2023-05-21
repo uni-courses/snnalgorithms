@@ -30,7 +30,7 @@ def get_cumulative_starting_height(
         return 0.0
     sum_height: float = 0
     for i in range(0, node_index):
-        sum_height += 1 * dy_node + plot_config.dy_redundant * (
+        sum_height += 1 * dy_node + plot_config.redundancy_radius * (
             node_redundancy + (degree_indices[i] - 1)
         )
     return sum_height
@@ -76,7 +76,7 @@ def degree_receiver_xy(
     y = (
         sum_height
         # TODO: change to radius spacing per degree receiver.
-        + degree_index_per_circuit * plot_config.dy_redundant
+        + degree_index_per_circuit * plot_config.y_degree_receiver_spacing
     )
     return x, y
 
@@ -107,7 +107,6 @@ def counter_xy(
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a counter node."""
     x = dx_node * (5 + 2 * m_val_max)
-    # y = dy_node * node_index + plot_config.dy_redundant * node_redundancy
     y = sum_height
     return x, y
 
@@ -174,8 +173,12 @@ def get_node_position(
             )
         )
 
-    dx_node = redundancy * plot_config.dx_redundant + plot_config.x_node_spacer
-    dy_node = redundancy * plot_config.dx_redundant + plot_config.x_node_spacer
+    dx_node = (
+        redundancy * plot_config.redundancy_radius + plot_config.x_node_spacer
+    )
+    dy_node = (
+        redundancy * plot_config.redundancy_radius + plot_config.x_node_spacer
+    )
 
     # At most n-1 degree_receivers per node (circuit).
     # Put them above each other in a circuit.
