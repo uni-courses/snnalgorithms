@@ -173,7 +173,6 @@ def get_node_position(
         redundancy = 0
     else:
         redundancy = run_config.adaptation.redundancy
-        raise SyntaxError("Error, did not expect to need this.")
 
     if degree_indices is not None:
         if identifiers[0].description != "node_index":
