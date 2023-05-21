@@ -10,7 +10,6 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
-from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -28,7 +27,7 @@ from snncompare.helper import (
 )
 from snncompare.import_results.load_stage_1_and_2 import load_simsnn_graphs
 from snncompare.optional_config import Output_config
-from snncompare.run_config.Run_config import Run_config, print_run_config_dict
+from snncompare.run_config.Run_config import Run_config
 from snncompare.simulation.stage2_sim import stage_2_or_4_graph_exists_already
 from typeguard import typechecked
 
@@ -183,7 +182,7 @@ def assert_valid_results(
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
             print(f"\nfor:{graph_name}, in:\n")
-            pprint(print_run_config_dict(run_config=run_config))
+            run_config.print_run_config_dict()
             print(f"expected_node_names={expected_node_names}")
             print(f"  actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
