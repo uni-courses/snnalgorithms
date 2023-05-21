@@ -192,9 +192,6 @@ def get_node_position(
 
     # At most n-1 degree_receivers per node (circuit).
     # Put them above each other in a circuit.
-    # dy_node = (
-    # graph_size - 1 + redundancy
-    # ) * plot_config.dy_redundant + plot_config.y_node_spacer
 
     if node_name == "spike_once":
         return spike_once_xy(
