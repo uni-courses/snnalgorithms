@@ -76,3 +76,12 @@ class MDSA:
                     "Error, the maximum supported value for m_vals is:"
                     + f"{self.min_m_vals}, yet we found:{m_vals}"
                 )
+
+
+def get_algorithm_setting_name(algorithm_setting: Dict) -> str:
+    """Converts an algorithm dict with an algorithm name, parameter name and
+    parameter value, into a single algorithm setting name."""
+    alg_name: str = list(algorithm_setting.keys())[0]
+    alg_param: int = list(algorithm_setting.values())[0]["m_val"]
+    algorithm_name: str = f"{alg_name}_{alg_param}"
+    return algorithm_name
