@@ -227,7 +227,6 @@ def assert_valid_results(
         )
 
     if verbose:
-        print("")
         for node_index, expected_count in expected_node_names.items():
             print(
                 f"{graph_name}: node_index:{node_index}, ali-mark:"
