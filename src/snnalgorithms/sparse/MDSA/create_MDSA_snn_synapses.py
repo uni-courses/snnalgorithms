@@ -311,14 +311,12 @@ def create_degree_to_degree_synapses(
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
 ) -> nx.DiGraph:
-    """
+    """:param G: The original graph on which the MDSA algorithm is ran.
 
-    :param G: The original graph on which the MDSA algorithm is ran.
     :param get_degree: Graph with the MDSA SNN approximation solution.
     :param m: The amount of approximation iterations used in the MDSA
-     approximation.
+        approximation.
     :param rand_ceil: Ceiling of the range in which rand nrs can be generated.
-
     """
     # pylint: disable=R0913
     # Currently no method is found to reduce the 6/5 nested blocks.
