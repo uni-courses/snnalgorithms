@@ -225,6 +225,7 @@ def assert_valid_results(
                 "v",
                 "vth",
             ]
+
             create_svg_plot(
                 graph_names=[graph_name],
                 graphs=graphs_dict,

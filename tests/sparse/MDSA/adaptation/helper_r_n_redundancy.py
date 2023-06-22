@@ -62,7 +62,6 @@ def assert_n_redundant_neuron_takes_over(
 
                             if "degree_receiver" not in node_name:
                                 # Visualise the snn behaviour
-
                                 create_svg_plot(
                                     graph_names=[
                                         "adapted_snn_graph",
