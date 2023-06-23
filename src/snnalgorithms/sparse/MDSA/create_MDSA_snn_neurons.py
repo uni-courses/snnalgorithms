@@ -156,7 +156,6 @@ def create_connector_node(
         get_node_position(
             node_name="connecting",
             identifiers=[],
-            node_redundancy=0,
             plot_config=plot_config,
             run_config=run_config,
         )
@@ -197,7 +196,6 @@ def create_spike_once_node(
                 node_name="spike_once",
                 plot_config=plot_config,
                 identifiers=identifiers,
-                node_redundancy=0,
                 run_config=run_config,
                 degree_indices=degree_indices,
             )
@@ -257,7 +255,6 @@ def create_degree_receiver_node(
                             node_name="degree_receiver",
                             plot_config=plot_config,
                             identifiers=identifiers,
-                            node_redundancy=0,
                             run_config=run_config,
                             m_val_max=run_config.algorithm["MDSA"]["m_val"],
                             degree_index=degree_index,
@@ -321,7 +318,6 @@ def create_rand_node(
                 node_name="rand",
                 plot_config=plot_config,
                 identifiers=identifiers,
-                node_redundancy=0,
                 run_config=run_config,
                 degree_indices=degree_indices,
             )
@@ -378,7 +374,6 @@ def create_selector_node(
                     node_name="selector",
                     identifiers=identifiers,
                     plot_config=plot_config,
-                    node_redundancy=0,
                     run_config=run_config,
                     m_val_max=run_config.algorithm["MDSA"]["m_val"],
                     degree_indices=degree_indices,
@@ -423,7 +418,6 @@ def create_counter_node(
                 node_name="counter",
                 plot_config=plot_config,
                 identifiers=identifiers,
-                node_redundancy=0,
                 run_config=run_config,
                 m_val_max=run_config.algorithm["MDSA"]["m_val"],
                 degree_indices=degree_indices,
@@ -466,7 +460,6 @@ def create_next_round_node(
                 node_name="next_round",
                 plot_config=plot_config,
                 identifiers=identifiers,
-                node_redundancy=0,
                 run_config=run_config,
                 # m_val=m_val - 1,
                 m_val_max=run_config.algorithm["MDSA"]["m_val"] + 1,
@@ -503,7 +496,6 @@ def create_terminator_node(
             node_name="terminator",
             plot_config=plot_config,
             identifiers=[],
-            node_redundancy=0,
             run_config=run_config,
             m_val_max=run_config.algorithm["MDSA"]["m_val"],
         )

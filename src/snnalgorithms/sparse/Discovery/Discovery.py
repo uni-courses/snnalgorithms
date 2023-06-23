@@ -346,8 +346,7 @@ class Discovery_algo:
     ) -> None:
         """Creates an input spike neuron if a_in_time is larger than 0.
 
-        If
-        a_in_time== 0, then no input spike is given, nor verified.
+        If a_in_time== 0, then no input spike is given, nor verified.
         """
         # Create input neuron.
         input_neuron = LIF_neuron(

@@ -21,10 +21,12 @@ def create_MDSA_synapses(
     )
 
     # Create spike_once nodes.
-    for _ in input_graph.nodes:
-        create_outgoing_spike_once_synapses(
-            input_graph=input_graph, mdsa_snn=mdsa_snn
-        )
+    # TODO: verify this should be repeated for each node index.
+    # for node_index in input_graph.nodes:
+    #    print(f'node_index={node_index}')
+    create_outgoing_spike_once_synapses(
+        input_graph=input_graph, mdsa_snn=mdsa_snn
+    )
 
     create_degree_receiver_selector_synapses(
         input_graph=input_graph,
@@ -311,14 +313,12 @@ def create_degree_to_degree_synapses(
     mdsa_snn: nx.DiGraph,
     run_config: Run_config,
 ) -> nx.DiGraph:
-    """
+    """:param G: The original graph on which the MDSA algorithm is ran.
 
-    :param G: The original graph on which the MDSA algorithm is ran.
     :param get_degree: Graph with the MDSA SNN approximation solution.
     :param m: The amount of approximation iterations used in the MDSA
-     approximation.
+        approximation.
     :param rand_ceil: Ceiling of the range in which rand nrs can be generated.
-
     """
     # pylint: disable=R0913
     # Currently no method is found to reduce the 6/5 nested blocks.

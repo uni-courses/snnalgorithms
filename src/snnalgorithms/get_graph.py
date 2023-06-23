@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import random
 from itertools import combinations, groupby
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import networkx as nx
 import numpy as np
@@ -12,7 +12,7 @@ from networkx.classes.digraph import DiGraph
 from numpy import ndarray
 from snnbackends.networkx.LIF_neuron import LIF_neuron
 from snncompare.export_plots.plot_graphs import plot_circular_graph
-from typeguard import TYPE_CHECKING, typechecked
+from typeguard import typechecked
 
 if TYPE_CHECKING:
     from snncompare.tests.test_scope import Long_scope_of_tests
@@ -57,9 +57,6 @@ def gnp_random_connected_graph(
     """Generates a random undirected graph, similarly to an Erdős-Rényi graph,
     but enforcing that the resulting graph is connected.
 
-    :param density: param size:
-    :param test_scope:
-    :param recurrent_density:
     :param size: Nr of nodes in the original graph on which test is ran.
     """
     random.seed(test_scope.seed)
@@ -109,8 +106,6 @@ def add_random_recurrent_edges(
     """Adds random recurrent edges.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param recurrent_edge_density:
-    :param test_scope:
     """
 
     # Use the recurrent_edge_density to get amount of True values.
@@ -153,10 +148,6 @@ def set_random_edge_weights(
     graph.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param min_weight:
-    :param max_weight:
-    :param seed:
-    :param min_weight:
     :param seed: The value of the random seed used for this test.
     """
 
@@ -185,7 +176,6 @@ def set_rand_neuron_properties(
     neuron with random value within predetermined ranges.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param test_scope:
     """
     biases = get_list_with_rand_floats_in_range(
         min_val=test_scope.min_bias,
@@ -226,9 +216,6 @@ def get_list_with_rand_ints_in_range(
     """Generates and returns a list with random integers in range [min,max] of
     length length.
 
-    :param min_val: param max_val:
-    :param length: param seed:
-    :param max_val:
     :param seed: The value of the random seed used for this test.
     """
     # Specify random seed.
@@ -249,9 +236,6 @@ def get_list_with_rand_floats_in_range(
     """Generates and returns a list with random integers in range [min,max] of
     length length.
 
-    :param min_val: param max_val:
-    :param length: param seed:
-    :param max_val:
     :param seed: The value of the random seed used for this test.
     """
     # Specify random seed.
@@ -269,9 +253,6 @@ def get_list_with_rand_bools(
     """Generates and returns a list with random booleans of length length. The
     amount of True values is determined by: recurrent_edge_density*length.
 
-    :param min_val: param max_val:
-    :param length: param seed:
-    :param recurrent_edge_density:
     :param seed: The value of the random seed used for this test.
     """
     # Specify random seed.

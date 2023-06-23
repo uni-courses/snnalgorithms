@@ -54,7 +54,6 @@ def assert_no_duplicate_spikes_in_adapted_network(
                         )
 
                         # Visualise the snn behaviour
-
                         create_svg_plot(
                             graph_names=["adapted_snn_graph"],
                             graphs=graphs_dict,

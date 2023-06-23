@@ -28,7 +28,7 @@ from snncompare.helper import (
 )
 from snncompare.import_results.load_stage_1_and_2 import load_simsnn_graphs
 from snncompare.optional_config import Output_config
-from snncompare.run_config.Run_config import Run_config, run_config_to_dict
+from snncompare.run_config.Run_config import Run_config
 from snncompare.simulation.stage2_sim import stage_2_or_4_graph_exists_already
 from typeguard import typechecked
 
@@ -147,9 +147,27 @@ def set_mdsa_snn_results(
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
-            # TODO: verify the results are set correctly.
-            print(f"graph_name={graph_name}")
-            pprint(graph_attributes["results"])
+
+    # TODO: verify the results are set correctly.
+
+
+# @typechecked # TODO: restore.
+def print_mdsa_snn_results(
+    *,
+    stage_2_graphs: Dict,
+    desired_graph_name: str,
+    verbose: Optional[bool] = False,
+) -> None:
+    """Print snn results."""
+    if verbose:
+        for graph_name, snn in stage_2_graphs.items():
+            if graph_name == desired_graph_name:
+                if isinstance(snn, Simulator):
+                    graph_attributes = snn.network.graph.graph
+                else:
+                    graph_attributes = snn.graph
+                print(f"graph_name={graph_name}")
+                pprint(graph_attributes["results"])
 
 
 # @typechecked # TODO: restore.
@@ -185,7 +203,7 @@ def assert_valid_results(
     for key in expected_node_names.keys():
         if expected_node_names[key] != copy_actual_node_names[key]:
             print(f"\nfor:{graph_name}, in:\n")
-            pprint(run_config_to_dict(run_config=run_config))
+            run_config.print_run_config_dict()
             print(f"expected_node_names={expected_node_names}")
             print(f"  actual_node_names={copy_actual_node_names}")
             print("So printing the behaviour.\n\n")
@@ -208,6 +226,7 @@ def assert_valid_results(
                 "v",
                 "vth",
             ]
+
             create_svg_plot(
                 graph_names=[graph_name],
                 graphs=graphs_dict,
@@ -230,7 +249,6 @@ def assert_valid_results(
         )
 
     if verbose:
-        print("")
         for node_index, expected_count in expected_node_names.items():
             print(
                 f"{graph_name}: node_index:{node_index}, ali-mark:"
@@ -300,13 +318,33 @@ def get_snn_results(
             t=final_timestep,
         )
     else:
-        snn_counter_marks = get_nx_LIF_count_with_redundancy(
-            input_graph=input_graph,
-            adapted_nx_snn_graph=snn_graph,
-            red_level=run_config.adaptation["redundancy"],
-            simulator=run_config.simulator,
-            t=final_timestep,
-        )
+        # TODO: support different adaptation types.
+        if run_config.adaptation.adaptation_type == "redundancy":
+            snn_counter_marks = get_nx_LIF_count_with_redundancy(
+                input_graph=input_graph,
+                adapted_nx_snn_graph=snn_graph,
+                red_level=run_config.adaptation.redundancy,
+                simulator=run_config.simulator,
+                t=final_timestep,
+            )
+        elif run_config.adaptation.adaptation_type == "population":
+            snn_counter_marks = get_nx_LIF_count_with_redundancy(
+                input_graph=input_graph,
+                adapted_nx_snn_graph=snn_graph,
+                red_level=run_config.adaptation.redundancy,
+                simulator=run_config.simulator,
+                t=final_timestep,
+            )
+            # Normalise the scores by dividing by the population size.
+            for neuron_name, count in snn_counter_marks.items():
+                snn_counter_marks[neuron_name] = count / (
+                    run_config.adaptation.redundancy + 1
+                )
+        else:
+            raise NotImplementedError(
+                "Error, did not yet implement: "
+                + f"{run_config.adaptation.adaptation_type}."
+            )
 
     # Compare the two performances.
     if alipour_counter_marks == snn_counter_marks:
@@ -325,14 +363,11 @@ def get_nx_LIF_count_without_redundancy(
     t: int,
 ) -> Dict:
     """Creates a dictionary with the node name and the the current as node
-    count.
-
-    # TODO: build support for Lava NX neuron.
+    count. # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
-    approximation.
+        approximation.
     """
     # Initialise the node counts
     node_counts = {}
@@ -371,9 +406,8 @@ def get_nx_LIF_count_with_redundancy(
     # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
-    approximation.
+        approximation.
     """
     # Initialise the node counts.
     node_counts: Dict = {}
@@ -536,15 +570,8 @@ def get_majority_node_count(
         for node_name in remove_node_names:
             snn_counter_marks.pop(node_name)
 
-    # Verify there are at most 2 different values, one for died neurons,
-    # and one for functional count neurons.
-    # if len(set(list(snn_counter_marks.values()))) > 2:
-    #    raise ValueError(
-    #        "Error, the node count contains more than 2 different values."
-    #        "Only a valid, and an invalid value for died neurons may exist."
-    #        f"However, we found:{list(snn_counter_marks.values())}."
-    #    )
-
+    if not snn_counter_marks:
+        return 0  # If no votes are found, return 0 as default count.
     return find_majority(votes=list(snn_counter_marks.values()), position=1)[
         0
     ]  # Return value that occurred most.
@@ -585,7 +612,7 @@ def counter_neuron_died(
 
 @typechecked
 def graph_has_dead_neurons(*, snn_graph: nx.DiGraph) -> bool:
-    """Checks whether the "rad_death" key is in any of the nodes of the graph,
+    """Checks whether the 'rad_death' key is in any of the nodes of the graph,
     and if it is, verifies it is in all of the nodes."""
     rad_death_found = False
     for node_name in snn_graph.nodes:
