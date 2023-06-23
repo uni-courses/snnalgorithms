@@ -10,6 +10,7 @@ These results are returned in the form of a dict.
 """
 import copy
 from collections import Counter
+from pprint import pprint
 from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
@@ -149,6 +150,7 @@ def set_mdsa_snn_results(
 
     # TODO: verify the results are set correctly.
 
+
 # @typechecked # TODO: restore.
 def print_mdsa_snn_results(
     *,
@@ -166,6 +168,7 @@ def print_mdsa_snn_results(
                     graph_attributes = snn.graph
                 print(f"graph_name={graph_name}")
                 pprint(graph_attributes["results"])
+
 
 # @typechecked # TODO: restore.
 def assert_valid_results(
