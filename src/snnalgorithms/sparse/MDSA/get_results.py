@@ -20,13 +20,11 @@ def get_neumann_results(
     seed: int,
     size: int,
 ) -> Dict[str, int]:
-    """
+    """:param G: The original graph on which the MDSA algorithm is ran.
 
-    :param G: The original graph on which the MDSA algorithm is ran.
     :param m: The amount of approximation iterations used in the MDSA
-    approximation.
+        approximation.
     :param rand_props:
-
     """
 
     rand_ceil = rand_props["rand_ceil"]

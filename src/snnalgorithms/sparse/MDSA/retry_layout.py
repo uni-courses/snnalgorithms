@@ -1,7 +1,7 @@
 """Specifies the plotting layout of the snn.
 
-TODO: instead of creating complicated relative positions, create a grid and
-pint the neurons on the grid intersections instead.
+TODO: instead of creating complicated relative positions, create a grid
+and pint the neurons on the grid intersections instead.
 """
 from typing import Dict, List, Optional, Tuple
 

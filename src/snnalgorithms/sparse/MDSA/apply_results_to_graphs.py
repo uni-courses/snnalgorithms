@@ -146,8 +146,26 @@ def set_mdsa_snn_results(
                 )
             else:
                 raise ValueError(f"Invalid graph name:{graph_name}")
-            # TODO: verify the results are set correctly.
 
+    # TODO: verify the results are set correctly.
+
+# @typechecked # TODO: restore.
+def print_mdsa_snn_results(
+    *,
+    stage_2_graphs: Dict,
+    desired_graph_name: str,
+    verbose: Optional[bool] = False,
+) -> None:
+    """Print snn results."""
+    if verbose:
+        for graph_name, snn in stage_2_graphs.items():
+            if graph_name == desired_graph_name:
+                if isinstance(snn, Simulator):
+                    graph_attributes = snn.network.graph.graph
+                else:
+                    graph_attributes = snn.graph
+                print(f"graph_name={graph_name}")
+                pprint(graph_attributes["results"])
 
 # @typechecked # TODO: restore.
 def assert_valid_results(
@@ -205,6 +223,7 @@ def assert_valid_results(
                 "v",
                 "vth",
             ]
+
             create_svg_plot(
                 graph_names=[graph_name],
                 graphs=graphs_dict,
@@ -341,14 +360,11 @@ def get_nx_LIF_count_without_redundancy(
     t: int,
 ) -> Dict:
     """Creates a dictionary with the node name and the the current as node
-    count.
-
-    # TODO: build support for Lava NX neuron.
+    count. # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
-    approximation.
+        approximation.
     """
     # Initialise the node counts
     node_counts = {}
@@ -387,9 +403,8 @@ def get_nx_LIF_count_with_redundancy(
     # TODO: build support for Lava NX neuron.
 
     :param G: The original graph on which the MDSA algorithm is ran.
-    :param snn:
     :param m: The amount of approximation iterations used in the MDSA
-    approximation.
+        approximation.
     """
     # Initialise the node counts.
     node_counts: Dict = {}
@@ -594,7 +609,7 @@ def counter_neuron_died(
 
 @typechecked
 def graph_has_dead_neurons(*, snn_graph: nx.DiGraph) -> bool:
-    """Checks whether the "rad_death" key is in any of the nodes of the graph,
+    """Checks whether the 'rad_death' key is in any of the nodes of the graph,
     and if it is, verifies it is in all of the nodes."""
     rad_death_found = False
     for node_name in snn_graph.nodes:

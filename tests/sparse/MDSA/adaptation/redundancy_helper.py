@@ -109,7 +109,6 @@ def perform_verification_for_each_spike_time(
             print(f"Error, t={t}, red={range(1,max_redundancy)}: nodes:")
             print(red_neuron_names)
             print(f"don't take over from:{dead_neuron_name}.")
-
             create_svg_plot(
                 graph_names=["adapted_snn_graph", "rad_adapted_snn_graph"],
                 graphs=graphs_dict,
