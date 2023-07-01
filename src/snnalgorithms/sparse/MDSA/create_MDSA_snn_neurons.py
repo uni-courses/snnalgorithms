@@ -127,6 +127,7 @@ def create_MDSA_neurons(
     )
 
     create_next_round_node(
+        degree_indices=degree_indices,
         mdsa_snn=mdsa_snn,
         nr_of_nodes=len(input_graph.nodes),
         plot_config=plot_config,
@@ -440,6 +441,7 @@ def create_counter_node(
 @typechecked
 def create_next_round_node(
     *,
+    degree_indices: Dict[int, int],
     mdsa_snn: nx.DiGraph,
     nr_of_nodes: int,
     plot_config: Plot_config,
@@ -455,14 +457,17 @@ def create_next_round_node(
         identifiers = [
             Identifier(description="m_val", position=0, value=m_val),
         ]
+        # TODO: find a better method to compute the y position of the
+        # next_round neurons.
         next_round_xy = tuple(
             get_node_position(
                 node_name="next_round",
                 plot_config=plot_config,
                 identifiers=identifiers,
                 run_config=run_config,
-                # m_val=m_val - 1,
                 m_val_max=run_config.algorithm["MDSA"]["m_val"] + 1,
+                degree_indices=degree_indices,
+                degree_index=nr_of_nodes - 1,  # To compute sum_height.
             )
         )
         lif_neuron = LIF_neuron(

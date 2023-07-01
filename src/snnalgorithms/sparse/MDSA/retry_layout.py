@@ -26,6 +26,7 @@ def get_cumulative_starting_height(
 ) -> float:
     """Returns the cumulative starting height for a node at some node index
     level."""
+
     if node_index == 0:
         return 0.0
     sum_height: float = 0
@@ -86,14 +87,12 @@ def degree_receiver_xy(
 def selector_xy(
     *,
     dx_node: float,
-    dy_node: float,
     m_val: int,
     sum_height: float,
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a selector node."""
     x = dx_node * (4 + 2 * m_val)
-    # Move selector nodes up with 1*dy_node to allow next_round node at y=0.
-    y = sum_height + 1 * dy_node
+    y = sum_height  # + 1 * dy_node
     return x, y
 
 
@@ -127,7 +126,12 @@ def terminator_xy(
 @typechecked
 def next_round_xy(
     *,
+    degree_indices: Dict[int, int],
+    max_node_count: int,
+    redundancy: int,
+    plot_config: Plot_config,
     dx_node: float,
+    dy_node: float,
     m_val: int,
 ) -> Tuple[float, float]:
     """Returns the  x and y coordinates of a next_round node.
@@ -135,7 +139,21 @@ def next_round_xy(
     Same x-coordinate as the selector node, except at y=0
     """
     x = dx_node * (4 + 2 * m_val)
-    y = 0
+
+    # Recompute the sum height with custom values to get the maximum sum
+    # height.
+    sum_height: float = (
+        get_cumulative_starting_height(  # type:ignore[arg-type]
+            degree_indices=degree_indices,
+            dy_node=plot_config.y_degree_receiver_spacing,
+            node_index=max_node_count,
+            node_redundancy=redundancy,
+            plot_config=plot_config,
+        )
+    )
+    # Move nextround nodes up with 1*dy_node to allow next_round node at y=0.
+    y = sum_height + 1 * dy_node
+    # exit()
     return (x, y)
 
 
@@ -161,8 +179,8 @@ def get_node_position(
         redundancy = run_config.adaptation.redundancy
 
     if degree_indices is not None:
-        if identifiers[0].description != "node_index":
-            raise ValueError("Error, node_index not found.")
+        # if identifiers[0].description != "node_index":
+        # raise ValueError("Error, node_index not found.")
         sum_height: float = (
             get_cumulative_starting_height(  # type:ignore[arg-type]
                 degree_indices=degree_indices,
@@ -220,7 +238,12 @@ def get_node_position(
 
     if node_name == "next_round":
         return next_round_xy(
+            degree_indices=degree_indices,
+            max_node_count=degree_index,
+            redundancy=redundancy,
+            plot_config=plot_config,
             dx_node=dx_node,
+            dy_node=dy_node,
             m_val=identifiers[0].value,
         )
 
