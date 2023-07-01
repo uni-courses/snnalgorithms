@@ -224,7 +224,6 @@ def get_node_position(
     if node_name == "selector":
         return selector_xy(
             dx_node=dx_node,
-            dy_node=dy_node,
             m_val=identifiers[1].value,
             sum_height=sum_height,
         )
